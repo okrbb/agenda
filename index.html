@@ -94,24 +94,57 @@
     #plotlySankey .sankey {
       overflow: visible !important;
     }
+
+    .scroll-top-btn {
+      position: fixed;
+      right: 1.25rem;
+      bottom: 1.25rem;
+      z-index: 60;
+      width: 3rem;
+      height: 3rem;
+      border-radius: 9999px;
+      border: 1px solid rgba(14, 116, 144, 0.4);
+      background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+      color: white;
+      box-shadow: 0 10px 25px rgba(14, 165, 233, 0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .scroll-top-btn:hover {
+      box-shadow: 0 14px 30px rgba(14, 165, 233, 0.45);
+      transform: translateY(-1px);
+    }
+
+    .scroll-top-btn.hidden {
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(10px);
+    }
   </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col antialiased selection:bg-sky-500 selection:text-white">
 
+  <button id="scrollToTopBtn" class="scroll-top-btn hidden" aria-label="Scroll na začiatok">
+    <i class="fa-solid fa-arrow-up text-lg"></i>
+  </button>
+
   <!-- Top Navigation Header -->
   <header class="bg-slate-900 text-white border-b border-slate-800 sticky top-0 z-40 shadow-md">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex items-center justify-between h-16">
+      <div class="flex items-center justify-between min-h-[4rem] py-3">
         <div class="flex items-center space-x-3">
           <div class="flex items-center justify-center text-white font-bold text-lg shadow">
             <img src="logo.svg" alt="BBK logo" class="w-20 h-20 object-contain" />
           </div>
-          <div>
+          <div class="space-y-1.5">
             <div class="flex items-center space-x-2">
               <span class="text-xs font-semibold tracking-wider text-sky-400 uppercase">Odbor krízového riadenia</span>
               <span class="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-slate-800 text-slate-300 rounded border border-slate-700">BBK</span>
             </div>
-            <h1 class="text-base sm:text-lg font-bold text-slate-100 leading-tight">Matica funkčnej zodpovednosti, rozdelenia agendy a kapacít</h1>
+            <h1 class="text-base sm:text-lg font-bold text-slate-100 leading-snug">Matica funkčnej zodpovednosti, rozdelenia agendy a kapacít</h1>
           </div>
         </div>
 
@@ -125,7 +158,7 @@
       </div>
 
       <!-- Navigation Tabs -->
-      <div class="flex space-x-1 sm:space-x-4 overflow-x-auto pt-1 border-t border-slate-800 text-sm font-medium">
+      <div class="flex flex-wrap items-center gap-1 sm:gap-2 pt-2 pb-1 border-t border-slate-800 text-sm font-medium">
         <button onclick="switchTab('sankeyTab')" id="tabBtn-sankeyTab" class="tab-btn py-2.5 px-3 border-b-2 border-sky-500 text-sky-400 font-semibold whitespace-nowrap flex items-center space-x-2 transition">
           <i class="fa-solid fa-diagram-project"></i>
           <span>Sankey tok kapacít</span>
@@ -145,6 +178,10 @@
         <button onclick="switchTab('districtsTab')" id="tabBtn-districtsTab" class="tab-btn py-2.5 px-3 border-b-2 border-transparent text-slate-400 hover:text-slate-200 whitespace-nowrap flex items-center space-x-2 transition">
           <i class="fa-solid fa-map-location-dot"></i>
           <span>Regióny & Okresy</span>
+        </button>
+        <button onclick="switchTab('comparisonTab')" id="tabBtn-comparisonTab" class="tab-btn py-2.5 px-3 border-b-2 border-transparent text-slate-400 hover:text-slate-200 whitespace-nowrap flex items-center space-x-2 transition">
+          <i class="fa-solid fa-scale-balanced"></i>
+          <span>Porovnanie</span>
         </button>
       </div>
     </div>
@@ -665,6 +702,263 @@
       </div>
     </div>
 
+    <!-- TAB 6: POROVNANIE SYSTÉMOV -->
+    <div id="comparisonTab" class="tab-content hidden space-y-6">
+      <div class="bg-gradient-to-r from-slate-900 via-slate-800 to-indigo-950 p-6 rounded-2xl text-white shadow-lg border border-slate-800">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-700/80">
+          <div>
+            <div class="flex items-center space-x-2 text-amber-400 text-xs font-bold uppercase tracking-wider mb-1">
+              <i class="fa-solid fa-award"></i>
+              <span>Strategická analýza transformácie Odboru krízového riadenia BBK</span>
+            </div>
+            <h2 class="text-xl sm:text-2xl font-black text-white">Prečo je nový systém preukázateľne lepší, efektívnejší a odolnejší?</h2>
+            <p class="text-xs sm:text-sm text-slate-300 mt-1 max-w-3xl">
+              Prechod z izolovaného okresného modelu (13 izolovaných ostrovov) na 4 funkčné územné regióny so špecializovanou maticou zodpovednosti a kaskádovým zásahom.
+            </p>
+          </div>
+          <div class="flex items-center space-x-2 shrink-0">
+            <button onclick="scrollToComparisonMatrix()" class="px-4 py-2 rounded-xl bg-sky-500 hover:bg-sky-600 text-white text-xs font-bold shadow-md transition flex items-center space-x-2">
+              <i class="fa-solid fa-table-list"></i>
+              <span>Porovnávacia matica okresov</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-5">
+          <div class="bg-slate-800/80 p-4 rounded-xl border border-slate-700 flex items-start space-x-3">
+            <div class="w-10 h-10 rounded-lg bg-rose-500/20 text-rose-400 flex items-center justify-center text-lg font-bold shrink-0">
+              <i class="fa-solid fa-sitemap"></i>
+            </div>
+            <div>
+              <div class="text-[11px] text-slate-400 font-semibold uppercase tracking-wider">Roztrieštenosť agend na pracovníka</div>
+              <div class="flex items-baseline space-x-2 mt-0.5">
+                <span class="text-sm line-through text-rose-400 font-bold">3,5 až 7 agend</span>
+                <i class="fa-solid fa-arrow-right text-xs text-slate-400"></i>
+                <span class="text-lg font-extrabold text-emerald-400">1 až 2 agendy</span>
+              </div>
+              <p class="text-[11px] text-slate-300 mt-1">
+                Koniec plytkej znalosti. Zamestnanec je hĺbkovým špecialistom a metodikom pre starostov.
+              </p>
+            </div>
+          </div>
+
+          <div class="bg-slate-800/80 p-4 rounded-xl border border-slate-700 flex items-start space-x-3">
+            <div class="w-10 h-10 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center text-lg font-bold shrink-0">
+              <i class="fa-solid fa-shield-halved"></i>
+            </div>
+            <div>
+              <div class="text-[11px] text-slate-400 font-semibold uppercase tracking-wider">Zastupiteľnosť pri PN a dovolenkách</div>
+              <div class="flex items-baseline space-x-2 mt-0.5">
+                <span class="text-sm line-through text-rose-400 font-bold">Kritická (0 až 1 osoba)</span>
+                <i class="fa-solid fa-arrow-right text-xs text-slate-400"></i>
+                <span class="text-lg font-extrabold text-emerald-400">100% v regióne</span>
+              </div>
+              <p class="text-[11px] text-slate-300 mt-1">
+                Odstránený „Single Point of Failure“. Partner v regióne okamžite preberá procesy.
+              </p>
+            </div>
+          </div>
+
+          <div class="bg-slate-800/80 p-4 rounded-xl border border-slate-700 flex items-start space-x-3">
+            <div class="w-10 h-10 rounded-lg bg-sky-500/20 text-sky-400 flex items-center justify-center text-lg font-bold shrink-0">
+              <i class="fa-solid fa-truck-fast"></i>
+            </div>
+            <div>
+              <div class="text-[11px] text-slate-400 font-semibold uppercase tracking-wider">Reakčný operačný model pri kríze</div>
+              <div class="flex items-baseline space-x-2 mt-0.5">
+                <span class="text-sm line-through text-rose-400 font-bold">Každý sám za seba</span>
+                <i class="fa-solid fa-arrow-right text-xs text-slate-400"></i>
+                <span class="text-lg font-extrabold text-emerald-400">3-stupňová kaskáda</span>
+              </div>
+              <p class="text-[11px] text-slate-300 mt-1">
+                Aktivácia susedov podľa dojazdových časov (napr. BS do KA len 25 minút).
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+        <div>
+          <h3 class="text-base font-bold text-slate-900 flex items-center space-x-2">
+            <i class="fa-solid fa-list-check text-sky-600"></i>
+            <span>4 kľúčové dôvody, prečo je nový systém neporovnateľne kvalitnejší</span>
+          </h3>
+          <p class="text-xs text-slate-500 mt-0.5">
+            Vecné, organizačné a právne argumenty podložené dátami z územia Banskobystrického kraja.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pt-2">
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 hover:border-sky-300 hover:bg-sky-50/20 transition flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="w-8 h-8 rounded-lg bg-rose-100 text-rose-700 font-bold text-xs flex items-center justify-center">01</span>
+                <span class="text-[10px] uppercase font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded border border-rose-200">Koniec roztrieštenosti</span>
+              </div>
+              <h4 class="text-sm font-bold text-slate-900 mb-1.5">Špecializácia namiesto „všetci robia všetko“</h4>
+              <p class="text-xs text-slate-600 leading-relaxed">
+                V starom systéme musel každý okres vykonávať všetkých 7 zložitých agend. Výsledkom bola povrchná znalosť a vysoké riziko procesných chýb.
+              </p>
+            </div>
+            <div class="mt-3 pt-2 border-t border-slate-200 text-[11px] font-semibold text-emerald-700 flex items-center space-x-1.5">
+              <i class="fa-solid fa-circle-check"></i>
+              <span>Nový stav: Expertíza v 2 agendách na špičkovej úrovni.</span>
+            </div>
+          </div>
+
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 hover:border-sky-300 hover:bg-sky-50/20 transition flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="w-8 h-8 rounded-lg bg-amber-100 text-amber-700 font-bold text-xs flex items-center justify-center">02</span>
+                <span class="text-[10px] uppercase font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">Odolnosť úradu</span>
+              </div>
+              <h4 class="text-sm font-bold text-slate-900 mb-1.5">Inštitucionálna krížová zastupiteľnosť</h4>
+              <p class="text-xs text-slate-600 leading-relaxed">
+                Nový systém prepája okresy do 4 regiónov, kde každú regionálnu agendu garantujú 2 odborníci v regióne a 8 v celom kraji.
+              </p>
+            </div>
+            <div class="mt-3 pt-2 border-t border-slate-200 text-[11px] font-semibold text-emerald-700 flex items-center space-x-1.5">
+              <i class="fa-solid fa-circle-check"></i>
+              <span>Nový stav: Okamžitá a prirodzená partnerská zastupiteľnosť.</span>
+            </div>
+          </div>
+
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 hover:border-sky-300 hover:bg-sky-50/20 transition flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-700 font-bold text-xs flex items-center justify-center">03</span>
+                <span class="text-[10px] uppercase font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-200">Reálna operačná prax</span>
+              </div>
+              <h4 class="text-sm font-bold text-slate-900 mb-1.5">Flexibilný zásah podľa dojazdových časov</h4>
+              <p class="text-xs text-slate-600 leading-relaxed">
+                Nový systém zaviedol pravidlo preukázateľného dojazdového času. Pri mimoriadnej udalosti v Krupine prichádza podpora od susedov podľa časov dojazdu.
+              </p>
+            </div>
+            <div class="mt-3 pt-2 border-t border-slate-200 text-[11px] font-semibold text-emerald-700 flex items-center space-x-1.5">
+              <i class="fa-solid fa-circle-check"></i>
+              <span>Nový stav: Pomoc prichádza do 20 – 45 minút bez byrokratických bariér.</span>
+            </div>
+          </div>
+
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 hover:border-sky-300 hover:bg-sky-50/20 transition flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="w-8 h-8 rounded-lg bg-purple-100 text-purple-700 font-bold text-xs flex items-center justify-center">04</span>
+                <span class="text-[10px] uppercase font-bold text-purple-600 bg-purple-50 px-2 py-0.5 rounded border border-purple-200">Spravodlivosť zaťaženia</span>
+              </div>
+              <h4 class="text-sm font-bold text-slate-900 mb-1.5">Koniec extrémnych disproporcií v zaťažení</h4>
+              <p class="text-xs text-slate-600 leading-relaxed">
+                V novom modeli sú veľké územia kryté regionálnymi špecialistami, čo rozptyľuje tlak na obrovské katastre a vytvára vyváženú distribúciu pracovnej záťaže.
+              </p>
+            </div>
+            <div class="mt-3 pt-2 border-t border-slate-200 text-[11px] font-semibold text-emerald-700 flex items-center space-x-1.5">
+              <i class="fa-solid fa-circle-check"></i>
+              <span>Nový stav: Vyvážená distribúcia pracovnej záťaže naprieč regiónom.</span>
+            </div>
+          </div>
+
+          <div class="p-4 rounded-xl bg-gradient-to-br from-slate-900 to-slate-800 text-white border border-slate-700 flex flex-col justify-between shadow-sm">
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <span class="w-8 h-8 rounded-lg bg-amber-400 text-slate-950 font-bold text-xs flex items-center justify-center">
+                  <i class="fa-solid fa-calculator"></i>
+                </span>
+                <span class="text-[10px] uppercase font-bold text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded border border-amber-400/30">Kvantifikácia</span>
+              </div>
+              <h4 class="text-sm font-bold text-white mb-1.5">Agendový index zaťaženia</h4>
+              <div class="space-y-2 text-xs text-slate-300 mt-2">
+                <div class="flex justify-between pb-1 border-b border-slate-700">
+                  <span>Starý model (13 × 7 agend):</span>
+                  <span class="font-bold text-rose-400 font-mono-code">91 agendových uzlov</span>
+                </div>
+                <div class="flex justify-between pb-1 border-b border-slate-700">
+                  <span>Nový model (funkčná matica):</span>
+                  <span class="font-bold text-emerald-400 font-mono-code">37 alokovaných špecializácií</span>
+                </div>
+                <div class="flex justify-between font-semibold text-sky-300">
+                  <span>Redukcia administratívnej roztrieštenosti:</span>
+                  <span class="font-bold font-mono-code">-59,3 %</span>
+                </div>
+              </div>
+            </div>
+            <p class="text-[10px] text-slate-400 mt-3 pt-2 border-t border-slate-700 italic">
+              Prednosta OÚ a vedúci odboru KR koordinujú kompaktný systém 4 regiónov namiesto 13 nekoordinovaných ostrovov.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div id="districtComparisonAnchor" class="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+          <div>
+            <h3 class="text-base font-bold text-slate-900 flex items-center space-x-2">
+              <i class="fa-solid fa-table-list text-sky-600"></i>
+              <span>Podrobné porovnanie okres po okrese (Starý vs. Nový systém)</span>
+            </h3>
+          </div>
+
+          <div class="flex items-center space-x-2 text-xs">
+            <span class="text-slate-500 font-medium">Zvýrazniť:</span>
+            <button onclick="highlightCompRows('all')" id="compFilter-all" class="px-2.5 py-1 rounded-md bg-slate-900 text-white font-semibold">Všetky (13)</button>
+            <button onclick="highlightCompRows('critical')" id="compFilter-critical" class="px-2.5 py-1 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium">Najviac ohrozené v starom systéme</button>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto rounded-xl border border-slate-200">
+          <table class="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr class="bg-slate-900 text-white uppercase text-[11px] tracking-wider">
+                <th class="p-3 border-r border-slate-800">Okres (Kód)</th>
+                <th class="p-3 text-center border-r border-slate-800">Počet obcí</th>
+                <th class="p-3 text-center border-r border-slate-800">FTE</th>
+                <th class="p-3 bg-rose-950/60 text-rose-200 border-r border-slate-800">
+                  <div class="font-bold flex items-center space-x-1">
+                    <i class="fa-solid fa-circle-xmark text-rose-400"></i>
+                    <span>Starý systém (Každý okres všetkých 7 agend)</span>
+                  </div>
+                  <div class="text-[10px] font-normal text-rose-300 lowercase">Bez regiónov, bez koordinácie</div>
+                </th>
+                <th class="p-3 bg-emerald-950/60 text-emerald-200">
+                  <div class="font-bold flex items-center space-x-1">
+                    <i class="fa-solid fa-circle-check text-emerald-400"></i>
+                    <span>Nový systém (Regióny & Funkčná špecializácia)</span>
+                  </div>
+                  <div class="text-[10px] font-normal text-emerald-300 lowercase">4 regióny, kaskáda, garancia zastúpenia</div>
+                </th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-200" id="comparisonTableBody">
+            </tbody>
+            <tfoot>
+              <tr class="bg-slate-100 font-bold text-slate-800 border-t-2 border-slate-300">
+                <td class="p-3 border-r border-slate-200">SPOLU (Banskobystrický kraj)</td>
+                <td class="p-3 text-center border-r border-slate-200 font-mono-code">516</td>
+                <td class="p-3 text-center border-r border-slate-200 font-mono-code">37</td>
+                <td class="p-3 border-r border-slate-200 bg-rose-50/70 text-rose-900">
+                  13 okresov × 7 agend = <strong>91 paralelných agendových uzlov</strong>. Nulová garantovaná zastupiteľnosť v 2-členných okresoch.
+                </td>
+                <td class="p-3 bg-emerald-50/70 text-emerald-900">
+                  <strong>4 integrované regióny</strong>. 37 špecializovaných miest. 100% krížová zastupiteľnosť a operačný dojazd do 20 – 45 min.
+                </td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+
+        <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-600 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div class="flex items-center space-x-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
+            <span>Červený riadok indikuje okresy s 2 zamestnancami, ktoré boli v starom systéme v kritickom riziku kolapsu.</span>
+          </div>
+          <button onclick="switchTab('matrixTab')" class="text-sky-600 hover:text-sky-800 font-bold flex items-center space-x-1 shrink-0">
+            <span>Zobraziť farebnú maticu pokrytia</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
   </main>
 
   <!-- Modal Dialog for Cell/District Inspection -->
@@ -873,23 +1167,107 @@
       return AGENDAS.find(a => a.id === id);
     }
 
+    function scrollToComparisonMatrix() {
+      const el = document.getElementById('districtComparisonAnchor');
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function renderComparisonTable(filter = 'all') {
+      const tbody = document.getElementById('comparisonTableBody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      DISTRICT_COMPARISON_DATA.forEach(d => {
+        if (filter === 'critical' && !d.isCritical) return;
+
+        const tr = document.createElement('tr');
+        tr.className = `hover:bg-slate-50 transition ${d.isCritical ? 'bg-rose-50/25' : ''}`;
+
+        const isCriticalBadge = d.isCritical
+          ? '<span class="px-1.5 py-0.2 rounded text-[9px] font-bold bg-rose-100 text-rose-800 ml-1.5" title="Kritické ohrozenie v starom systéme">2 FTE</span>'
+          : '';
+
+        tr.innerHTML = `
+          <td class="p-3 font-medium border-r border-slate-200">
+            <div class="flex items-center space-x-2">
+              <span class="font-bold text-slate-900">${d.name} (${d.id})</span>
+              ${isCriticalBadge}
+            </div>
+            <div class="text-[10px] text-slate-400">Región: ${d.region}</div>
+          </td>
+          <td class="p-3 text-center border-r border-slate-200 font-mono-code font-semibold text-slate-800">${d.villages}</td>
+          <td class="p-3 text-center border-r border-slate-200 font-mono-code font-bold text-sky-700">${d.fte} FTE</td>
+          <td class="p-3 border-r border-slate-200 bg-rose-50/40 text-slate-700">
+            <div class="flex items-center space-x-1.5 text-rose-700 font-semibold mb-1">
+              <i class="fa-solid fa-triangle-exclamation text-xs"></i>
+              <span>Všetkých 7 agend bez podpory</span>
+            </div>
+            <p class="text-[11px] leading-relaxed text-slate-600">${d.oldNote}</p>
+          </td>
+          <td class="p-3 bg-emerald-50/40 text-slate-700">
+            <div class="flex items-center space-x-1.5 text-emerald-700 font-semibold mb-1">
+              <i class="fa-solid fa-shield-check text-xs"></i>
+              <span>Cielená funkčná špecializácia</span>
+            </div>
+            <p class="text-[11px] leading-relaxed text-slate-600">${d.newNote}</p>
+          </td>
+        `;
+
+        tbody.appendChild(tr);
+      });
+    }
+
+    function highlightCompRows(mode) {
+      const btnAll = document.getElementById('compFilter-all');
+      const btnCrit = document.getElementById('compFilter-critical');
+      if (mode === 'all') {
+        btnAll.className = 'px-2.5 py-1 rounded-md bg-slate-900 text-white font-semibold';
+        btnCrit.className = 'px-2.5 py-1 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium';
+      } else {
+        btnCrit.className = 'px-2.5 py-1 rounded-md bg-rose-700 text-white font-semibold';
+        btnAll.className = 'px-2.5 py-1 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium';
+      }
+      renderComparisonTable(mode);
+    }
+
+    const DISTRICT_COMPARISON_DATA = [
+      { id: "BB", name: "Banská Bystrica", villages: 42, fte: 7, region: "SEVER", oldNote: "7 zamestnancov robilo 7 agend pre okres BB a zároveň neprehľadne riadilo celý kraj. Preťaženie koordináciou.", newNote: "Krajské agendy (AG1, AG5, AG7) sú jasne inštitucionalizované. Zostáva plná špecializácia pre severný región." },
+      { id: "BS", name: "Banská Štiavnica", villages: 15, fte: 2, region: "ZÁPAD", isCritical: true, oldNote: "2 zamestnanci museli obsluhovať všetkých 7 agend (3,5 agendy na osobu). Pri PN jedného človeka hrozil výpadok 50 % a paralýza.", newNote: "Špecializuje sa iba na AG4 a AG6. Zastupiteľnosť na AG2 a AG3 plne garantujú partneri v regióne (ZV, ZC, ZH)." },
+      { id: "BR", name: "Brezno", villages: 30, fte: 3, region: "SEVER", oldNote: "3 zamestnanci obsluhovali všetkých 7 agend na 30 obcí v náročnom horskom teréne.", newNote: "Garantuje AG1, AG2 a AG3 v regióne SEVER v tandeme so sídlom kraja BB." },
+      { id: "DT", name: "Detva", villages: 15, fte: 2, region: "VÝCHOD", isCritical: true, oldNote: "2 zamestnanci robili všetkých 7 agend. Izolované pracovisko bez systémovej podpory susedov.", newNote: "Zameriava sa výhradne na AG2 a AG3. Ostatné agendy riešia partnerské okresy Poltár a Rimavská Sobota." },
+      { id: "KA", name: "Krupina", villages: 36, fte: 2, region: "JUH", isCritical: true, oldNote: "2 zamestnanci robili 7 agend pre 36 obcí (18 obcí na osobu cez 7 zákonných agend = 126 agendových zaťažení!).", newNote: "Špecializácia na AG3 a AG4. Pri zásahu ťaží z dojazdu z Banskej Štiavnice (len 25 minút)." },
+      { id: "LC", name: "Lučenec", villages: 57, fte: 3, region: "JUH", oldNote: "3 zamestnanci pokrývali všetkých 7 agend pre 57 obcí vrátane zložitej protipovodňovej a materiálnej agendy.", newNote: "Plné zameranie na AG2, AG3 a AG6 s priamou synergickou väzbou na Poltár a Rimavskú Sobotu." },
+      { id: "PT", name: "Poltár", villages: 22, fte: 2, region: "VÝCHOD", isCritical: true, oldNote: "2 zamestnanci museli zvládať všetkých 7 agend. Absencia hĺbkovej metodiky.", newNote: "Špecializuje sa na AG4 a AG6. Mimoriadne rýchla výpomoc z Lučenca (20 minút)." },
+      { id: "RA", name: "Revúca", villages: 42, fte: 2, region: "SEVER", isCritical: true, oldNote: "2 zamestnanci robili 7 agend pre 42 obcí v odľahlom regióne. Dojazd z krajského sídla BB až 1:30 h!", newNote: "Špecializuje sa na AG4 a AG6. Operačnú podporu zabezpečuje Brezno (53 min) a Rimavská Sobota." },
+      { id: "RS", name: "Rimavská Sobota", villages: 107, fte: 4, region: "VÝCHOD", oldNote: "4 zamestnanci robili 7 agend pre extrémny počet 107 obcí. Enormné zaťaženie kontrolami a správnymi konaniami.", newNote: "Špecializovaný uzol východu (AG2, AG3, AG4, AG6). Spoločne s Detvou a Poltárom vyvážené zaťaženie." },
+      { id: "VK", name: "Veľký Krtíš", villages: 71, fte: 3, region: "JUH", oldNote: "3 zamestnanci na 71 obcí a 7 agend (veľký pohraničný okres s vysokou rozlohou).", newNote: "Zameranie na AG2, AG4 a AG6 v regióne JUH. Vzájomná podpora s Lučencom a Krupinou." },
+      { id: "ZC", name: "Žarnovica", villages: 18, fte: 2, region: "ZÁPAD", isCritical: true, oldNote: "2 zamestnanci robili všetkých 7 agend. Zraniteľnosť pri práceneschopnosti.", newNote: "Špecializácia na AG2 a AG4. Okamžitý dojazd zo Žiaru nad Hronom po R1 za 15 minút." },
+      { id: "ZH", name: "Žiar nad Hronom", villages: 35, fte: 2, region: "ZÁPAD", isCritical: true, oldNote: "2 zamestnanci na 35 obcí a 7 agend. Vysoká priemyselná záťaž.", newNote: "Špecializácia na AG3 (stavebné konania, ukrytie) a AG6 (mobilizácia) v tandemovom zväzku ZÁPAD." },
+      { id: "ZV", name: "Zvolen", villages: 26, fte: 3, region: "ZÁPAD", oldNote: "3 zamestnanci na 7 agend a 26 obcí, duplicita s krajským sídlom Banská Bystrica.", newNote: "Strategický uzol: AG2, AG3 a garant celokrajskej logistiky skladov CO (AG5) spolu s BB." }
+    ];
+
     /* =========================================================================
        2. TAB NAVIGATION
        ========================================================================= */
 
     function switchTab(tabId) {
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
       currentTab = tabId;
       document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
       const activeContent = document.getElementById(tabId);
       if (activeContent) activeContent.classList.remove('hidden');
 
       document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.classList.remove('border-sky-500', 'text-sky-400', 'font-semibold');
+        btn.classList.remove('border-sky-500', 'text-sky-400', 'border-amber-400', 'text-amber-300', 'font-semibold');
         btn.classList.add('border-transparent', 'text-slate-400');
       });
       const activeBtn = document.getElementById('tabBtn-' + tabId);
       if (activeBtn) {
-        activeBtn.classList.add('border-sky-500', 'text-sky-400', 'font-semibold');
+        if (tabId === 'comparisonTab') {
+          activeBtn.classList.add('border-amber-400', 'text-amber-300', 'font-semibold');
+        } else {
+          activeBtn.classList.add('border-sky-500', 'text-sky-400', 'font-semibold');
+        }
         activeBtn.classList.remove('border-transparent', 'text-slate-400');
       }
 
@@ -2193,6 +2571,15 @@
        ========================================================================= */
 
     window.addEventListener('DOMContentLoaded', () => {
+      const scrollToTopBtn = document.getElementById('scrollToTopBtn');
+
+      function updateScrollTopButton() {
+        if (!scrollToTopBtn) return;
+        const shouldShow = window.scrollY > 280;
+        scrollToTopBtn.classList.toggle('hidden', !shouldShow);
+      }
+
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
       renderSankey();
       setTimeout(() => {
         Plotly.Plots.resize('plotlySankey').then(() => {
@@ -2202,9 +2589,23 @@
       renderMatrix();
       renderAgendasCatalog();
       renderRegionsOverview();
+      renderComparisonTable('all');
       renderTravelMatrixTable('KA');
       runDispatchSimulation();
+      updateScrollTopButton();
+
+      if (scrollToTopBtn) {
+        scrollToTopBtn.addEventListener('click', () => {
+          window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+        });
+      }
     });
+
+    window.addEventListener('scroll', () => {
+      const scrollToTopBtn = document.getElementById('scrollToTopBtn');
+      if (!scrollToTopBtn) return;
+      scrollToTopBtn.classList.toggle('hidden', window.scrollY <= 280);
+    }, { passive: true });
 
     window.addEventListener('resize', () => {
       setTimeout(alignSankeyLabels, 150);
