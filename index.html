@@ -1,0 +1,1907 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Matica funkčnej zodpovednosti a Tok kapacít OKR BBK</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0f7ff',
+              100: '#e0effe',
+              500: '#0284c7',
+              600: '#0369a1',
+              700: '#075985',
+              800: '#0c4a6e',
+              900: '#082f49'
+            },
+            ag1: '#c00000',
+            ag2: '#66a344',
+            ag3: '#2e75b6',
+            ag4: '#c55a11',
+            ag5: '#990000',
+            ag6: '#7030a0',
+            ag7: '#7a0016'
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Google Font: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <!-- Plotly.js for interactive Sankey -->
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+    .font-mono-code {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    /* Custom scrollbars */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+
+    /* High-contrast halo & crisp legibility for all Sankey labels */
+    #plotlySankey text,
+    .sankey-node text,
+    .node-label text,
+    g.node-label text {
+      font-weight: 700 !important;
+      paint-order: stroke fill !important;
+      stroke: #ffffff !important;
+      stroke-width: 4px !important;
+      stroke-linecap: round !important;
+      stroke-linejoin: round !important;
+      fill: #0f172a !important;
+      letter-spacing: 0.015em !important;
+      cursor: default !important;
+      user-select: none !important;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col antialiased selection:bg-sky-500 selection:text-white">
+
+  <!-- Top Navigation Header -->
+  <header class="bg-slate-900 text-white border-b border-slate-800 sticky top-0 z-40 shadow-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-sky-500 to-blue-700 flex items-center justify-center text-white font-bold text-lg shadow">
+            <i class="fa-solid fa-shield-halved"></i>
+          </div>
+          <div>
+            <div class="flex items-center space-x-2">
+              <span class="text-xs font-semibold tracking-wider text-sky-400 uppercase">Odbor krízového riadenia</span>
+              <span class="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-slate-800 text-slate-300 rounded border border-slate-700">BBK</span>
+            </div>
+            <h1 class="text-base sm:text-lg font-bold text-slate-100 leading-tight">Matica funkčnej zodpovednosti a kapacít</h1>
+          </div>
+        </div>
+
+        <!-- Status Summary Badge -->
+        <div class="flex items-center space-x-3">
+          <div class="flex items-center space-x-2 px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-800/90 text-slate-300 border border-slate-700/80">
+            <i class="fa-solid fa-shield text-sky-400"></i>
+            <span>37 FTE • 13 okresov • 4 regióny</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <div class="flex space-x-1 sm:space-x-4 overflow-x-auto pt-1 border-t border-slate-800 text-sm font-medium">
+        <button onclick="switchTab('sankeyTab')" id="tabBtn-sankeyTab" class="tab-btn py-2.5 px-3 border-b-2 border-sky-500 text-sky-400 font-semibold whitespace-nowrap flex items-center space-x-2 transition">
+          <i class="fa-solid fa-diagram-project"></i>
+          <span>Sankey tok kapacít</span>
+        </button>
+        <button onclick="switchTab('matrixTab')" id="tabBtn-matrixTab" class="tab-btn py-2.5 px-3 border-b-2 border-transparent text-slate-400 hover:text-slate-200 whitespace-nowrap flex items-center space-x-2 transition">
+          <i class="fa-solid fa-table-cells"></i>
+          <span>Kompaktná matica pokrytia</span>
+        </button>
+        <button onclick="switchTab('cascadeTab')" id="tabBtn-cascadeTab" class="tab-btn py-2.5 px-3 border-b-2 border-transparent text-slate-400 hover:text-slate-200 whitespace-nowrap flex items-center space-x-2 transition">
+          <i class="fa-solid fa-truck-medical"></i>
+          <span>Kaskádový model & Dojazdy</span>
+        </button>
+        <button onclick="switchTab('agendasTab')" id="tabBtn-agendasTab" class="tab-btn py-2.5 px-3 border-b-2 border-transparent text-slate-400 hover:text-slate-200 whitespace-nowrap flex items-center space-x-2 transition">
+          <i class="fa-solid fa-list-check"></i>
+          <span>Katalóg agend (AG1–AG7)</span>
+        </button>
+        <button onclick="switchTab('districtsTab')" id="tabBtn-districtsTab" class="tab-btn py-2.5 px-3 border-b-2 border-transparent text-slate-400 hover:text-slate-200 whitespace-nowrap flex items-center space-x-2 transition">
+          <i class="fa-solid fa-map-location-dot"></i>
+          <span>Regióny & Okresy</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Container -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+    <!-- Executive KPI Metrics Strip -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-6">
+      <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-lg bg-sky-100 text-sky-700 flex items-center justify-center font-bold text-lg">
+          <i class="fa-solid fa-users"></i>
+        </div>
+        <div>
+          <div class="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Celková kapacita</div>
+          <div class="text-xl font-bold text-slate-900">37 <span class="text-xs font-normal text-slate-500">FTE</span></div>
+        </div>
+      </div>
+
+      <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-lg">
+          <i class="fa-solid fa-layer-group"></i>
+        </div>
+        <div>
+          <div class="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Územné regióny</div>
+          <div class="text-xl font-bold text-slate-900">4 <span class="text-xs font-normal text-slate-500">oblasti</span></div>
+        </div>
+      </div>
+
+      <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-lg">
+          <i class="fa-solid fa-building-columns"></i>
+        </div>
+        <div>
+          <div class="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Okresné pracoviská</div>
+          <div class="text-xl font-bold text-slate-900">13 <span class="text-xs font-normal text-slate-500">úradov</span></div>
+        </div>
+      </div>
+
+      <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center font-bold text-lg">
+          <i class="fa-solid fa-city"></i>
+        </div>
+        <div>
+          <div class="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Spádových obcí</div>
+          <div class="text-xl font-bold text-slate-900">516 <span class="text-xs font-normal text-slate-500">samospráv</span></div>
+        </div>
+      </div>
+
+      <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm flex items-center space-x-3 col-span-2 sm:col-span-1">
+        <div class="w-10 h-10 rounded-lg bg-rose-100 text-rose-700 flex items-center justify-center font-bold text-lg">
+          <i class="fa-solid fa-star"></i>
+        </div>
+        <div>
+          <div class="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Celokrajské agendy</div>
+          <div class="text-xl font-bold text-slate-900">3 <span class="text-xs font-normal text-slate-500">[KRAJ: 1, 5, 7]</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 1: SANKEY DIAGRAM (TOK KAPACÍT) -->
+    <div id="sankeyTab" class="tab-content block space-y-4">
+      <div class="bg-white p-4 sm:p-6 rounded-2xl border border-slate-200 shadow-sm">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+          <div>
+            <h2 class="text-lg font-bold text-slate-900 flex items-center space-x-2">
+              <i class="fa-solid fa-diagram-project text-sky-600"></i>
+              <span>Sankey diagram toku kapacít: Agendy → Oblasti → Okresy</span>
+            </h2>
+            <p class="text-xs sm:text-sm text-slate-500 mt-0.5">
+              Názvy agend sú vysunuté <strong>vľavo pred hada</strong> a okresy <strong>vpravo za hada</strong> pre 100% čitateľnosť bez prekrývania tokov.
+            </p>
+          </div>
+
+          <!-- Controls for Sankey -->
+          <div class="flex flex-wrap items-center gap-2">
+            <div class="bg-slate-100 p-1 rounded-lg flex text-xs font-medium border border-slate-200">
+              <button onclick="setSankeyMode('three-tier')" id="btnSankeyTier3" class="px-3 py-1.5 rounded-md bg-white text-slate-800 shadow-sm font-semibold transition">
+                3 Úrovne (s regiónmi)
+              </button>
+              <button onclick="setSankeyMode('direct')" id="btnSankeyDirect" class="px-3 py-1.5 rounded-md text-slate-600 hover:text-slate-900 transition">
+                Priamy tok (Agenda → Okres)
+              </button>
+            </div>
+
+            <button onclick="resetSankeyView()" class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-medium shadow-sm transition flex items-center space-x-1.5">
+              <i class="fa-solid fa-arrows-rotate text-slate-400"></i>
+              <span>Resetovať zobrazenie</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Legend for Agenda Colors -->
+        <div class="py-3 flex flex-wrap items-center gap-2 border-b border-slate-100 text-xs">
+          <span class="font-semibold text-slate-600 mr-1">Farby agend:</span>
+          <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-red-50 text-red-800 border border-red-200">
+            <span class="w-2.5 h-2.5 rounded-full bg-[#c00000] mr-1.5"></span> AG1: Prevencia, CBRN (2)
+          </span>
+          <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-green-50 text-green-800 border border-green-200">
+            <span class="w-2.5 h-2.5 rounded-full bg-[#66a344] mr-1.5"></span> AG2: IS CO & Varovanie (8)
+          </span>
+          <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-blue-50 text-blue-800 border border-blue-200">
+            <span class="w-2.5 h-2.5 rounded-full bg-[#2e75b6] mr-1.5"></span> AG3: Ukrytie & Stavby (8)
+          </span>
+          <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-amber-50 text-amber-800 border border-amber-200">
+            <span class="w-2.5 h-2.5 rounded-full bg-[#c55a11] mr-1.5"></span> AG4: Evakuácia & ŠHR (8)
+          </span>
+          <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-rose-50 text-rose-800 border border-rose-200">
+            <span class="w-2.5 h-2.5 rounded-full bg-[#990000] mr-1.5"></span> AG5: Materiál & Sklady (2)
+          </span>
+          <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-purple-50 text-purple-800 border border-purple-200">
+            <span class="w-2.5 h-2.5 rounded-full bg-[#7030a0] mr-1.5"></span> AG6: Mobilizácia & EPSIS (8)
+          </span>
+          <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-rose-50 text-rose-900 border border-rose-300">
+            <span class="w-2.5 h-2.5 rounded-full bg-[#7a0016] mr-1.5"></span> AG7: Bezpečnostné rady (1)
+          </span>
+        </div>
+
+        <!-- The Plotly Graph Container -->
+        <div class="relative w-full h-[720px] bg-white rounded-xl overflow-hidden pt-2" id="plotlySankeyWrapper">
+          <div id="plotlySankey" class="w-full h-full"></div>
+          <div id="sankeyLoading" class="absolute inset-0 bg-white/80 flex items-center justify-center text-sm font-medium text-slate-600 hidden">
+            <i class="fa-solid fa-spinner fa-spin text-sky-600 text-xl mr-2"></i> Načítavam diagram tokov...
+          </div>
+        </div>
+
+        <!-- Insights footer -->
+        <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3 text-xs bg-slate-50 p-3.5 rounded-xl border border-slate-200 text-slate-600">
+          <div class="flex items-start space-x-2">
+            <i class="fa-solid fa-circle-check text-emerald-600 mt-0.5"></i>
+            <span><strong>Perfektná symetria kľúčových agend:</strong> Agendy AG2, AG3, AG4 a AG6 majú presne 2 úväzky v každej zo 4 oblastí BBK.</span>
+          </div>
+          <div class="flex items-start space-x-2">
+            <i class="fa-solid fa-circle-info text-sky-600 mt-0.5"></i>
+            <span><strong>Centralizácia krajských agend:</strong> AG1 (2 FTE) v BB a BR, AG5 (2 FTE) v BB a ZV, AG7 (1 FTE) výlučne v BB.</span>
+          </div>
+          <div class="flex items-start space-x-2">
+            <i class="fa-solid fa-arrows-split-up-and-left text-purple-600 mt-0.5"></i>
+            <span><strong>Interaktivita:</strong> Kliknite na uzol alebo prejdite kurzorom po prúde pre zvýraznenie toku konkrétneho funkčného miesta.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: KOMPAKTNÁ MATICA POKRYTIA -->
+    <div id="matrixTab" class="tab-content hidden space-y-4">
+      <div class="bg-white p-4 sm:p-6 rounded-2xl border border-slate-200 shadow-sm">
+        
+        <!-- Header & Matrix Filters -->
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+          <div>
+            <h2 class="text-lg font-bold text-slate-900 flex items-center space-x-2">
+              <i class="fa-solid fa-table-cells text-sky-600"></i>
+              <span>Kompaktná matica funkčnej zodpovednosti (Heatmap)</span>
+            </h2>
+            <p class="text-xs sm:text-sm text-slate-500 mt-0.5">
+              Skonsolidovaný prehľad 7 odborných agend naprieč 13 okresnými pracoviskami BBK.
+            </p>
+          </div>
+
+          <!-- Region Filter Buttons -->
+          <div class="flex flex-wrap items-center gap-1.5 text-xs font-medium">
+            <span class="text-slate-500 mr-1 font-semibold">Filter:</span>
+            <button onclick="filterMatrix('all')" id="filter-all" class="px-2.5 py-1 rounded-md bg-slate-900 text-white shadow-sm font-semibold transition">Všetky (13)</button>
+            <button onclick="filterMatrix('sever')" id="filter-sever" class="px-2.5 py-1 rounded-md bg-slate-100 text-slate-700 hover:bg-slate-200 transition flex items-center space-x-1">
+              <span class="w-2 h-2 rounded-full inline-block" style="background-color: #4F6228;"></span>
+              <span>Sever (3)</span>
+            </button>
+            <button onclick="filterMatrix('zapad')" id="filter-zapad" class="px-2.5 py-1 rounded-md bg-slate-100 text-slate-700 hover:bg-slate-200 transition flex items-center space-x-1">
+              <span class="w-2 h-2 rounded-full inline-block" style="background-color: #403152;"></span>
+              <span>Západ (4)</span>
+            </button>
+            <button onclick="filterMatrix('juh')" id="filter-juh" class="px-2.5 py-1 rounded-md bg-slate-100 text-slate-700 hover:bg-slate-200 transition flex items-center space-x-1">
+              <span class="w-2 h-2 rounded-full inline-block" style="background-color: #984806;"></span>
+              <span>Juh (3)</span>
+            </button>
+            <button onclick="filterMatrix('vychod')" id="filter-vychod" class="px-2.5 py-1 rounded-md bg-slate-100 text-slate-700 hover:bg-slate-200 transition flex items-center space-x-1">
+              <span class="w-2 h-2 rounded-full inline-block" style="background-color: #215868;"></span>
+              <span>Východ (3)</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Matrix Controls & Legend -->
+        <div class="py-3 flex flex-wrap items-center justify-between gap-3 text-xs border-b border-slate-100">
+          <div class="flex items-center space-x-2">
+            <span class="text-slate-500">Veľkosť dlaždíc:</span>
+            <button onclick="setMatrixCellMode('standard')" id="matrixModeStandard" class="px-2.5 py-1 rounded border border-sky-300 bg-sky-50 text-sky-800 font-semibold transition">Štandardná</button>
+            <button onclick="setMatrixCellMode('compact')" id="matrixModeCompact" class="px-2.5 py-1 rounded border border-slate-200 bg-white text-slate-600 hover:bg-slate-100 transition">Kompaktná</button>
+          </div>
+
+          <div class="flex items-center space-x-4">
+            <div class="flex items-center space-x-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-amber-400 ring-1 ring-amber-500"></span>
+              <span class="text-slate-600">= Celokrajská pôsobnosť (KRAJ)</span>
+            </div>
+            <div class="flex items-center space-x-2">
+              <span class="w-2 h-2 rounded-full bg-slate-200"></span>
+              <span class="text-slate-500">= Bez priamej alokácie na úrade</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Responsive Matrix Table Container -->
+        <div class="overflow-x-auto mt-4 rounded-xl border border-slate-200">
+          <table class="w-full text-left border-collapse" id="coverageTable">
+            <thead>
+              <tr class="bg-slate-900 text-white text-xs font-semibold uppercase tracking-wider">
+                <th class="p-3 w-44 sticky left-0 z-20 bg-slate-900 border-r border-slate-800">Agenda / Kód</th>
+                <th class="p-3 w-28 text-center border-r border-slate-800">Typ</th>
+                <!-- Region Headers with updated palette colors -->
+                <th colspan="3" class="p-2 text-center border-r border-slate-900/30 text-white font-semibold" style="background-color: #4F6228;" data-region="sever">Banská Bystrica - SEVER</th>
+                <th colspan="4" class="p-2 text-center border-r border-slate-900/30 text-white font-semibold" style="background-color: #403152;" data-region="zapad">Banská Bystrica - ZÁPAD</th>
+                <th colspan="3" class="p-2 text-center border-r border-slate-900/30 text-white font-semibold" style="background-color: #984806;" data-region="juh">Banská Bystrica - JUH</th>
+                <th colspan="3" class="p-2 text-center border-r border-slate-900/30 text-white font-semibold" style="background-color: #215868;" data-region="vychod">Banská Bystrica - VÝCHOD</th>
+                <th class="p-3 w-20 text-center bg-slate-900 text-amber-400 font-bold">Spolu FTE</th>
+              </tr>
+              <tr class="bg-slate-100 text-slate-700 text-xs font-semibold border-b border-slate-200">
+                <th class="p-2.5 sticky left-0 z-20 bg-slate-100 border-r border-slate-200">Názov agendy</th>
+                <th class="p-2.5 text-center border-r border-slate-200">Pôsobnosť</th>
+                <!-- Districts: BB, BR, RA -->
+                <th class="p-2 text-center border-r border-slate-200 hover:bg-slate-200 cursor-pointer" onclick="showDistrictModal('BB')" data-dist="BB" data-region="sever" title="Banská Bystrica (7 FTE)">BB <span class="text-[10px] text-slate-500 font-normal block">7 FTE</span></th>
+                <th class="p-2 text-center border-r border-slate-200 hover:bg-slate-200 cursor-pointer" onclick="showDistrictModal('BR')" data-dist="BR" data-region="sever" title="Brezno (3 FTE)">BR <span class="text-[10px] text-slate-500 font-normal block">3 FTE</span></th>
+                <th class="p-2 text-center border-r border-slate-300 hover:bg-slate-200 cursor-pointer" onclick="showDistrictModal('RA')" data-dist="RA" data-region="sever" title="Revúca (2 FTE)">RA <span class="text-[10px] text-slate-500 font-normal block">2 FTE</span></th>
+                
+                <!-- Districts: ZV, ZC, ZH, BS -->
+                <th class="p-2 text-center border-r border-slate-200 hover:bg-slate-200 cursor-pointer" onclick="showDistrictModal('ZV')" data-dist="ZV" data-region="zapad" title="Zvolen (3 FTE)">ZV <span class="text-[10px] text-slate-500 font-normal block">3 FTE</span></th>
+                <th class="p-2 text-center border-r border-slate-200 hover:bg-slate-200 cursor-pointer" onclick="showDistrictModal('ZC')" data-dist="ZC" data-region="zapad" title="Žarnovica (2 FTE)">ZC <span class="text-[10px] text-slate-500 font-normal block">2 FTE</span></th>
+                <th class="p-2 text-center border-r border-slate-200 hover:bg-slate-200 cursor-pointer" onclick="showDistrictModal('ZH')" data-dist="ZH" data-region="zapad" title="Žiar nad Hronom (2 FTE)">ZH <span class="text-[10px] text-slate-500 font-normal block">2 FTE</span></th>
+                <th class="p-2 text-center border-r border-slate-300 hover:bg-slate-200 cursor-pointer" onclick="showDistrictModal('BS')" data-dist="BS" data-region="zapad" title="Banská Štiavnica (2 FTE)">BS <span class="text-[10px] text-slate-500 font-normal block">2 FTE</span></th>
+                
+                <!-- Districts: KA, VK, LC -->
+                <th class="p-2 text-center border-r border-slate-200 hover:bg-slate-200 cursor-pointer" onclick="showDistrictModal('KA')" data-dist="KA" data-region="juh" title="Krupina (2 FTE)">KA <span class="text-[10px] text-slate-500 font-normal block">2 FTE</span></th>
+                <th class="p-2 text-center border-r border-slate-200 hover:bg-slate-200 cursor-pointer" onclick="showDistrictModal('VK')" data-dist="VK" data-region="juh" title="Veľký Krtíš (3 FTE)">VK <span class="text-[10px] text-slate-500 font-normal block">3 FTE</span></th>
+                <th class="p-2 text-center border-r border-slate-300 hover:bg-slate-200 cursor-pointer" onclick="showDistrictModal('LC')" data-dist="LC" data-region="juh" title="Lučenec (3 FTE)">LC <span class="text-[10px] text-slate-500 font-normal block">3 FTE</span></th>
+
+                <!-- Districts: DT, PT, RS -->
+                <th class="p-2 text-center border-r border-slate-200 hover:bg-slate-200 cursor-pointer" onclick="showDistrictModal('DT')" data-dist="DT" data-region="vychod" title="Detva (2 FTE)">DT <span class="text-[10px] text-slate-500 font-normal block">2 FTE</span></th>
+                <th class="p-2 text-center border-r border-slate-200 hover:bg-slate-200 cursor-pointer" onclick="showDistrictModal('PT')" data-dist="PT" data-region="vychod" title="Poltár (2 FTE)">PT <span class="text-[10px] text-slate-500 font-normal block">2 FTE</span></th>
+                <th class="p-2 text-center border-r border-slate-300 hover:bg-slate-200 cursor-pointer" onclick="showDistrictModal('RS')" data-dist="RS" data-region="vychod" title="Rimavská Sobota (4 FTE)">RS <span class="text-[10px] text-slate-500 font-normal block">4 FTE</span></th>
+
+                <th class="p-2 text-center bg-slate-100 font-bold text-slate-800">37 FTE</th>
+              </tr>
+            </thead>
+            <tbody id="matrixTableBody" class="divide-y divide-slate-200 text-xs">
+              <!-- Rendered via JavaScript -->
+            </tbody>
+            <tfoot>
+              <tr class="bg-slate-100 font-bold text-slate-800 text-xs border-t-2 border-slate-300">
+                <td class="p-2.5 sticky left-0 z-20 bg-slate-100 border-r border-slate-200">Súčet úväzkov (FTE)</td>
+                <td class="p-2.5 text-center border-r border-slate-200">-</td>
+                <td class="p-2 text-center border-r border-slate-200 bg-sky-50 text-sky-900" data-dist="BB" data-region="sever">7</td>
+                <td class="p-2 text-center border-r border-slate-200 bg-sky-50 text-sky-900" data-dist="BR" data-region="sever">3</td>
+                <td class="p-2 text-center border-r border-slate-300 bg-sky-50 text-sky-900" data-dist="RA" data-region="sever">2</td>
+                
+                <td class="p-2 text-center border-r border-slate-200 bg-cyan-50 text-cyan-900" data-dist="ZV" data-region="zapad">3</td>
+                <td class="p-2 text-center border-r border-slate-200 bg-cyan-50 text-cyan-900" data-dist="ZC" data-region="zapad">2</td>
+                <td class="p-2 text-center border-r border-slate-200 bg-cyan-50 text-cyan-900" data-dist="ZH" data-region="zapad">2</td>
+                <td class="p-2 text-center border-r border-slate-300 bg-cyan-50 text-cyan-900" data-dist="BS" data-region="zapad">2</td>
+
+                <td class="p-2 text-center border-r border-slate-200 bg-indigo-50 text-indigo-900" data-dist="KA" data-region="juh">2</td>
+                <td class="p-2 text-center border-r border-slate-200 bg-indigo-50 text-indigo-900" data-dist="VK" data-region="juh">3</td>
+                <td class="p-2 text-center border-r border-slate-300 bg-indigo-50 text-indigo-900" data-dist="LC" data-region="juh">3</td>
+
+                <td class="p-2 text-center border-r border-slate-200 bg-slate-200 text-slate-900" data-dist="DT" data-region="vychod">2</td>
+                <td class="p-2 text-center border-r border-slate-200 bg-slate-200 text-slate-900" data-dist="PT" data-region="vychod">2</td>
+                <td class="p-2 text-center border-r border-slate-300 bg-slate-200 text-slate-900" data-dist="RS" data-region="vychod">4</td>
+
+                <td class="p-2 text-center font-extrabold text-sky-700 bg-sky-100">37</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+
+        <div class="mt-4 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-2">
+          <div>
+            <i class="fa-solid fa-hand-pointer text-slate-400 mr-1"></i> Kliknutím na akúkoľvek vyfarbenú bunku zobrazíte detailnú kompetenčnú kartu a zoznam povinností.
+          </div>
+          <div class="flex items-center space-x-2">
+            <button onclick="exportMatrixCSV()" class="px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-100 text-slate-700 font-medium transition flex items-center space-x-1">
+              <i class="fa-solid fa-file-csv text-emerald-600"></i>
+              <span>Exportovať do CSV</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- TAB 3: KASKÁDOVÝ MODEL & OPERAČNÉ RIADENIE -->
+    <div id="cascadeTab" class="tab-content hidden space-y-6">
+      
+      <!-- Command Structure Overview -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-sm">
+          <div class="flex items-center space-x-3 pb-3 border-b border-slate-100">
+            <div class="w-10 h-10 rounded-lg bg-red-100 text-red-700 flex items-center justify-center text-lg">
+              <i class="fa-solid fa-sitemap"></i>
+            </div>
+            <div>
+              <h3 class="font-bold text-slate-900 text-base">Strategická úroveň velenia</h3>
+              <p class="text-xs text-slate-500">Krajský krízový štáb v sídle kraja (OÚ Banská Bystrica)</p>
+            </div>
+          </div>
+          <ul class="mt-4 space-y-3 text-xs sm:text-sm text-slate-600">
+            <li class="flex items-start space-x-2.5">
+              <i class="fa-solid fa-user-tie text-red-600 mt-1 text-xs"></i>
+              <span><strong>Predseda krízového štábu:</strong> Prednosta Okresného úradu Banská Bystrica. Vyhlasuje a odvoláva mimoriadnu situáciu.</span>
+            </li>
+            <li class="flex items-start space-x-2.5">
+              <i class="fa-solid fa-user-gear text-red-600 mt-1 text-xs"></i>
+              <span><strong>Zástupca predsedu:</strong> Vedúci odboru krízového riadenia OÚ Banská Bystrica. Riadi celokrajské kapacity a koordináciu záchranných prác.</span>
+            </li>
+            <li class="flex items-start space-x-2.5">
+              <i class="fa-solid fa-bullhorn text-red-600 mt-1 text-xs"></i>
+              <span>Prijíma zásadné rozhodnutia, schvaľuje presun personálu z iných regiónov (3. stupeň).</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-sm">
+          <div class="flex items-center space-x-3 pb-3 border-b border-slate-100">
+            <div class="w-10 h-10 rounded-lg bg-sky-100 text-sky-700 flex items-center justify-center text-lg">
+              <i class="fa-solid fa-person-military-pointing"></i>
+            </div>
+            <div>
+              <h3 class="font-bold text-slate-900 text-base">Takticko-operačná úroveň v území</h3>
+              <p class="text-xs text-slate-500">Územná skupina priamo v dotknutom okrese</p>
+            </div>
+          </div>
+          <ul class="mt-4 space-y-3 text-xs sm:text-sm text-slate-600">
+            <li class="flex items-start space-x-2.5">
+              <i class="fa-solid fa-id-badge text-sky-600 mt-1 text-xs"></i>
+              <span><strong>Vedúci územnej skupiny:</strong> Vedúci pracoviska (okresu), na ktorom je vyhlásená MS. Koná na základe písomného poverenia.</span>
+            </li>
+            <li class="flex items-start space-x-2.5">
+              <i class="fa-solid fa-people-group text-sky-600 mt-1 text-xs"></i>
+              <span><strong>Podriadenosť posíl:</strong> Všetci zamestnanci vyslaní na výpomoc z iných okresov alebo regiónov operačne podliehajú tomuto vedúcemu.</span>
+            </li>
+            <li class="flex items-start space-x-2.5">
+              <i class="fa-solid fa-walkie-talkie text-sky-600 mt-1 text-xs"></i>
+              <span><strong>Jediný styčný bod:</strong> Vedúci pracoviska je autorizovaný styčný bod, ktorý reportuje vedúcemu odboru KR a sekretariátu KŠ.</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Cascade Levels Grid (1, 2, 3) -->
+      <div class="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-sm">
+        <h3 class="text-base font-bold text-slate-900 mb-1 flex items-center space-x-2">
+          <i class="fa-solid fa-stairs text-amber-500"></i>
+          <span>Kaskádový model nasadzovania síl a prostriedkov</span>
+        </h3>
+        <p class="text-xs sm:text-sm text-slate-500 mb-6">
+          Postupná mobilizácia personálnych kapacít podľa závažnosti a trvania mimoriadnej udalosti.
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <!-- Stupeň 1 -->
+          <div class="p-4 rounded-xl bg-slate-50 border-2 border-emerald-500/50 hover:border-emerald-500 transition relative">
+            <div class="absolute -top-3 left-4 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-600 text-white shadow-sm">
+              1. STUPEŇ
+            </div>
+            <div class="mt-2 text-sm font-bold text-slate-900">Lokálne sily (Prvotný zásah)</div>
+            <div class="text-xs text-emerald-700 font-medium mb-3">Vlastný okres výskytu MS</div>
+            
+            <div class="space-y-2 text-xs text-slate-600">
+              <p><strong>Kto zasahuje:</strong> Zamestnanci dislokovaní priamo v okrese, kde MS vznikla.</p>
+              <p><strong>Hlavné úlohy:</strong> Okamžité nadviazanie spojenia so starostami obcí, overenie rozsahu na mieste, zriadenie operatívneho pracoviska a hlásna služba.</p>
+            </div>
+          </div>
+
+          <!-- Stupeň 2 -->
+          <div class="p-4 rounded-xl bg-slate-50 border-2 border-sky-500/50 hover:border-sky-500 transition relative">
+            <div class="absolute -top-3 left-4 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-sky-600 text-white shadow-sm">
+              2. STUPEŇ
+            </div>
+            <div class="mt-2 text-sm font-bold text-slate-900">Regionálna podpora</div>
+            <div class="text-xs text-sky-700 font-medium mb-3">Susedné okresy v rámci regiónu</div>
+            
+            <div class="space-y-2 text-xs text-slate-600">
+              <p><strong>Aktivácia:</strong> Na pokyn vedúceho pracoviska po predchádzajúcom súhlase vedúceho odboru KR.</p>
+              <p><strong>Hlavné úlohy:</strong> Posilnenie tímov, koordinácia núdzového zásobovania a ubytovania, administratíva záchranných prác.</p>
+            </div>
+          </div>
+
+          <!-- Stupeň 3 -->
+          <div class="p-4 rounded-xl bg-slate-50 border-2 border-purple-500/50 hover:border-purple-500 transition relative">
+            <div class="absolute -top-3 left-4 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-purple-600 text-white shadow-sm">
+              3. STUPEŇ
+            </div>
+            <div class="mt-2 text-sm font-bold text-slate-900">Krajská výpomoc</div>
+            <div class="text-xs text-purple-700 font-medium mb-3">Rozsiahla udalosť v celom kraji</div>
+            
+            <div class="space-y-2 text-xs text-slate-600">
+              <p><strong>Aktivácia:</strong> Výlučne na pokyn prednostu OÚ v sídle kraja alebo vedúceho odboru KR.</p>
+              <p><strong>Hlavné úlohy:</strong> Odbremenenie pracovníkov od byrokracie – príkazy na vecné plnenie, evidencia výdavkov záchranných prác, logistika.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Interactive Travel-Time Dispatch Calculator -->
+      <div class="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-sm">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+          <div>
+            <h3 class="text-base font-bold text-slate-900 flex items-center space-x-2">
+              <i class="fa-solid fa-stopwatch text-sky-600"></i>
+              <span>Pravidlo dojazdových časov (Výnimka z regionality)</span>
+            </h3>
+            <p class="text-xs text-slate-500 mt-0.5">
+              Ak je dojazdový čas zo susedného regiónu preukázateľne kratší než z vlastného regiónu, vedúci odboru aktivuje rýchlejšiu pomoc bez ohľadu na príslušnosť k regiónu.
+            </p>
+          </div>
+        </div>
+
+        <!-- Simulation Tool -->
+        <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
+          <div class="space-y-2">
+            <label class="text-xs font-semibold text-slate-700 uppercase tracking-wider">Vyberte zasiahnutý okres:</label>
+            <select id="dispatchDistrictSelect" onchange="runDispatchSimulation()" class="w-full text-sm p-2.5 rounded-lg border border-slate-300 bg-slate-50 focus:ring-2 focus:ring-sky-500 focus:outline-none">
+              <option value="KA" selected>Krupina (KA) - Región JUH</option>
+              <option value="RA">Revúca (RA) - Región SEVER</option>
+              <option value="BS">Banská Štiavnica (BS) - Región ZÁPAD</option>
+              <option value="DT">Detva (DT) - Región VÝCHOD</option>
+              <option value="PT">Poltár (PT) - Región VÝCHOD</option>
+              <option value="ZC">Žarnovica (ZC) - Región ZÁPAD</option>
+              <option value="BR">Brezno (BR) - Región SEVER</option>
+            </select>
+            <p class="text-[11px] text-slate-500 italic">Interaktívna ukážka rozhodovacieho algoritmu velenia.</p>
+          </div>
+
+          <!-- Simulation Result Cards -->
+          <div class="col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-3" id="dispatchResultBox">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- TAB 4: KATALÓG AGEND (AG1–AG7) -->
+    <div id="agendasTab" class="tab-content hidden space-y-4">
+      <div class="bg-white p-4 sm:p-6 rounded-2xl border border-slate-200 shadow-sm">
+        <div class="pb-4 border-b border-slate-100">
+          <h2 class="text-lg font-bold text-slate-900 flex items-center space-x-2">
+            <i class="fa-solid fa-list-check text-sky-600"></i>
+            <span>Katalóg odborných agend krízového riadenia (AG1 – AG7)</span>
+          </h2>
+          <p class="text-xs sm:text-sm text-slate-500 mt-0.5">
+            Presná deľba kompetencií, odborné činnosti a personálne alokácie v zmysle nového organizačného usporiadania.
+          </p>
+        </div>
+
+        <div class="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="agendasCatalogGrid">
+          <!-- Rendered by JavaScript -->
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 5: REGIÓNY A OKRESY (PODROBNÝ ROZPAD) -->
+    <div id="districtsTab" class="tab-content hidden space-y-6">
+      <div class="bg-white p-4 sm:p-6 rounded-2xl border border-slate-200 shadow-sm">
+        <div class="pb-4 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div>
+            <h2 class="text-lg font-bold text-slate-900 flex items-center space-x-2">
+              <i class="fa-solid fa-map-location-dot text-sky-600"></i>
+              <span>Územná štruktúra: 4 Regióny & 13 Okresov BBK</span>
+            </h2>
+            <p class="text-xs sm:text-sm text-slate-500 mt-0.5">
+              Porovnanie personálneho zabezpečenia a zaťaženosti (počet obcí na jedného zamestnanca FTE).
+            </p>
+          </div>
+        </div>
+
+        <!-- 4 Regions Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 mt-6" id="regionsGridContainer">
+          <!-- Rendered by JS -->
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Modal Dialog for Cell/District Inspection -->
+  <div id="infoModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl border border-slate-200 overflow-hidden transform transition-all">
+      <div id="modalHeader" class="p-5 bg-slate-900 text-white flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+          <div id="modalIconBox" class="w-9 h-9 rounded-lg bg-sky-500/20 text-sky-400 flex items-center justify-center font-bold">
+            <i class="fa-solid fa-info"></i>
+          </div>
+          <div>
+            <h3 id="modalTitle" class="text-base font-bold">Detail zodpovednosti</h3>
+            <p id="modalSubtitle" class="text-xs text-slate-400">Podrobný rozpis agendy</p>
+          </div>
+        </div>
+        <button onclick="closeModal()" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center transition">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="p-5 space-y-4 text-xs sm:text-sm text-slate-600 max-h-[70vh] overflow-y-auto" id="modalBody">
+        <!-- Injected via JS -->
+      </div>
+
+      <div class="p-4 bg-slate-50 border-t border-slate-100 flex justify-end">
+        <button onclick="closeModal()" class="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-white font-medium text-xs transition">
+          Zatvoriť
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toastContainer" class="fixed bottom-4 right-4 z-50 flex flex-col space-y-2 pointer-events-none"></div>
+
+  <script>
+    /* =========================================================================
+       1. DATA STRUCTURES & DEFINITIONS
+       ========================================================================= */
+
+    const AGENDAS = [
+      {
+        id: "AG1",
+        num: 1,
+        name: "Prevencia, CBRN ochrana a havárie",
+        shortName: "Prevencia & CBRN",
+        color: "#c00000",
+        type: "KRAJ",
+        fteTotal: 2,
+        badgeBg: "bg-red-50 text-red-700 border-red-200",
+        desc: "Prevencia + súťaž mladých záchranárov CO, odborná príprava zamestnancov OKR, CBRN ochrana (chemická, biologická, radiačná a jadrová), horská služba, závažné priemyselné havárie.",
+        scope: "Celokrajská pôsobnosť (vykonáva sa pre všetkých 13 okresov kraja).",
+        coveredIn: ["BB", "BR"]
+      },
+      {
+        id: "AG2",
+        num: 2,
+        name: "IS CO, varovanie, vyrozumenie a povodne",
+        shortName: "IS CO & Varovanie",
+        color: "#66a344",
+        type: "REGION",
+        fteTotal: 8,
+        badgeBg: "bg-emerald-50 text-emerald-700 border-emerald-200",
+        desc: "Informačný systém civilnej ochrany, varovné a vyrozumievacie systémy, prielomové vlny vodných stavieb, hlásna služba a protipovodňová ochrana.",
+        scope: "Regionálna pôsobnosť (v každom zo 4 regiónov pôsobia 2 špecialisti).",
+        coveredIn: ["BB", "BR", "ZV", "ZC", "VK", "LC", "DT", "RS"]
+      },
+      {
+        id: "AG3",
+        num: 3,
+        name: "Ukrytie, stavebné konania a plány ukrytia",
+        shortName: "Ukrytie & Stavby CO",
+        color: "#2e75b6",
+        type: "REGION",
+        fteTotal: 8,
+        badgeBg: "bg-sky-50 text-sky-700 border-sky-200",
+        desc: "Ukrytie obyvateľstva, posudzovanie stavebných zámerov, stavebno-technické požiadavky na stavby CO, plány ukrytia obcí a vyraďovanie/rušenie ochranných stavieb.",
+        scope: "Regionálna pôsobnosť (v každom zo 4 regiónov pôsobia 2 špecialisti).",
+        coveredIn: ["BB", "BR", "ZV", "ZH", "KA", "LC", "DT", "RS"]
+      },
+      {
+        id: "AG4",
+        num: 4,
+        name: "Evakuácia, núdzové zásobovanie a ŠHR",
+        shortName: "Evakuácia & ŠHR",
+        color: "#c55a11",
+        type: "REGION",
+        fteTotal: 8,
+        badgeBg: "bg-amber-50 text-amber-700 border-amber-200",
+        desc: "Evakuácia obyvateľstva, plány evakuácie, núdzové zásobovanie a ubytovanie, koordinácia zásob zo Štátnych hmotných rezerv (ŠHR) a evidencia mimoriadnych udalostí.",
+        scope: "Regionálna pôsobnosť (v každom zo 4 regiónov pôsobia 2 špecialisti).",
+        coveredIn: ["BB", "RA", "ZC", "BS", "KA", "VK", "PT", "RS"]
+      },
+      {
+        id: "AG5",
+        num: 5,
+        name: "Hospodárenie s materiálom CO a logistika",
+        shortName: "Materiál CO & Sklady",
+        color: "#990000",
+        type: "KRAJ",
+        fteTotal: 2,
+        badgeBg: "bg-rose-50 text-rose-800 border-rose-200",
+        desc: "Hospodárenie s materiálom CO, logistika skladov, systém EMCO, materiálne zabezpečenie zásahov, financovanie záchranných prác a náhrady škôd.",
+        scope: "Celokrajská pôsobnosť (špecializovane garantuje BB a ZV pre celý kraj).",
+        coveredIn: ["BB", "ZV"]
+      },
+      {
+        id: "AG6",
+        num: 6,
+        name: "Hospodárska mobilizácia, EPSIS a obrana",
+        shortName: "Mobilizácia & EPSIS",
+        color: "#7030a0",
+        type: "REGION",
+        fteTotal: 8,
+        badgeBg: "bg-purple-50 text-purple-700 border-purple-200",
+        desc: "Kompletná hospodárska mobilizácia, informačný systém EPSIS, obranné plánovanie štátu, vecné plnenie a agenda utajovaných skutočností.",
+        scope: "Regionálna pôsobnosť (v každom zo 4 regiónov pôsobia 2 špecialisti).",
+        coveredIn: ["BB", "RA", "ZH", "BS", "VK", "LC", "PT", "RS"]
+      },
+      {
+        id: "AG7",
+        num: 7,
+        name: "Bezpečnostné rady a krízové štáby",
+        shortName: "Bezpečnostné rady",
+        color: "#7a0016",
+        type: "KRAJ",
+        fteTotal: 1,
+        badgeBg: "bg-red-50 text-red-900 border-red-300",
+        desc: "Tajomník a administratíva Bezpečnostnej rady kraja a Krízového štábu okresného úradu v sídle kraja, zvolávanie zasadnutí, príprava uznesení a strategické velenie.",
+        scope: "Celokrajská pôsobnosť (výlučne dislokované v sídle kraja BB).",
+        coveredIn: ["BB"]
+      }
+    ];
+
+    const REGIONS = [
+      {
+        id: "sever",
+        name: "Banská Bystrica - SEVER",
+        shortName: "SEVER",
+        fteTotal: 12,
+        villagesTotal: 114,
+        color: "#4F6228",
+        districts: [
+          { id: "BB", name: "Banská Bystrica", fte: 7, villages: 42, ags: ["AG1", "AG2", "AG3", "AG4", "AG5", "AG6", "AG7"] },
+          { id: "BR", name: "Brezno", fte: 3, villages: 30, ags: ["AG1", "AG2", "AG3"] },
+          { id: "RA", name: "Revúca", fte: 2, villages: 42, ags: ["AG4", "AG6"] }
+        ]
+      },
+      {
+        id: "zapad",
+        name: "Banská Bystrica - ZÁPAD",
+        shortName: "ZÁPAD",
+        fteTotal: 9,
+        villagesTotal: 94,
+        color: "#403152",
+        districts: [
+          { id: "ZV", name: "Zvolen", fte: 3, villages: 26, ags: ["AG2", "AG3", "AG5"] },
+          { id: "ZC", name: "Žarnovica", fte: 2, villages: 18, ags: ["AG2", "AG4"] },
+          { id: "ZH", name: "Žiar nad Hronom", fte: 2, villages: 22, ags: ["AG3", "AG6"] },
+          { id: "BS", name: "Banská Štiavnica", fte: 2, villages: 28, ags: ["AG4", "AG6"] }
+        ]
+      },
+      {
+        id: "juh",
+        name: "Banská Bystrica - JUH",
+        shortName: "JUH",
+        fteTotal: 8,
+        villagesTotal: 144,
+        color: "#984806",
+        districts: [
+          { id: "KA", name: "Krupina", fte: 2, villages: 36, ags: ["AG3", "AG4"] },
+          { id: "VK", name: "Veľký Krtíš", fte: 3, villages: 71, ags: ["AG2", "AG4", "AG6"] },
+          { id: "LC", name: "Lučenec", fte: 3, villages: 37, ags: ["AG2", "AG3", "AG6"] }
+        ]
+      },
+      {
+        id: "vychod",
+        name: "Banská Bystrica - VÝCHOD",
+        shortName: "VÝCHOD",
+        fteTotal: 8,
+        villagesTotal: 164,
+        color: "#215868",
+        districts: [
+          { id: "DT", name: "Detva", fte: 2, villages: 15, ags: ["AG2", "AG3"] },
+          { id: "PT", name: "Poltár", fte: 2, villages: 22, ags: ["AG4", "AG6"] },
+          { id: "RS", name: "Rimavská Sobota", fte: 4, villages: 127, ags: ["AG2", "AG3", "AG4", "AG6"] }
+        ]
+      }
+    ];
+
+    // State variables
+    let currentTab = 'sankeyTab';
+    let sankeyDisplayMode = 'three-tier'; // 'three-tier' or 'direct'
+    let matrixFilter = 'all';
+    let matrixCellMode = 'standard';
+
+    // Helper: find district object
+    function getDistrict(id) {
+      for (const r of REGIONS) {
+        const found = r.districts.find(d => d.id === id);
+        if (found) return { ...found, regionName: r.name, regionShort: r.shortName };
+      }
+      return null;
+    }
+
+    // Helper: find agenda object
+    function getAgenda(id) {
+      return AGENDAS.find(a => a.id === id);
+    }
+
+    /* =========================================================================
+       2. TAB NAVIGATION
+       ========================================================================= */
+
+    function switchTab(tabId) {
+      currentTab = tabId;
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.getElementById(tabId).classList.remove('hidden');
+
+      // Update button styles
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('border-sky-500', 'text-sky-400', 'font-semibold');
+        btn.classList.add('border-transparent', 'text-slate-400');
+      });
+      const activeBtn = document.getElementById('tabBtn-' + tabId);
+      if (activeBtn) {
+        activeBtn.classList.add('border-sky-500', 'text-sky-400', 'font-semibold');
+        activeBtn.classList.remove('border-transparent', 'text-slate-400');
+      }
+
+      // If Sankey tab activated, trigger resize so Plotly fits correctly
+      if (tabId === 'sankeyTab') {
+        setTimeout(() => {
+          Plotly.Plots.resize('plotlySankey').then(() => {
+            if (typeof alignSankeyLabels === 'function') alignSankeyLabels();
+          });
+        }, 100);
+      }
+    }
+
+    /* =========================================================================
+       3. SANKEY DIAGRAM RENDERING (PLOTLY)
+       ========================================================================= */
+
+    // Funkcia na premiestnenie popiskov: agendy/regiony nad uzlom, úrady za uzlom
+    function alignSankeyLabels() {
+      const gd = document.getElementById('plotlySankey');
+      if (!gd) return;
+      const nodes = gd.querySelectorAll('.sankey-node');
+      if (!nodes || nodes.length === 0) return;
+
+      nodes.forEach(node => {
+        const rect = node.querySelector('rect');
+        const label = node.querySelector('.node-label') || node.querySelector('text');
+        if (!label) return;
+
+        const rectWidth = rect ? parseFloat(rect.getAttribute('width') || '24') : 24;
+        const rectHeight = rect ? parseFloat(rect.getAttribute('height') || '24') : 24;
+        const centerX = rectWidth / 2;
+        const centerY = rectHeight / 2 + 2;
+
+        const text = label.textContent.trim();
+        const isAgenda = /^AG\d/i.test(text);
+        const isRegion = /^(SEVER|ZÁPAD|JUH|VÝCHOD)\s*\(/i.test(text);
+        const isDistrict = /^(BB|BR|RA|ZV|ZC|ZH|BS|KA|VK|LC|DT|PT|RS)\s*\(/i.test(text);
+
+        if (isAgenda || isRegion) {
+          // Agendy a regióny ostanú nad uzlom
+          label.setAttribute('x', 0);
+          label.setAttribute('y', 0);
+          label.setAttribute('text-anchor', 'middle');
+          label.style.textAnchor = 'middle';
+          label.setAttribute('transform', `translate(${centerX}, -15)`);
+
+          label.querySelectorAll('tspan').forEach(tspan => {
+            tspan.setAttribute('x', 0);
+            tspan.setAttribute('y', 0);
+            tspan.setAttribute('text-anchor', 'middle');
+            tspan.style.textAnchor = 'middle';
+            tspan.setAttribute('transform', `translate(${centerX}, -15)`);
+          });
+          return;
+        }
+
+        if (isDistrict) {
+          // Úrady budú mať popis za uzlom
+          label.setAttribute('x', 0);
+          label.setAttribute('y', 0);
+          label.setAttribute('text-anchor', 'start');
+          label.style.textAnchor = 'start';
+          label.setAttribute('transform', `translate(${rectWidth + 18}, ${centerY})`);
+
+          label.querySelectorAll('tspan').forEach(tspan => {
+            tspan.setAttribute('x', 0);
+            tspan.setAttribute('y', 0);
+            tspan.setAttribute('text-anchor', 'start');
+            tspan.style.textAnchor = 'start';
+            tspan.setAttribute('transform', `translate(${rectWidth + 18}, ${centerY})`);
+          });
+        }
+      });
+    }
+
+    function renderSankey() {
+      const is3Tier = (sankeyDisplayMode === 'three-tier');
+
+      if (is3Tier) {
+        render3TierSankey();
+      } else {
+        renderDirectSankey();
+      }
+    }
+
+    function render3TierSankey() {
+      // Nodes:
+      // 0..6: AG1..AG7
+      // 7..10: SEVER, ZÁPAD, JUH, VÝCHOD
+      // 11..23: BB, BR, RA, ZV, ZC, ZH, BS, KA, VK, LC, DT, PT, RS
+      const labels = [
+        "AG1", "AG2", "AG3",
+        "AG4", "AG5", "AG6", "AG7",
+        "SEVER (12)", "ZÁPAD (9)", "JUH (8)", "VÝCHOD (8)",
+        "BB (7)", "BR (3)", "RA (2)",
+        "ZV (3)", "ZC (2)", "ZH (2)", "BS (2)",
+        "KA (2)", "VK (3)", "LC (3)", "RS (4)",
+        "DT (2)", "PT (2)"
+      ];
+
+      const nodeColors = [
+        "#c00000", "#66a344", "#2e75b6", "#c55a11", "#990000", "#7030a0", "#7a0016",
+        "#4F6228", "#403152", "#984806", "#215868",
+        "#334155", "#475569", "#64748b",
+        "#334155", "#475569", "#64748b", "#94a3b8",
+        "#475569", "#1e293b", "#334155", "#334155",
+        "#475569", "#64748b"
+      ];
+
+      // Tier 1: Agendy -> Regióny
+      const sources = [];
+      const targets = [];
+      const values = [];
+      const linkColors = [];
+      const customHover = [];
+
+      function hexToRgba(hex, alpha = 0.5) {
+        const c = hex.replace('#', '');
+        const r = parseInt(c.substring(0, 2), 16);
+        const g = parseInt(c.substring(2, 4), 16);
+        const b = parseInt(c.substring(4, 6), 16);
+        return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+      }
+
+      // AG1 (2): SEVER (2)
+      sources.push(0); targets.push(7); values.push(2); linkColors.push(hexToRgba("#c00000", 0.6));
+      customHover.push("AG1 (Prevencia) → SEVER: 2 FTE");
+
+      // AG2 (8): 2 to SEVER, 2 to ZAPAD, 2 to JUH, 2 to VYCHOD
+      sources.push(1, 1, 1, 1);
+      targets.push(7, 8, 9, 10);
+      values.push(2, 2, 2, 2);
+      linkColors.push(hexToRgba("#66a344", 0.6), hexToRgba("#66a344", 0.6), hexToRgba("#66a344", 0.6), hexToRgba("#66a344", 0.6));
+      customHover.push("AG2 (IS CO) → SEVER: 2 FTE", "AG2 (IS CO) → ZÁPAD: 2 FTE", "AG2 (IS CO) → JUH: 2 FTE", "AG2 (IS CO) → VÝCHOD: 2 FTE");
+
+      // AG3 (8): 2 each
+      sources.push(2, 2, 2, 2);
+      targets.push(7, 8, 9, 10);
+      values.push(2, 2, 2, 2);
+      linkColors.push(hexToRgba("#2e75b6", 0.6), hexToRgba("#2e75b6", 0.6), hexToRgba("#2e75b6", 0.6), hexToRgba("#2e75b6", 0.6));
+      customHover.push("AG3 (Ukrytie) → SEVER: 2 FTE", "AG3 (Ukrytie) → ZÁPAD: 2 FTE", "AG3 (Ukrytie) → JUH: 2 FTE", "AG3 (Ukrytie) → VÝCHOD: 2 FTE");
+
+      // AG4 (8): 2 each
+      sources.push(3, 3, 3, 3);
+      targets.push(7, 8, 9, 10);
+      values.push(2, 2, 2, 2);
+      linkColors.push(hexToRgba("#c55a11", 0.6), hexToRgba("#c55a11", 0.6), hexToRgba("#c55a11", 0.6), hexToRgba("#c55a11", 0.6));
+      customHover.push("AG4 (Evakuácia) → SEVER: 2 FTE", "AG4 (Evakuácia) → ZÁPAD: 2 FTE", "AG4 (Evakuácia) → JUH: 2 FTE", "AG4 (Evakuácia) → VÝCHOD: 2 FTE");
+
+      // AG5 (2): 1 to SEVER, 1 to ZAPAD
+      sources.push(4, 4);
+      targets.push(7, 8);
+      values.push(1, 1);
+      linkColors.push(hexToRgba("#990000", 0.6), hexToRgba("#990000", 0.6));
+      customHover.push("AG5 (Materiál) → SEVER: 1 FTE", "AG5 (Materiál) → ZÁPAD: 1 FTE");
+
+      // AG6 (8): 2 each
+      sources.push(5, 5, 5, 5);
+      targets.push(7, 8, 9, 10);
+      values.push(2, 2, 2, 2);
+      linkColors.push(hexToRgba("#7030a0", 0.6), hexToRgba("#7030a0", 0.6), hexToRgba("#7030a0", 0.6), hexToRgba("#7030a0", 0.6));
+      customHover.push("AG6 (Mobilizácia) → SEVER: 2 FTE", "AG6 (Mobilizácia) → ZÁPAD: 2 FTE", "AG6 (Mobilizácia) → JUH: 2 FTE", "AG6 (Mobilizácia) → VÝCHOD: 2 FTE");
+
+      // AG7 (1): 1 to SEVER
+      sources.push(6);
+      targets.push(7);
+      values.push(1);
+      linkColors.push(hexToRgba("#7a0016", 0.6));
+      customHover.push("AG7 (Bezp. rady) → SEVER: 1 FTE");
+
+      // Tier 2: Regióny do okresov vo FARBÁCH JEDNOTLIVÝCH AGEND
+      const distIndex = {
+        BB: 11, BR: 12, RA: 13,
+        ZV: 14, ZC: 15, ZH: 16, BS: 17,
+        KA: 18, VK: 19, LC: 20, RS: 21,
+        DT: 22, PT: 23
+      };
+
+      const regionDistFlows = [
+        // SEVER (7)
+        { from: 7, to: "BB", ag: "AG1", col: "#c00000" },
+        { from: 7, to: "BB", ag: "AG2", col: "#66a344" },
+        { from: 7, to: "BB", ag: "AG3", col: "#2e75b6" },
+        { from: 7, to: "BB", ag: "AG4", col: "#c55a11" },
+        { from: 7, to: "BB", ag: "AG5", col: "#990000" },
+        { from: 7, to: "BB", ag: "AG6", col: "#7030a0" },
+        { from: 7, to: "BB", ag: "AG7", col: "#7a0016" },
+
+        { from: 7, to: "BR", ag: "AG1", col: "#c00000" },
+        { from: 7, to: "BR", ag: "AG2", col: "#66a344" },
+        { from: 7, to: "BR", ag: "AG3", col: "#2e75b6" },
+
+        { from: 7, to: "RA", ag: "AG4", col: "#c55a11" },
+        { from: 7, to: "RA", ag: "AG6", col: "#7030a0" },
+
+        // ZÁPAD (8)
+        { from: 8, to: "ZV", ag: "AG2", col: "#66a344" },
+        { from: 8, to: "ZV", ag: "AG3", col: "#2e75b6" },
+        { from: 8, to: "ZV", ag: "AG5", col: "#990000" },
+
+        { from: 8, to: "ZC", ag: "AG2", col: "#66a344" },
+        { from: 8, to: "ZC", ag: "AG4", col: "#c55a11" },
+
+        { from: 8, to: "ZH", ag: "AG3", col: "#2e75b6" },
+        { from: 8, to: "ZH", ag: "AG6", col: "#7030a0" },
+
+        { from: 8, to: "BS", ag: "AG4", col: "#c55a11" },
+        { from: 8, to: "BS", ag: "AG6", col: "#7030a0" },
+
+        // JUH (9)
+        { from: 9, to: "KA", ag: "AG3", col: "#2e75b6" },
+        { from: 9, to: "KA", ag: "AG4", col: "#c55a11" },
+
+        { from: 9, to: "VK", ag: "AG2", col: "#66a344" },
+        { from: 9, to: "VK", ag: "AG4", col: "#c55a11" },
+        { from: 9, to: "VK", ag: "AG6", col: "#7030a0" },
+
+        { from: 9, to: "LC", ag: "AG2", col: "#66a344" },
+        { from: 9, to: "LC", ag: "AG3", col: "#2e75b6" },
+        { from: 9, to: "LC", ag: "AG6", col: "#7030a0" },
+
+        // VÝCHOD (10)
+        { from: 10, to: "DT", ag: "AG2", col: "#66a344" },
+        { from: 10, to: "DT", ag: "AG3", col: "#2e75b6" },
+
+        { from: 10, to: "PT", ag: "AG4", col: "#c55a11" },
+        { from: 10, to: "PT", ag: "AG6", col: "#7030a0" },
+
+        { from: 10, to: "RS", ag: "AG2", col: "#66a344" },
+        { from: 10, to: "RS", ag: "AG3", col: "#2e75b6" },
+        { from: 10, to: "RS", ag: "AG4", col: "#c55a11" },
+        { from: 10, to: "RS", ag: "AG6", col: "#7030a0" }
+      ];
+
+      regionDistFlows.forEach(f => {
+        sources.push(f.from);
+        targets.push(distIndex[f.to]);
+        values.push(1);
+        linkColors.push(hexToRgba(f.col, 0.58));
+        customHover.push(`${f.ag} → Okres ${f.to} (1 FTE)`);
+      });
+
+      const nodeX = [
+        0, 0, 0, 0, 0, 0, 0,
+        0.5, 0.5, 0.5, 0.5,
+        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
+      ];
+      const nodeY = [
+        0.08, 0.22, 0.36, 0.50, 0.64, 0.78, 0.92,
+        0.18, 0.42, 0.66, 0.90,
+        0.06, 0.13, 0.20, 0.27, 0.34, 0.41, 0.48, 0.55, 0.62, 0.69, 0.76, 0.83, 0.90
+      ];
+
+      const data = [{
+        type: "sankey",
+        orientation: "h",
+        arrangement: "freeform",
+        node: {
+          pad: 24,
+          thickness: 24,
+          x: nodeX,
+          y: nodeY,
+          line: { color: "#0f172a", width: 1 },
+          label: labels,
+          color: nodeColors,
+          hovertemplate: '<b>%{label}</b><br>Kapacita: %{value} FTE<extra></extra>'
+        },
+        link: {
+          source: sources,
+          target: targets,
+          value: values,
+          color: linkColors,
+          customdata: customHover,
+          hovertemplate: '%{customdata}<extra></extra>'
+        }
+      }];
+
+      const layout = {
+        title: {
+          text: "<b>Personálny tok OKR BBK: Agendy → Regióny → Okresné pracoviská</b>",
+          font: { size: 15, color: "#0f172a" }
+        },
+        font: { family: "Inter, sans-serif", size: 12, color: "#0f172a" },
+        hoverlabel: {
+          bgcolor: "#0f172a",
+          bordercolor: "#38bdf8",
+          font: { family: "Inter, sans-serif", size: 12, color: "#ffffff" }
+        },
+        // Vyrovnané okraje, aby bol diagram centrálne zarovnaný, a zároveň ostali miesto pre popisky
+        margin: { l: 170, r: 170, t: 55, b: 25 },
+        paper_bgcolor: "transparent",
+        annotations: [
+          {
+            text: "<b>ODBORNÉ AGENDY (7)</b>",
+            x: 0,
+            y: 1.05,
+            xref: 'paper',
+            yref: 'paper',
+            showarrow: false,
+            xanchor: 'right',
+            font: { size: 11, color: '#64748b', family: 'Inter, sans-serif' }
+          },
+          {
+            text: "<b>ÚZEMNÉ REGIÓNY (4)</b>",
+            x: 0.5,
+            y: 1.05,
+            xref: 'paper',
+            yref: 'paper',
+            showarrow: false,
+            xanchor: 'center',
+            font: { size: 11, color: '#64748b', family: 'Inter, sans-serif' }
+          },
+          {
+            text: "<b>OKRESNÉ ÚRADY (13)</b>",
+            x: 1,
+            y: 1.05,
+            xref: 'paper',
+            yref: 'paper',
+            showarrow: false,
+            xanchor: 'left',
+            font: { size: 11, color: '#64748b', family: 'Inter, sans-serif' }
+          }
+        ]
+      };
+
+      Plotly.newPlot('plotlySankey', data, layout, { responsive: true, displayModeBar: false }).then(() => {
+        alignSankeyLabels();
+        const gd = document.getElementById('plotlySankey');
+        if (gd && !gd._hasAlignListener) {
+          gd.on('plotly_afterplot', alignSankeyLabels);
+          gd._hasAlignListener = true;
+        }
+      });
+    }
+
+    function renderDirectSankey() {
+      // Direct Sankey: Agenda -> District directly
+      const agLabels = AGENDAS.map(a => a.id);
+      const distNames = [
+        "BB (7)", "BR (3)", "RA (2)",
+        "ZV (3)", "ZC (2)", "ZH (2)", "BS (2)",
+        "KA (2)", "VK (3)", "LC (3)", "RS (4)",
+        "DT (2)", "PT (2)"
+      ];
+      const distKeys = ["BB", "BR", "RA", "ZV", "ZC", "ZH", "BS", "KA", "VK", "LC", "RS", "DT", "PT"];
+      const labels = [...agLabels, ...distNames];
+
+      const nodeColors = [
+        "#c00000", "#66a344", "#2e75b6", "#c55a11", "#990000", "#7030a0", "#7a0016",
+        "#4F6228", "#4F6228", "#4F6228",
+        "#403152", "#403152", "#403152", "#403152",
+        "#984806", "#984806", "#984806",
+        "#215868", "#215868", "#215868"
+      ];
+
+      const sources = [];
+      const targets = [];
+      const values = [];
+      const linkColors = [];
+      const customHover = [];
+
+      function hexToRgba(hex, alpha = 0.55) {
+        const c = hex.replace('#', '');
+        const r = parseInt(c.substring(0, 2), 16);
+        const g = parseInt(c.substring(2, 4), 16);
+        const b = parseInt(c.substring(4, 6), 16);
+        return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+      }
+
+      AGENDAS.forEach((ag, agIndex) => {
+        ag.coveredIn.forEach(dKey => {
+          const dIndex = distKeys.indexOf(dKey);
+          if (dIndex >= 0) {
+            sources.push(agIndex);
+            targets.push(7 + dIndex);
+            values.push(1);
+            linkColors.push(hexToRgba(ag.color, 0.55));
+            customHover.push(`Priamy tok: ${ag.id} (${ag.shortName}) → ${dKey} (1 FTE)`);
+          }
+        });
+      });
+
+      const nodeX = [
+        0, 0, 0, 0, 0, 0, 0,
+        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
+      ];
+      const nodeY = [
+        0.08, 0.20, 0.32, 0.44, 0.56, 0.68, 0.80,
+        0.06, 0.13, 0.20, 0.27, 0.34, 0.41, 0.48, 0.55, 0.62, 0.69, 0.76, 0.83, 0.90
+      ];
+
+      const data = [{
+        type: "sankey",
+        orientation: "h",
+        arrangement: "freeform",
+        node: {
+          pad: 24,
+          thickness: 24,
+          x: nodeX,
+          y: nodeY,
+          line: { color: "#0f172a", width: 1 },
+          label: labels,
+          color: nodeColors,
+          hovertemplate: '<b>%{label}</b><br>Objem: %{value} FTE<extra></extra>'
+        },
+        link: {
+          source: sources,
+          target: targets,
+          value: values,
+          color: linkColors,
+          customdata: customHover,
+          hovertemplate: '%{customdata}<extra></extra>'
+        }
+      }];
+
+      const layout = {
+        title: {
+          text: "<b>Priamy tok: Agendy krízového riadenia → 13 Okresných pracovísk</b>",
+          font: { size: 15, color: "#0f172a" }
+        },
+        font: { family: "Inter, sans-serif", size: 12, color: "#0f172a" },
+        hoverlabel: {
+          bgcolor: "#0f172a",
+          bordercolor: "#38bdf8",
+          font: { family: "Inter, sans-serif", size: 12, color: "#ffffff" }
+        },
+        margin: { l: 170, r: 170, t: 55, b: 25 },
+        paper_bgcolor: "transparent",
+        annotations: [
+          {
+            text: "<b>ODBORNÉ AGENDY (7)</b>",
+            x: 0,
+            y: 1.05,
+            xref: 'paper',
+            yref: 'paper',
+            showarrow: false,
+            xanchor: 'right',
+            font: { size: 11, color: '#64748b', family: 'Inter, sans-serif' }
+          },
+          {
+            text: "<b>OKRESNÉ ÚRADY (13)</b>",
+            x: 1,
+            y: 1.05,
+            xref: 'paper',
+            yref: 'paper',
+            showarrow: false,
+            xanchor: 'left',
+            font: { size: 11, color: '#64748b', family: 'Inter, sans-serif' }
+          }
+        ]
+      };
+
+      Plotly.newPlot('plotlySankey', data, layout, { responsive: true, displayModeBar: false }).then(() => {
+        alignSankeyLabels();
+        const gd = document.getElementById('plotlySankey');
+        if (gd && !gd._hasAlignListener) {
+          gd.on('plotly_afterplot', alignSankeyLabels);
+          gd._hasAlignListener = true;
+        }
+      });
+    }
+
+    function setSankeyMode(mode) {
+      sankeyDisplayMode = mode;
+      document.getElementById('btnSankeyTier3').className = mode === 'three-tier' 
+        ? "px-3 py-1.5 rounded-md bg-white text-slate-800 shadow-sm font-semibold transition"
+        : "px-3 py-1.5 rounded-md text-slate-600 hover:text-slate-900 transition";
+      
+      document.getElementById('btnSankeyDirect').className = mode === 'direct' 
+        ? "px-3 py-1.5 rounded-md bg-white text-slate-800 shadow-sm font-semibold transition"
+        : "px-3 py-1.5 rounded-md text-slate-600 hover:text-slate-900 transition";
+
+      renderSankey();
+      showToast(`Prepnuté na ${mode === 'three-tier' ? '3-úrovňový Sankey diagram' : 'Priamy tok'}`, "info");
+    }
+
+    function resetSankeyView() {
+      renderSankey();
+      showToast("Pohľad na diagram bol vycentrovaný.", "info");
+    }
+
+    /* =========================================================================
+       4. COVERAGE MATRIX (HEATMAP) LOGIC
+       ========================================================================= */
+
+    function renderMatrix() {
+      const tbody = document.getElementById('matrixTableBody');
+      tbody.innerHTML = '';
+
+      const districtsList = [
+        { id: "BB", region: "sever" }, { id: "BR", region: "sever" }, { id: "RA", region: "sever" },
+        { id: "ZV", region: "zapad" }, { id: "ZC", region: "zapad" }, { id: "ZH", region: "zapad" }, { id: "BS", region: "zapad" },
+        { id: "KA", region: "juh" }, { id: "VK", region: "juh" }, { id: "LC", region: "juh" },
+        { id: "DT", region: "vychod" }, { id: "PT", region: "vychod" }, { id: "RS", region: "vychod" }
+      ];
+
+      AGENDAS.forEach(ag => {
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-50/80 transition group";
+
+        // Col 1: Agenda code and title
+        const tdAgenda = document.createElement('td');
+        tdAgenda.className = "p-2.5 font-medium sticky left-0 z-10 bg-white group-hover:bg-slate-50 border-r border-slate-200 cursor-pointer";
+        tdAgenda.onclick = () => showAgendaModal(ag.id);
+        tdAgenda.innerHTML = `
+          <div class="flex items-center space-x-2">
+            <span class="w-6 h-6 rounded flex items-center justify-center text-[11px] font-bold text-white shadow-sm" style="background-color: ${ag.color}">${ag.num}</span>
+            <div>
+              <div class="font-bold text-slate-900 flex items-center space-x-1">
+                <span>${ag.id}</span>
+                <i class="fa-solid fa-circle-question text-[10px] text-slate-400 group-hover:text-sky-500"></i>
+              </div>
+              <div class="text-[11px] text-slate-500 truncate max-w-[150px]" title="${ag.name}">${ag.shortName}</div>
+            </div>
+          </div>
+        `;
+        tr.appendChild(tdAgenda);
+
+        // Col 2: Scope badge
+        const tdType = document.createElement('td');
+        tdType.className = "p-2.5 text-center border-r border-slate-200";
+        if (ag.type === 'KRAJ') {
+          tdType.innerHTML = `<span class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-amber-100 text-amber-900 border border-amber-300">KRAJ</span>`;
+        } else {
+          tdType.innerHTML = `<span class="px-2 py-0.5 text-[10px] font-semibold rounded-full bg-slate-100 text-slate-700">Región</span>`;
+        }
+        tr.appendChild(tdType);
+
+        // Cols for each of the 13 districts
+        districtsList.forEach(d => {
+          const td = document.createElement('td');
+          td.className = "p-1.5 text-center border-r border-slate-200";
+          td.setAttribute('data-dist', d.id);
+          td.setAttribute('data-region', d.region);
+
+          const hasAgenda = ag.coveredIn.includes(d.id);
+
+          if (hasAgenda) {
+            const isKraj = ag.type === 'KRAJ';
+            const sizeClasses = matrixCellMode === 'compact' ? 'w-5 h-5 rounded-md' : 'w-7 h-7 rounded-lg';
+            
+            td.innerHTML = `
+              <div onclick="showCellDetail('${ag.id}', '${d.id}')" class="mx-auto ${sizeClasses} cursor-pointer shadow-sm transform hover:scale-115 hover:shadow-md transition duration-150 relative" style="background-color: ${ag.color};" title="${ag.id} (${ag.shortName}) - OÚ ${d.id}">
+                ${isKraj ? '<span class="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-amber-400 ring-2 ring-white shadow-sm" title="Celokrajská pôsobnosť"></span>' : ''}
+              </div>
+            `;
+          } else {
+            td.innerHTML = `<div class="w-2 h-2 rounded-full bg-slate-200 mx-auto opacity-60"></div>`;
+          }
+
+          tr.appendChild(td);
+        });
+
+        // Col total FTE for this agenda
+        const tdTotal = document.createElement('td');
+        tdTotal.className = "p-2.5 text-center font-bold text-slate-800 bg-slate-50";
+        tdTotal.innerHTML = `<span class="px-2 py-0.5 rounded bg-slate-200/80 text-slate-700 font-mono-code">${ag.fteTotal} FTE</span>`;
+        tr.appendChild(tdTotal);
+
+        tbody.appendChild(tr);
+      });
+    }
+
+    function filterMatrix(regionKey) {
+      matrixFilter = regionKey;
+
+      // Update button styles
+      ['all', 'sever', 'zapad', 'juh', 'vychod'].forEach(k => {
+        const btn = document.getElementById('filter-' + k);
+        if (k === regionKey) {
+          btn.className = "px-2.5 py-1 rounded-md bg-slate-900 text-white shadow-sm font-semibold transition";
+        } else {
+          btn.className = "px-2.5 py-1 rounded-md bg-slate-100 text-slate-700 hover:bg-slate-200 transition";
+        }
+      });
+
+      // Filter columns in the table
+      const thRegions = document.querySelectorAll('#coverageTable th[data-region]');
+      const thDists = document.querySelectorAll('#coverageTable th[data-dist]');
+      const tdDists = document.querySelectorAll('#coverageTable td[data-dist]');
+      const tfDists = document.querySelectorAll('#coverageTable tfoot td[data-dist]');
+
+      if (regionKey === 'all') {
+        thRegions.forEach(el => el.classList.remove('hidden'));
+        thDists.forEach(el => el.classList.remove('hidden'));
+        tdDists.forEach(el => el.classList.remove('hidden'));
+        tfDists.forEach(el => el.classList.remove('hidden'));
+      } else {
+        thRegions.forEach(el => {
+          if (el.getAttribute('data-region') === regionKey) {
+            el.classList.remove('hidden');
+          } else {
+            el.classList.add('hidden');
+          }
+        });
+
+        [...thDists, ...tdDists, ...tfDists].forEach(el => {
+          if (el.getAttribute('data-region') === regionKey) {
+            el.classList.remove('hidden');
+          } else {
+            el.classList.add('hidden');
+          }
+        });
+      }
+
+      showToast(`Filter matice: ${regionKey.toUpperCase()}`, "info");
+    }
+
+    function setMatrixCellMode(mode) {
+      matrixCellMode = mode;
+      const btnStd = document.getElementById('matrixModeStandard');
+      const btnCmp = document.getElementById('matrixModeCompact');
+      if (btnStd && btnCmp) {
+        btnStd.className = mode === 'standard'
+          ? "px-2.5 py-1 rounded border border-sky-300 bg-sky-50 text-sky-800 font-semibold transition"
+          : "px-2.5 py-1 rounded border border-slate-200 bg-white text-slate-600 hover:bg-slate-100 transition";
+        
+        btnCmp.className = mode === 'compact'
+          ? "px-2.5 py-1 rounded border border-sky-300 bg-sky-50 text-sky-800 font-semibold transition"
+          : "px-2.5 py-1 rounded border border-slate-200 bg-white text-slate-600 hover:bg-slate-100 transition";
+      }
+
+      renderMatrix();
+    }
+
+    function exportMatrixCSV() {
+      let csv = "ID;Agenda;Pôsobnosť;BB;BR;RA;ZV;ZC;ZH;BS;KA;VK;LC;DT;PT;RS;Spolu FTE\n";
+      const distKeys = ["BB", "BR", "RA", "ZV", "ZC", "ZH", "BS", "KA", "VK", "LC", "DT", "PT", "RS"];
+      
+      AGENDAS.forEach(ag => {
+        const row = [
+          ag.id,
+          `"${ag.name}"`,
+          ag.type,
+          ...distKeys.map(d => ag.coveredIn.includes(d) ? "1" : "0"),
+          ag.fteTotal
+        ];
+        csv += row.join(";") + "\n";
+      });
+
+      // Browser download
+      const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "matica_funkcnej_zodpovednosti_OKR_BBK.csv";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+
+      showToast("Matica bola úspešne exportovaná do CSV.", "success");
+    }
+
+    /* =========================================================================
+       5. CASCADE & TRAVEL-TIME DISPATCH CALCULATOR
+       ========================================================================= */
+
+    const DISPATCH_DATABASE = {
+      KA: {
+        districtName: "Krupina (KA)",
+        ownRegion: "Banská Bystrica - JUH",
+        primaryRegionalOffice: "Lučenec (LC) / Veľký Krtíš (VK)",
+        primaryTime: "1 hod. 15 min. (75 km)",
+        crossBorderOffice: "Zvolen (ZV) - Región ZÁPAD",
+        crossBorderTime: "30 min. (29 km)",
+        decision: "AKTIVOVAŤ ZVOLEN (Región ZÁPAD)",
+        reason: "Dojazdový čas zo Zvolena je o 45 minút kratší než z Lučenca. Vedúci odboru aplikuje výnimku dojazdových časov."
+      },
+      RA: {
+        districtName: "Revúca (RA)",
+        ownRegion: "Banská Bystrica - SEVER",
+        primaryRegionalOffice: "Banská Bystrica (BB)",
+        primaryTime: "1 hod. 40 min. (105 km)",
+        crossBorderOffice: "Rimavská Sobota (RS) - Región VÝCHOD",
+        crossBorderTime: "45 min. (42 km)",
+        decision: "AKTIVOVAŤ RIMAVSKÚ SOBOTU (Región VÝCHOD)",
+        reason: "Geografická dostupnosť cez Tisovec/Hnúšťu robí z RS prirodzenú rýchlu podporu pre Revúcu namiesto horského prechodu z BB."
+      },
+      BS: {
+        districtName: "Banská Štiavnica (BS)",
+        ownRegion: "Banská Bystrica - ZÁPAD",
+        primaryRegionalOffice: "Žiar nad Hronom (ZH)",
+        primaryTime: "35 min. (31 km)",
+        crossBorderOffice: "Zvolen (ZV) - Región ZÁPAD",
+        crossBorderTime: "30 min. (28 km)",
+        decision: "AKTIVOVAŤ ZVOLEN / ŽIAR NAD HRONOM",
+        reason: "Obe pracoviská sú v rámci vlastného regiónu ZÁPAD a disponujú komplementárnymi agendami (ZV pokrýva AG2 a AG5, ZH pokrýva AG3 a AG6)."
+      },
+      DT: {
+        districtName: "Detva (DT)",
+        ownRegion: "Banská Bystrica - VÝCHOD",
+        primaryRegionalOffice: "Rimavská Sobota (RS)",
+        primaryTime: "55 min. (65 km)",
+        crossBorderOffice: "Zvolen (ZV) - Región ZÁPAD",
+        crossBorderTime: "20 min. (24 km rýchlostná cesta R2)",
+        decision: "AKTIVOVAŤ ZVOLEN (Región ZÁPAD)",
+        reason: "Priame diaľničné spojenie R2 medzi Zvolenom a Detvou umožňuje dojazd za 20 minút oproti 55 minútam z RS."
+      },
+      PT: {
+        districtName: "Poltár (PT)",
+        ownRegion: "Banská Bystrica - VÝCHOD",
+        primaryRegionalOffice: "Rimavská Sobota (RS)",
+        primaryTime: "35 min. (32 km)",
+        crossBorderOffice: "Lučenec (LC) - Región JUH",
+        crossBorderTime: "20 min. (18 km)",
+        decision: "AKTIVOVAŤ LUČENEC (Región JUH)",
+        reason: "Lučenec je bezprostredný susedný okres s dojazdom len 20 minút a plným personálnym zabezpečením CO."
+      },
+      ZC: {
+        districtName: "Žarnovica (ZC)",
+        ownRegion: "Banská Bystrica - ZÁPAD",
+        primaryRegionalOffice: "Žiar nad Hronom (ZH)",
+        primaryTime: "15 min. (17 km po R1)",
+        crossBorderOffice: "Zvolen (ZV) - Región ZÁPAD",
+        crossBorderTime: "25 min. (38 km)",
+        decision: "ŠTANDARDNÉ NASADENIE V RÁMCI REGIÓNU (ZH)",
+        reason: "Priame napojenie po R1 zabezpečuje bleskový dojazd v rámci vlastného regiónu ZÁPAD do 15 minút."
+      },
+      BR: {
+        districtName: "Brezno (BR)",
+        ownRegion: "Banská Bystrica - SEVER",
+        primaryRegionalOffice: "Banská Bystrica (BB)",
+        primaryTime: "35 min. (42 km cesta I/66)",
+        crossBorderOffice: "Revúca (RA) - Región SEVER",
+        crossBorderTime: "55 min. (52 km cez sedlo Zbojská)",
+        decision: "ŠTANDARDNÉ NASADENIE SÍDLA KRAJA (BB)",
+        reason: "Krajské riaditeľstvo BB poskytuje priamu štvorprúdovú/kvalitnú os po I/66 s plným zázemím všetkých 7 agend."
+      }
+    };
+
+    function runDispatchSimulation() {
+      const select = document.getElementById('dispatchDistrictSelect');
+      const data = DISPATCH_DATABASE[select.value];
+      const resultBox = document.getElementById('dispatchResultBox');
+
+      if (!data) return;
+
+      resultBox.innerHTML = `
+        <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+          <div class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1">Porovnanie dojazdových časov</div>
+          <div class="space-y-2 text-xs">
+            <div class="flex justify-between items-center py-1 border-b border-slate-200">
+              <span class="text-slate-600">Vlastný región (${data.primaryRegionalOffice}):</span>
+              <span class="font-bold text-slate-800">${data.primaryTime}</span>
+            </div>
+            <div class="flex justify-between items-center py-1 border-b border-slate-200 bg-sky-50/60 -mx-1 px-1 rounded">
+              <span class="text-sky-900 font-medium">Susedné pracovisko (${data.crossBorderOffice}):</span>
+              <span class="font-bold text-sky-700">${data.crossBorderTime}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-4 rounded-xl bg-gradient-to-br from-slate-900 to-slate-800 text-white border border-slate-700 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center space-x-2 text-amber-400 font-bold text-xs uppercase tracking-wider mb-1">
+              <i class="fa-solid fa-route"></i>
+              <span>Rozhodnutie veliteľa:</span>
+            </div>
+            <div class="text-sm font-bold text-slate-100">${data.decision}</div>
+            <p class="text-xs text-slate-300 mt-2">${data.reason}</p>
+          </div>
+          <div class="mt-3 pt-2 border-t border-slate-700 text-[11px] text-slate-400 flex items-center justify-between">
+            <span>Uplatnenie § metodického pokynu</span>
+            <span class="text-sky-400 font-semibold">2. STUPEŇ KASKÁDY</span>
+          </div>
+        </div>
+      `;
+    }
+
+    /* =========================================================================
+       6. AGENDAS CATALOG & REGIONAL OVERVIEW RENDERING
+       ========================================================================= */
+
+    function renderAgendasCatalog() {
+      const grid = document.getElementById('agendasCatalogGrid');
+      grid.innerHTML = '';
+
+      AGENDAS.forEach(ag => {
+        const card = document.createElement('div');
+        card.className = "bg-slate-50 p-4 rounded-xl border border-slate-200 hover:border-slate-300 hover:shadow-md transition flex flex-col justify-between";
+        card.innerHTML = `
+          <div>
+            <div class="flex items-start justify-between gap-2 mb-2">
+              <div class="flex items-center space-x-2">
+                <span class="w-7 h-7 rounded-lg text-white font-bold text-xs flex items-center justify-center shadow-sm" style="background-color: ${ag.color}">${ag.num}</span>
+                <span class="font-bold text-slate-900 text-sm">${ag.id}</span>
+              </div>
+              <span class="px-2 py-0.5 text-[10px] font-bold rounded-full uppercase tracking-wider ${ag.type === 'KRAJ' ? 'bg-amber-100 text-amber-900 border border-amber-300' : 'bg-slate-200 text-slate-700'}">
+                ${ag.type}
+              </span>
+            </div>
+            <h4 class="font-bold text-slate-800 text-xs sm:text-sm mb-2">${ag.name}</h4>
+            <p class="text-xs text-slate-600 mb-3">${ag.desc}</p>
+          </div>
+
+          <div class="pt-3 border-t border-slate-200 text-xs">
+            <div class="flex items-center justify-between text-slate-500 mb-1">
+              <span>Personálna kapacita:</span>
+              <span class="font-bold text-slate-800">${ag.fteTotal} FTE</span>
+            </div>
+            <div class="text-[11px] text-slate-500">
+              <strong>Garantujúce okresy:</strong> ${ag.coveredIn.join(', ')}
+            </div>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function renderRegionsOverview() {
+      const container = document.getElementById('regionsGridContainer');
+      container.innerHTML = '';
+
+      REGIONS.forEach(reg => {
+        const card = document.createElement('div');
+        card.className = "p-5 rounded-2xl border border-slate-200 bg-slate-50 hover:bg-white hover:shadow-md transition";
+        card.style.borderTop = `4px solid ${reg.color}`;
+
+        // District pills
+        const distHtml = reg.districts.map(d => `
+          <div class="p-3 rounded-xl bg-white border border-slate-200 shadow-sm flex items-center justify-between">
+            <div>
+              <div class="flex items-center space-x-2">
+                <span class="font-bold text-slate-900 text-sm">${d.name} (${d.id})</span>
+                <span class="px-2 py-0.5 text-[10px] font-semibold bg-sky-100 text-sky-800 rounded">${d.fte} FTE</span>
+              </div>
+              <div class="text-xs text-slate-500 mt-0.5">${d.villages} obcí • ${(d.villages / d.fte).toFixed(1)} obcí / FTE</div>
+            </div>
+            <div class="flex flex-wrap gap-1 max-w-[140px] justify-end">
+              ${d.ags.map(agId => {
+                const a = getAgenda(agId);
+                return `<span class="w-5 h-5 rounded text-[10px] font-bold text-white flex items-center justify-center" style="background-color: ${a.color}" title="${a.name}">${a.num}</span>`;
+              }).join('')}
+            </div>
+          </div>
+        `).join('');
+
+        card.innerHTML = `
+          <div class="flex items-center justify-between pb-3 border-b border-slate-200 mb-4">
+            <div>
+              <div class="text-xs font-bold uppercase tracking-wider" style="color: ${reg.color}">${reg.shortName}</div>
+              <h3 class="text-base font-bold text-slate-900">${reg.name}</h3>
+            </div>
+            <div class="text-right">
+              <div class="text-base font-extrabold text-slate-900">${reg.fteTotal} FTE</div>
+              <div class="text-xs text-slate-500">${reg.villagesTotal} obcí v obvode</div>
+            </div>
+          </div>
+
+          <div class="space-y-2.5">
+            ${distHtml}
+          </div>
+
+          <div class="mt-4 pt-3 border-t border-slate-200 flex justify-between items-center text-xs text-slate-600">
+            <span>Priemerná zaťaženosť:</span>
+            <span class="font-bold text-slate-800">${(reg.villagesTotal / reg.fteTotal).toFixed(1)} obcí na 1 zamestnanca</span>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    /* =========================================================================
+       7. MODALS & TOAST NOTIFICATION HELPERS
+       ========================================================================= */
+
+    function showCellDetail(agendaId, districtId) {
+      const ag = getAgenda(agendaId);
+      const dist = getDistrict(districtId);
+      if (!ag || !dist) return;
+
+      document.getElementById('modalTitle').textContent = `${ag.id} na OÚ ${dist.name} (${dist.id})`;
+      document.getElementById('modalSubtitle').textContent = `${ag.name} • ${dist.regionName}`;
+      
+      const iconBox = document.getElementById('modalIconBox');
+      iconBox.style.backgroundColor = ag.color;
+      iconBox.innerHTML = `<span class="text-white font-bold text-sm">${ag.num}</span>`;
+
+      const body = document.getElementById('modalBody');
+      body.innerHTML = `
+        <div class="space-y-3">
+          <div class="p-3 rounded-lg bg-slate-50 border border-slate-200">
+            <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Popis agendy a činností</div>
+            <p class="text-slate-800 font-medium">${ag.desc}</p>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3 text-xs">
+            <div class="p-3 rounded-lg bg-slate-50 border border-slate-200">
+              <div class="text-slate-500 uppercase tracking-wider font-semibold text-[10px]">Pôsobnosť</div>
+              <div class="font-bold text-slate-900 text-sm mt-0.5">${ag.type === 'KRAJ' ? 'Celokrajská (13 okresov)' : 'Regionálna (' + dist.regionShort + ')'}</div>
+            </div>
+            <div class="p-3 rounded-lg bg-slate-50 border border-slate-200">
+              <div class="text-slate-500 uppercase tracking-wider font-semibold text-[10px]">Okresné kapacity</div>
+              <div class="font-bold text-slate-900 text-sm mt-0.5">${dist.fte} FTE (${dist.villages} obcí)</div>
+            </div>
+          </div>
+
+          <div class="p-3 rounded-lg bg-sky-50 text-sky-900 border border-sky-200 text-xs">
+            <strong>Režim zastupiteľnosti:</strong> Ak okresný zamestnanec čerpá dovolenku alebo zasahuje v teréne, agendu automaticky preberá partnerské pracovisko v regióne (pre ${ag.id}: ${ag.coveredIn.filter(x => x !== dist.id).join(', ')}).
+          </div>
+        </div>
+      `;
+
+      document.getElementById('infoModal').classList.remove('hidden');
+    }
+
+    function showAgendaModal(agendaId) {
+      const ag = getAgenda(agendaId);
+      if (!ag) return;
+
+      document.getElementById('modalTitle').textContent = `${ag.id}: ${ag.name}`;
+      document.getElementById('modalSubtitle').textContent = `Celková alokácia: ${ag.fteTotal} FTE v kraji`;
+      
+      const iconBox = document.getElementById('modalIconBox');
+      iconBox.style.backgroundColor = ag.color;
+      iconBox.innerHTML = `<span class="text-white font-bold text-sm">${ag.num}</span>`;
+
+      const body = document.getElementById('modalBody');
+      body.innerHTML = `
+        <div class="space-y-3">
+          <p class="text-slate-700">${ag.desc}</p>
+
+          <div class="p-3 rounded-lg bg-slate-50 border border-slate-200">
+            <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Pracoviská garantujúce túto agendu (${ag.coveredIn.length}):</div>
+            <div class="flex flex-wrap gap-1.5">
+              ${ag.coveredIn.map(dId => {
+                const d = getDistrict(dId);
+                return `<span class="px-2.5 py-1 rounded-md bg-white border border-slate-300 text-xs font-semibold text-slate-800 shadow-sm">${d ? d.name + ' (' + d.id + ')' : dId}</span>`;
+              }).join('')}
+            </div>
+          </div>
+
+          <div class="text-xs text-slate-500">
+            <strong>Kategória:</strong> ${ag.scope}
+          </div>
+        </div>
+      `;
+
+      document.getElementById('infoModal').classList.remove('hidden');
+    }
+
+    function showDistrictModal(distId) {
+      const dist = getDistrict(distId);
+      if (!dist) return;
+
+      document.getElementById('modalTitle').textContent = `Okresný úrad ${dist.name} (${dist.id})`;
+      document.getElementById('modalSubtitle').textContent = `${dist.regionName} • Kapacita: ${dist.fte} FTE`;
+      
+      const iconBox = document.getElementById('modalIconBox');
+      iconBox.style.backgroundColor = "#0284c7";
+      iconBox.innerHTML = `<i class="fa-solid fa-building text-white text-sm"></i>`;
+
+      const agHtml = dist.ags.map(agId => {
+        const a = getAgenda(agId);
+        return `
+          <div class="p-2.5 rounded-lg bg-white border border-slate-200 flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+              <span class="w-5 h-5 rounded text-[10px] font-bold text-white flex items-center justify-center" style="background-color: ${a.color}">${a.num}</span>
+              <div>
+                <span class="font-bold text-slate-800 text-xs">${a.id}</span>
+                <span class="text-[11px] text-slate-500 block truncate max-w-[200px]">${a.name}</span>
+              </div>
+            </div>
+            <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full ${a.type === 'KRAJ' ? 'bg-amber-100 text-amber-900 border border-amber-300' : 'bg-slate-100 text-slate-600'}">${a.type}</span>
+          </div>
+        `;
+      }).join('');
+
+      const body = document.getElementById('modalBody');
+      body.innerHTML = `
+        <div class="space-y-3">
+          <div class="grid grid-cols-2 gap-2 text-xs">
+            <div class="p-3 rounded-lg bg-slate-50 border border-slate-200">
+              <span class="text-slate-500 font-medium">Spravované územie:</span>
+              <div class="text-sm font-bold text-slate-900">${dist.villages} obcí</div>
+            </div>
+            <div class="p-3 rounded-lg bg-slate-50 border border-slate-200">
+              <span class="text-slate-500 font-medium">Zaťaženie na osobu:</span>
+              <div class="text-sm font-bold text-slate-900">${(dist.villages / dist.fte).toFixed(1)} obce / FTE</div>
+            </div>
+          </div>
+
+          <div>
+            <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Garantované odborné agendy na pracovisku:</div>
+            <div class="space-y-1.5">
+              ${agHtml}
+            </div>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('infoModal').classList.remove('hidden');
+    }
+
+    function closeModal() {
+      document.getElementById('infoModal').classList.add('hidden');
+    }
+
+    function showToast(message, type = "info") {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      
+      const icons = {
+        info: '<i class="fa-solid fa-circle-info text-sky-500"></i>',
+        success: '<i class="fa-solid fa-circle-check text-emerald-500"></i>',
+        warning: '<i class="fa-solid fa-triangle-exclamation text-amber-500"></i>'
+      };
+
+      toast.className = "pointer-events-auto bg-slate-900 text-white text-xs px-3.5 py-2.5 rounded-xl shadow-xl border border-slate-700 flex items-center space-x-2.5 transform transition-all duration-300 translate-y-2 opacity-0";
+      toast.innerHTML = `
+        <span>${icons[type] || icons.info}</span>
+        <span class="font-medium">${message}</span>
+      `;
+
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.classList.remove('translate-y-2', 'opacity-0');
+      }, 10);
+
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+
+    // Close modal on escape key
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeModal();
+    });
+
+    // Close modal on click outside
+    document.getElementById('infoModal').addEventListener('click', (e) => {
+      if (e.target.id === 'infoModal') closeModal();
+    });
+
+    /* =========================================================================
+       8. INITIALIZATION
+       ========================================================================= */
+
+    window.addEventListener('DOMContentLoaded', () => {
+      renderSankey();
+      setTimeout(() => {
+        Plotly.Plots.resize('plotlySankey').then(() => {
+          if (typeof alignSankeyLabels === 'function') alignSankeyLabels();
+        });
+      }, 150);
+      renderMatrix();
+      renderAgendasCatalog();
+      renderRegionsOverview();
+      runDispatchSimulation();
+    });
+
+    window.addEventListener('resize', () => {
+      setTimeout(alignSankeyLabels, 150);
+    });
+  </script>
+</body>
+</html>
