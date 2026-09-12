@@ -94,22 +94,22 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between h-16">
         <div class="flex items-center space-x-3">
-          <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-sky-500 to-blue-700 flex items-center justify-center text-white font-bold text-lg shadow">
-            <i class="fa-solid fa-shield-halved"></i>
+          <div class="flex items-center justify-center text-white font-bold text-lg shadow">
+            <img src="logo.svg" alt="BBK logo" class="w-20 h-20 object-contain" />
           </div>
           <div>
             <div class="flex items-center space-x-2">
               <span class="text-xs font-semibold tracking-wider text-sky-400 uppercase">Odbor krízového riadenia</span>
               <span class="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-slate-800 text-slate-300 rounded border border-slate-700">BBK</span>
             </div>
-            <h1 class="text-base sm:text-lg font-bold text-slate-100 leading-tight">Matica funkčnej zodpovednosti a kapacít</h1>
+            <h1 class="text-base sm:text-lg font-bold text-slate-100 leading-tight">Matica funkčnej zodpovednosti, rozdelenia agendy a kapacít</h1>
           </div>
         </div>
 
         <!-- Status Summary Badge -->
         <div class="flex items-center space-x-3">
           <div class="flex items-center space-x-2 px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-800/90 text-slate-300 border border-slate-700/80">
-            <i class="fa-solid fa-shield text-sky-400"></i>
+            <img src="logo.svg" alt="CO logo" class="w-4 h-4 object-contain" />
             <span>37 FTE • 13 okresov • 4 regióny</span>
           </div>
         </div>
@@ -152,7 +152,7 @@
         </div>
         <div>
           <div class="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Celková kapacita</div>
-          <div class="text-xl font-bold text-slate-900">37 <span class="text-xs font-normal text-slate-500">FTE</span></div>
+          <div class="text-xl font-bold text-slate-900">37 <span class="text-xs font-normal text-slate-500"></span></div>
         </div>
       </div>
 
@@ -162,7 +162,7 @@
         </div>
         <div>
           <div class="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Územné regióny</div>
-          <div class="text-xl font-bold text-slate-900">4 <span class="text-xs font-normal text-slate-500">oblasti</span></div>
+          <div class="text-xl font-bold text-slate-900">4 <span class="text-xs font-normal text-slate-500"></span></div>
         </div>
       </div>
 
@@ -172,7 +172,7 @@
         </div>
         <div>
           <div class="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Okresné pracoviská</div>
-          <div class="text-xl font-bold text-slate-900">13 <span class="text-xs font-normal text-slate-500">úradov</span></div>
+          <div class="text-xl font-bold text-slate-900">13 <span class="text-xs font-normal text-slate-500"></span></div>
         </div>
       </div>
 
@@ -182,7 +182,7 @@
         </div>
         <div>
           <div class="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Spádových obcí</div>
-          <div class="text-xl font-bold text-slate-900">516 <span class="text-xs font-normal text-slate-500">samospráv</span></div>
+          <div class="text-xl font-bold text-slate-900">516 <span class="text-xs font-normal text-slate-500"></span></div>
         </div>
       </div>
 
@@ -204,21 +204,18 @@
           <div>
             <h2 class="text-lg font-bold text-slate-900 flex items-center space-x-2">
               <i class="fa-solid fa-diagram-project text-sky-600"></i>
-              <span>Sankey diagram toku kapacít: Agendy → Oblasti → Okresy</span>
+              <span>Sankey diagram toku kapacít</span>
             </h2>
-            <p class="text-xs sm:text-sm text-slate-500 mt-0.5">
-              Názvy agend sú vysunuté <strong>vľavo pred hada</strong> a okresy <strong>vpravo za hada</strong> pre 100% čitateľnosť bez prekrývania tokov.
-            </p>
           </div>
 
           <!-- Controls for Sankey -->
           <div class="flex flex-wrap items-center gap-2">
             <div class="bg-slate-100 p-1 rounded-lg flex text-xs font-medium border border-slate-200">
               <button onclick="setSankeyMode('three-tier')" id="btnSankeyTier3" class="px-3 py-1.5 rounded-md bg-white text-slate-800 shadow-sm font-semibold transition">
-                3 Úrovne (s regiónmi)
+                4 regióny (agenda → región → okresné pracovisko)
               </button>
               <button onclick="setSankeyMode('direct')" id="btnSankeyDirect" class="px-3 py-1.5 rounded-md text-slate-600 hover:text-slate-900 transition">
-                Priamy tok (Agenda → Okres)
+                Priamy tok (agenda → okresné pracovisko)
               </button>
             </div>
 
@@ -233,25 +230,25 @@
         <div class="py-3 flex flex-wrap items-center gap-2 border-b border-slate-100 text-xs">
           <span class="font-semibold text-slate-600 mr-1">Farby agend:</span>
           <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-red-50 text-red-800 border border-red-200">
-            <span class="w-2.5 h-2.5 rounded-full bg-[#c00000] mr-1.5"></span> AG1: Prevencia, CBRN (2)
+            <span class="w-2.5 h-2.5 rounded-full bg-[#c00000] mr-1.5"></span> AG1: 2
           </span>
           <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-green-50 text-green-800 border border-green-200">
-            <span class="w-2.5 h-2.5 rounded-full bg-[#66a344] mr-1.5"></span> AG2: IS CO & Varovanie (8)
+            <span class="w-2.5 h-2.5 rounded-full bg-[#66a344] mr-1.5"></span> AG2: 8
           </span>
           <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-blue-50 text-blue-800 border border-blue-200">
-            <span class="w-2.5 h-2.5 rounded-full bg-[#2e75b6] mr-1.5"></span> AG3: Ukrytie & Stavby (8)
+            <span class="w-2.5 h-2.5 rounded-full bg-[#2e75b6] mr-1.5"></span> AG3: 8
           </span>
           <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-amber-50 text-amber-800 border border-amber-200">
-            <span class="w-2.5 h-2.5 rounded-full bg-[#c55a11] mr-1.5"></span> AG4: Evakuácia & ŠHR (8)
+            <span class="w-2.5 h-2.5 rounded-full bg-[#c55a11] mr-1.5"></span> AG4: 8
           </span>
           <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-rose-50 text-rose-800 border border-rose-200">
-            <span class="w-2.5 h-2.5 rounded-full bg-[#990000] mr-1.5"></span> AG5: Materiál & Sklady (2)
+            <span class="w-2.5 h-2.5 rounded-full bg-[#990000] mr-1.5"></span> AG5: 2
           </span>
           <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-purple-50 text-purple-800 border border-purple-200">
-            <span class="w-2.5 h-2.5 rounded-full bg-[#7030a0] mr-1.5"></span> AG6: Mobilizácia & EPSIS (8)
+            <span class="w-2.5 h-2.5 rounded-full bg-[#7030a0] mr-1.5"></span> AG6: 8
           </span>
           <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-rose-50 text-rose-900 border border-rose-300">
-            <span class="w-2.5 h-2.5 rounded-full bg-[#7a0016] mr-1.5"></span> AG7: Bezpečnostné rady (1)
+            <span class="w-2.5 h-2.5 rounded-full bg-[#7a0016] mr-1.5"></span> AG7: 1
           </span>
         </div>
 
@@ -267,11 +264,11 @@
         <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3 text-xs bg-slate-50 p-3.5 rounded-xl border border-slate-200 text-slate-600">
           <div class="flex items-start space-x-2">
             <i class="fa-solid fa-circle-check text-emerald-600 mt-0.5"></i>
-            <span><strong>Perfektná symetria kľúčových agend:</strong> Agendy AG2, AG3, AG4 a AG6 majú presne 2 úväzky v každej zo 4 oblastí BBK.</span>
+            <span><strong>Symetria kľúčových agend:</strong> Agendy AG2, AG3, AG4 a AG6 majú presne 2 úväzky v každom zo 4 regiónov BBK.</span>
           </div>
           <div class="flex items-start space-x-2">
             <i class="fa-solid fa-circle-info text-sky-600 mt-0.5"></i>
-            <span><strong>Centralizácia krajských agend:</strong> AG1 (2 FTE) v BB a BR, AG5 (2 FTE) v BB a ZV, AG7 (1 FTE) výlučne v BB.</span>
+            <span><strong>Centralizácia krajských agend:</strong> AG1 (BB a BR), AG5 (BB a ZV), AG7 (BB).</span>
           </div>
           <div class="flex items-start space-x-2">
             <i class="fa-solid fa-arrows-split-up-and-left text-purple-600 mt-0.5"></i>
@@ -290,7 +287,7 @@
           <div>
             <h2 class="text-lg font-bold text-slate-900 flex items-center space-x-2">
               <i class="fa-solid fa-table-cells text-sky-600"></i>
-              <span>Kompaktná matica funkčnej zodpovednosti (Heatmap)</span>
+              <span>Kompaktná matica funkčnej zodpovednosti</span>
             </h2>
             <p class="text-xs sm:text-sm text-slate-500 mt-0.5">
               Skonsolidovaný prehľad 7 odborných agend naprieč 13 okresnými pracoviskami BBK.
@@ -300,22 +297,22 @@
           <!-- Region Filter Buttons -->
           <div class="flex flex-wrap items-center gap-1.5 text-xs font-medium">
             <span class="text-slate-500 mr-1 font-semibold">Filter:</span>
-            <button onclick="filterMatrix('all')" id="filter-all" class="px-2.5 py-1 rounded-md bg-slate-900 text-white shadow-sm font-semibold transition">Všetky (13)</button>
+            <button onclick="filterMatrix('all')" id="filter-all" class="px-2.5 py-1 rounded-md bg-slate-900 text-white shadow-sm font-semibold transition">Všetky</button>
             <button onclick="filterMatrix('sever')" id="filter-sever" class="px-2.5 py-1 rounded-md bg-slate-100 text-slate-700 hover:bg-slate-200 transition flex items-center space-x-1">
               <span class="w-2 h-2 rounded-full inline-block" style="background-color: #4F6228;"></span>
-              <span>Sever (3)</span>
+              <span>Sever</span>
             </button>
             <button onclick="filterMatrix('zapad')" id="filter-zapad" class="px-2.5 py-1 rounded-md bg-slate-100 text-slate-700 hover:bg-slate-200 transition flex items-center space-x-1">
               <span class="w-2 h-2 rounded-full inline-block" style="background-color: #403152;"></span>
-              <span>Západ (4)</span>
+              <span>Západ</span>
             </button>
             <button onclick="filterMatrix('juh')" id="filter-juh" class="px-2.5 py-1 rounded-md bg-slate-100 text-slate-700 hover:bg-slate-200 transition flex items-center space-x-1">
               <span class="w-2 h-2 rounded-full inline-block" style="background-color: #984806;"></span>
-              <span>Juh (3)</span>
+              <span>Juh</span>
             </button>
             <button onclick="filterMatrix('vychod')" id="filter-vychod" class="px-2.5 py-1 rounded-md bg-slate-100 text-slate-700 hover:bg-slate-200 transition flex items-center space-x-1">
               <span class="w-2 h-2 rounded-full inline-block" style="background-color: #215868;"></span>
-              <span>Východ (3)</span>
+              <span>Východ</span>
             </button>
           </div>
         </div>
@@ -331,11 +328,11 @@
           <div class="flex items-center space-x-4">
             <div class="flex items-center space-x-2">
               <span class="w-2.5 h-2.5 rounded-full bg-amber-400 ring-1 ring-amber-500"></span>
-              <span class="text-slate-600">= Celokrajská pôsobnosť (KRAJ)</span>
+              <span class="text-slate-600">celokrajská pôsobnosť (KRAJ)</span>
             </div>
             <div class="flex items-center space-x-2">
               <span class="w-2 h-2 rounded-full bg-slate-200"></span>
-              <span class="text-slate-500">= Bez priamej alokácie na úrade</span>
+              <span class="text-slate-500">bez priamej alokácie na úrade</span>
             </div>
           </div>
         </div>
@@ -437,14 +434,14 @@
               <i class="fa-solid fa-sitemap"></i>
             </div>
             <div>
-              <h3 class="font-bold text-slate-900 text-base">Strategická úroveň velenia</h3>
-              <p class="text-xs text-slate-500">Krajský krízový štáb v sídle kraja (OÚ Banská Bystrica)</p>
+              <h3 class="font-bold text-slate-900 text-base">Strategická úroveň</h3>
+              <p class="text-xs text-slate-500">Krízový štáb okresného úradu v sídle kraja</p>
             </div>
           </div>
           <ul class="mt-4 space-y-3 text-xs sm:text-sm text-slate-600">
             <li class="flex items-start space-x-2.5">
               <i class="fa-solid fa-user-tie text-red-600 mt-1 text-xs"></i>
-              <span><strong>Predseda krízového štábu:</strong> Prednosta Okresného úradu Banská Bystrica. Vyhlasuje a odvoláva mimoriadnu situáciu.</span>
+              <span><strong>Predseda krízového štábu:</strong> Prednosta Okresného úradu Banská Bystrica. Vyhlasuje a odvoláva mimoriadnu situáciu. Riadi záchranné práce. Ukladá úlohy formou príkazu.</span>
             </li>
             <li class="flex items-start space-x-2.5">
               <i class="fa-solid fa-user-gear text-red-600 mt-1 text-xs"></i>
@@ -464,17 +461,17 @@
             </div>
             <div>
               <h3 class="font-bold text-slate-900 text-base">Takticko-operačná úroveň v území</h3>
-              <p class="text-xs text-slate-500">Územná skupina priamo v dotknutom okrese</p>
+              <p class="text-xs text-slate-500">Vyjazdová skupina priamo v dotknutom okrese</p>
             </div>
           </div>
           <ul class="mt-4 space-y-3 text-xs sm:text-sm text-slate-600">
             <li class="flex items-start space-x-2.5">
               <i class="fa-solid fa-id-badge text-sky-600 mt-1 text-xs"></i>
-              <span><strong>Vedúci územnej skupiny:</strong> Vedúci pracoviska (okresu), na ktorom je vyhlásená MS. Koná na základe písomného poverenia.</span>
+              <span><strong>Vedúci výjazdovej skupiny:</strong> Vedúci okresného pracoviska, na ktorom je vyhlásená MS. Koná na základe písomného poverenia.</span>
             </li>
             <li class="flex items-start space-x-2.5">
               <i class="fa-solid fa-people-group text-sky-600 mt-1 text-xs"></i>
-              <span><strong>Podriadenosť posíl:</strong> Všetci zamestnanci vyslaní na výpomoc z iných okresov alebo regiónov operačne podliehajú tomuto vedúcemu.</span>
+              <span><strong>Podriadenosť posíl:</strong> Všetci zamestnanci vyslaní na výpomoc z iných pracovísk okresov alebo regiónov operačne podliehajú tomuto vedúcemu.</span>
             </li>
             <li class="flex items-start space-x-2.5">
               <i class="fa-solid fa-walkie-talkie text-sky-600 mt-1 text-xs"></i>
@@ -505,7 +502,7 @@
             
             <div class="space-y-2 text-xs text-slate-600">
               <p><strong>Kto zasahuje:</strong> Zamestnanci dislokovaní priamo v okrese, kde MS vznikla.</p>
-              <p><strong>Hlavné úlohy:</strong> Okamžité nadviazanie spojenia so starostami obcí, overenie rozsahu na mieste, zriadenie operatívneho pracoviska a hlásna služba.</p>
+              <p><strong>Hlavné úlohy:</strong> Okamžité nadviazanie spojenia so starostami obcí, overenie rozsahu na mieste, operatívne riadenie a hlásna služba.</p>
             </div>
           </div>
 
@@ -519,7 +516,7 @@
             
             <div class="space-y-2 text-xs text-slate-600">
               <p><strong>Aktivácia:</strong> Na pokyn vedúceho pracoviska po predchádzajúcom súhlase vedúceho odboru KR.</p>
-              <p><strong>Hlavné úlohy:</strong> Posilnenie tímov, koordinácia núdzového zásobovania a ubytovania, administratíva záchranných prác.</p>
+              <p><strong>Hlavné úlohy:</strong> Posilnenie, koordinácia núdzového zásobovania a ubytovania, administratíva záchranných prác.</p>
             </div>
           </div>
 
@@ -747,7 +744,7 @@
         type: "KRAJ",
         fteTotal: 1,
         badgeBg: "bg-red-50 text-red-900 border-red-300",
-        desc: "Tajomník a administratíva Bezpečnostnej rady kraja a Krízového štábu okresného úradu v sídle kraja, zvolávanie zasadnutí, príprava uznesení a strategické velenie.",
+        desc: "Bezpečnostné rady, Krízový štáb okresného úradu v sídle kraja, zvolávanie zasadnutí, príprava zápisov a uznesení, strategické rozhodovanie.",
         scope: "Celokrajská pôsobnosť (výlučne dislokované v sídle kraja BB).",
         coveredIn: ["BB"]
       }
@@ -1125,10 +1122,6 @@
       }];
 
       const layout = {
-        title: {
-          text: "<b>Personálny tok OKR BBK: Agendy → Regióny → Okresné pracoviská</b>",
-          font: { size: 15, color: "#0f172a" }
-        },
         font: { family: "Inter, sans-serif", size: 12, color: "#0f172a" },
         hoverlabel: {
           bgcolor: "#0f172a",
@@ -1140,7 +1133,7 @@
         paper_bgcolor: "transparent",
         annotations: [
           {
-            text: "<b>ODBORNÉ AGENDY (7)</b>",
+            text: "<b>ODBORNÉ AGENDY</b>",
             x: 0,
             y: 1.05,
             xref: 'paper',
@@ -1150,7 +1143,7 @@
             font: { size: 11, color: '#64748b', family: 'Inter, sans-serif' }
           },
           {
-            text: "<b>ÚZEMNÉ REGIÓNY (4)</b>",
+            text: "<b>ÚZEMNÉ REGIÓNY</b>",
             x: 0.5,
             y: 1.05,
             xref: 'paper',
@@ -1160,7 +1153,7 @@
             font: { size: 11, color: '#64748b', family: 'Inter, sans-serif' }
           },
           {
-            text: "<b>OKRESNÉ ÚRADY (13)</b>",
+            text: "<b>OKRESNÉ PRACOVISKÁ</b>",
             x: 1,
             y: 1.05,
             xref: 'paper',
@@ -1287,7 +1280,7 @@
             font: { size: 11, color: '#64748b', family: 'Inter, sans-serif' }
           },
           {
-            text: "<b>OKRESNÉ ÚRADY (13)</b>",
+            text: "<b>OKRESNÉ PRACOVISKÁ (13)</b>",
             x: 1,
             y: 1.05,
             xref: 'paper',
