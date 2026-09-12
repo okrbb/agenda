@@ -1,0 +1,104 @@
+/* =========================================================================
+   Custom CSS Styles & Micro-interactions for OKR BBK Agenda App
+   ========================================================================= */
+
+body {
+  font-family: 'Inter', sans-serif;
+}
+
+.font-mono-code {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Custom clean scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* High-contrast halo & crisp legibility for all Sankey labels placed above nodes */
+#plotlySankey text,
+.sankey-node text,
+.node-label text,
+g.node-label text {
+  font-weight: 700 !important;
+  paint-order: stroke fill !important;
+  stroke: #ffffff !important;
+  stroke-width: 4.5px !important;
+  stroke-linecap: round !important;
+  stroke-linejoin: round !important;
+  fill: #0f172a !important;
+  letter-spacing: 0.02em !important;
+  cursor: default !important;
+  user-select: none !important;
+}
+
+/* Allow text elements to be visible beyond default SVG clip boundaries */
+#plotlySankey svg,
+#plotlySankey .sankey {
+  overflow: visible !important;
+}
+
+/* Floating Scroll to Top button */
+.scroll-top-btn {
+  position: fixed;
+  right: 1.25rem;
+  bottom: 1.25rem;
+  z-index: 60;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(14, 116, 144, 0.4);
+  background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+  color: white;
+  box-shadow: 0 10px 25px rgba(14, 165, 233, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.scroll-top-btn:hover {
+  box-shadow: 0 14px 30px rgba(14, 165, 233, 0.45);
+  transform: translateY(-1px);
+}
+
+.scroll-top-btn.hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(10px);
+}
+
+/* District Map interactive quick selector buttons */
+.district-map-btn {
+  border: 1px solid #cbd5e1;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  border-radius: 0.9rem;
+  padding: 0.5rem 0.6rem;
+  transition: all 0.15s ease;
+  text-align: left;
+}
+
+.district-map-btn:hover {
+  border-color: #7dd3fc;
+  background: linear-gradient(180deg, #f0f9ff 0%, #e0f2fe 100%);
+}
+
+.district-map-btn.active {
+  border-color: #0ea5e9;
+  background: linear-gradient(180deg, #e0f2fe 0%, #bae6fd 100%);
+  box-shadow: inset 0 0 0 1px rgba(14, 165, 233, 0.2);
+}
