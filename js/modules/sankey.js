@@ -249,11 +249,11 @@ function render3TierSankey() {
     orientation: "h",
     arrangement: "freeform",
     node: {
-      pad: 26,
-      thickness: 24,
+      pad: 22,
+      thickness: 28,
       x: nodeX,
       y: nodeY,
-      line: { color: "#0f172a", width: 1 },
+      line: { color: "#ffffff", width: 2 },
       label: labels,
       color: nodeColors,
       hovertemplate: '<b>%{label}</b><br>Kapacita: %{value} FTE<extra></extra>'
@@ -373,11 +373,11 @@ function renderDirectSankey() {
     orientation: "h",
     arrangement: "freeform",
     node: {
-      pad: 26,
-      thickness: 24,
+      pad: 22,
+      thickness: 28,
       x: nodeX,
       y: nodeY,
-      line: { color: "#0f172a", width: 1 },
+      line: { color: "#ffffff", width: 2 },
       label: labels,
       color: nodeColors,
       hovertemplate: '<b>%{label}</b><br>Objem: %{value} FTE<extra></extra>'

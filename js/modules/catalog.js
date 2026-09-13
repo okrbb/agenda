@@ -3,6 +3,31 @@
    Katalóg agend, personálny prehľad regiónov a porovnávacia tabuľka
    ========================================================================= */
 
+function highlightAgendaInMatrix(agId) {
+  if (typeof switchTab === 'function') {
+    switchTab('matrixTab');
+  }
+
+  const row = document.querySelector(`#matrixTableBody tr[data-agenda="${agId}"]`);
+  const table = document.getElementById('coverageTable');
+
+  if (table) {
+    table.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  if (row) {
+    row.classList.remove('agenda-row-pulse');
+    void row.offsetWidth; // reflow trigger
+    row.classList.add('agenda-row-pulse');
+  }
+
+  if (typeof showAgendaModal === 'function') {
+    setTimeout(() => {
+      showAgendaModal(agId);
+    }, 450);
+  }
+}
+
 function renderAgendasCatalog() {
   const grid = document.getElementById('agendasCatalogGrid');
   if (!grid) return;
@@ -10,13 +35,16 @@ function renderAgendasCatalog() {
 
   AGENDAS.forEach(ag => {
     const card = document.createElement('div');
-    card.className = "bg-slate-50 p-4 rounded-xl border border-slate-200 hover:border-slate-300 hover:shadow-md transition flex flex-col justify-between";
+    card.className = "bg-white p-4.5 rounded-xl border border-slate-200 hover:border-sky-400 hover:shadow-md transition flex flex-col justify-between cursor-pointer group";
+    card.title = `Kliknite pre zobrazenie agendy ${ag.id} v matici funkčnej zodpovednosti`;
+    card.onclick = () => highlightAgendaInMatrix(ag.id);
+
     card.innerHTML = `
       <div>
         <div class="flex items-start justify-between gap-2 mb-2">
           <div class="flex items-center space-x-2">
-            <span class="w-7 h-7 rounded-lg text-white font-bold text-xs flex items-center justify-center shadow-sm" style="background-color: ${ag.color}">${ag.num}</span>
-            <span class="font-bold text-slate-900 text-sm">${ag.id}</span>
+            <span class="w-7 h-7 rounded-lg text-white font-bold text-xs flex items-center justify-center shadow-sm group-hover:scale-105 transition" style="background-color: ${ag.color}">${ag.num}</span>
+            <span class="font-bold text-slate-900 text-sm group-hover:text-sky-600 transition">${ag.id}</span>
           </div>
           <span class="px-2 py-0.5 text-[10px] font-bold rounded-full uppercase tracking-wider ${ag.type === 'KRAJ' ? 'bg-amber-100 text-amber-900 border border-amber-300' : 'bg-slate-200 text-slate-700'}">
             ${ag.type}
@@ -33,6 +61,13 @@ function renderAgendasCatalog() {
         </div>
         <div class="text-[11px] text-slate-500">
           <strong>Garantujúce okresy:</strong> ${ag.coveredIn.join(', ')}
+        </div>
+        <div class="mt-2.5 pt-2 border-t border-slate-100 text-[11px] text-sky-600 font-semibold flex items-center justify-between">
+          <span class="flex items-center space-x-1.5 group-hover:translate-x-1 transition">
+            <i class="fa-solid fa-arrow-down text-[10px]"></i>
+            <span>Zobraziť v matici & detail</span>
+          </span>
+          <i class="fa-solid fa-chevron-right text-[10px] text-slate-400 group-hover:text-sky-600 group-hover:translate-x-0.5 transition"></i>
         </div>
       </div>
     `;

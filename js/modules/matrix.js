@@ -1,10 +1,29 @@
 /* =========================================================================
-   COVERAGE MATRIX MODULE (HEATMAP & FILTERS)
-   Matica funkčnej zodpovednosti, regionálne filtre a CSV export
+   COVERAGE MATRIX MODULE (HEATMAP, CROSSHAIR & FILTERS) - 2026 EDITION
+   Matica funkčnej zodpovednosti, crosshair tracking, regionálne filtre a CSV export
    ========================================================================= */
 
 let matrixFilter = 'all';
-let matrixCellMode = 'standard';
+
+function clearMatrixCrosshair() {
+  document.querySelectorAll('#coverageTable tr.crosshair-row-highlight').forEach(el => {
+    el.classList.remove('crosshair-row-highlight');
+  });
+  document.querySelectorAll('#coverageTable .crosshair-col-highlight').forEach(el => {
+    el.classList.remove('crosshair-col-highlight');
+  });
+}
+
+function applyMatrixCrosshair(distId, trElement) {
+  clearMatrixCrosshair();
+  if (trElement) {
+    trElement.classList.add('crosshair-row-highlight');
+  }
+  if (distId) {
+    const colCells = document.querySelectorAll(`#coverageTable [data-dist="${distId}"]`);
+    colCells.forEach(cell => cell.classList.add('crosshair-col-highlight'));
+  }
+}
 
 function renderMatrix() {
   const tbody = document.getElementById('matrixTableBody');
@@ -20,19 +39,20 @@ function renderMatrix() {
 
   AGENDAS.forEach(ag => {
     const tr = document.createElement('tr');
-    tr.className = "hover:bg-slate-50/80 transition group";
+    tr.className = "hover:bg-sky-50/60 transition group";
+    tr.setAttribute('data-agenda', ag.id);
 
     // Col 1: Agenda code and title
     const tdAgenda = document.createElement('td');
-    tdAgenda.className = "p-2.5 font-medium sticky left-0 z-10 bg-white group-hover:bg-slate-50 border-r border-slate-200 cursor-pointer";
+    tdAgenda.className = "p-2.5 font-medium matrix-sticky-col bg-white group-hover:bg-sky-50/90 border-r border-slate-200 cursor-pointer transition";
     tdAgenda.onclick = () => showAgendaModal(ag.id);
     tdAgenda.innerHTML = `
-      <div class="flex items-center space-x-2">
-        <span class="w-6 h-6 rounded flex items-center justify-center text-[11px] font-bold text-white shadow-sm" style="background-color: ${ag.color}">${ag.num}</span>
+      <div class="flex items-center space-x-2.5">
+        <span class="w-6 h-6 rounded-md flex items-center justify-center text-[11px] font-bold text-white shadow-sm" style="background-color: ${ag.color}">${ag.num}</span>
         <div>
           <div class="font-bold text-slate-900 flex items-center space-x-1">
             <span>${ag.id}</span>
-            <i class="fa-solid fa-circle-question text-[10px] text-slate-400 group-hover:text-sky-500"></i>
+            <i class="fa-solid fa-circle-question text-[10px] text-slate-400 group-hover:text-sky-500 transition"></i>
           </div>
           <div class="text-[11px] text-slate-500 truncate max-w-[150px]" title="${ag.name}">${ag.shortName}</div>
         </div>
@@ -50,10 +70,10 @@ function renderMatrix() {
     }
     tr.appendChild(tdType);
 
-    // Cols for each of the 13 districts: Clean colored tiles
+    // Cols for each of the 13 districts: Interactive Heatmap Pods
     districtsList.forEach(d => {
       const td = document.createElement('td');
-      td.className = "p-1.5 text-center border-r border-slate-200";
+      td.className = "p-1.5 text-center border-r border-slate-200 transition-colors duration-150";
       td.setAttribute('data-dist', d.id);
       td.setAttribute('data-region', d.region);
 
@@ -61,16 +81,24 @@ function renderMatrix() {
 
       if (hasAgenda) {
         const isKraj = ag.type === 'KRAJ';
-        const sizeClasses = matrixCellMode === 'compact' ? 'w-5 h-5 rounded-md' : 'w-7 h-7 rounded-lg';
+        const sizeClasses = 'w-7 h-7';
         
         td.innerHTML = `
-          <div onclick="showCellDetail('${ag.id}', '${d.id}')" class="mx-auto ${sizeClasses} cursor-pointer shadow-sm transform hover:scale-115 hover:shadow-md transition duration-150 relative" style="background-color: ${ag.color};" title="${ag.id} (${ag.shortName}) - OÚ ${d.id}">
+          <div onclick="showCellDetail('${ag.id}', '${d.id}')" 
+               class="matrix-cell-node mx-auto ${sizeClasses} cursor-pointer flex items-center justify-center relative" 
+               style="background: linear-gradient(135deg, ${ag.color} 0%, ${ag.color}dd 100%);" 
+               title="${ag.id} (${ag.shortName}) - OÚ ${d.id}">
             ${isKraj ? '<span class="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-amber-400 ring-2 ring-white shadow-sm" title="Celokrajská pôsobnosť"></span>' : ''}
           </div>
         `;
       } else {
-        td.innerHTML = `<div class="w-2 h-2 rounded-full bg-slate-200 mx-auto opacity-60"></div>`;
+        td.innerHTML = `<div class="w-1.5 h-1.5 rounded-full bg-slate-300/70 mx-auto"></div>`;
       }
+
+      // Crosshair tracking events
+      td.addEventListener('mouseenter', () => {
+        applyMatrixCrosshair(d.id, tr);
+      });
 
       tr.appendChild(td);
     });
@@ -83,18 +111,33 @@ function renderMatrix() {
 
     tbody.appendChild(tr);
   });
+
+  // Clear crosshair on leaving the matrix table
+  const table = document.getElementById('coverageTable');
+  if (table && !table._hasCrosshairLeave) {
+    table.addEventListener('mouseleave', clearMatrixCrosshair);
+    table._hasCrosshairLeave = true;
+  }
 }
 
 function filterMatrix(regionKey) {
   matrixFilter = regionKey;
 
-  ['all', 'sever', 'zapad', 'juh', 'vychod'].forEach(k => {
-    const btn = document.getElementById('filter-' + k);
+  const filterDefs = [
+    { key: 'all', fte: '37 FTE' },
+    { key: 'sever', fte: '12 FTE' },
+    { key: 'zapad', fte: '9 FTE' },
+    { key: 'juh', fte: '8 FTE' },
+    { key: 'vychod', fte: '8 FTE' }
+  ];
+
+  filterDefs.forEach(def => {
+    const btn = document.getElementById('filter-' + def.key);
     if (btn) {
-      if (k === regionKey) {
-        btn.className = "px-2.5 py-1 rounded-md bg-slate-900 text-white shadow-sm font-semibold transition";
+      if (def.key === regionKey) {
+        btn.className = "px-3 py-1.5 rounded-lg bg-sky-600 text-white shadow-sm font-semibold transition flex items-center space-x-1.5";
       } else {
-        btn.className = "px-2.5 py-1 rounded-md bg-slate-100 text-slate-700 hover:bg-slate-200 transition";
+        btn.className = "px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition flex items-center space-x-1.5";
       }
     }
   });
@@ -122,48 +165,4 @@ function filterMatrix(regionKey) {
   }
 
   showToast(`Filter matice: ${regionKey.toUpperCase()}`, "info");
-}
-
-function setMatrixCellMode(mode) {
-  matrixCellMode = mode;
-  const btnStd = document.getElementById('matrixModeStandard');
-  const btnCmp = document.getElementById('matrixModeCompact');
-  if (btnStd && btnCmp) {
-    btnStd.className = mode === 'standard'
-      ? "px-2.5 py-1 rounded border border-sky-300 bg-sky-50 text-sky-800 font-semibold transition"
-      : "px-2.5 py-1 rounded border border-slate-200 bg-white text-slate-600 hover:bg-slate-100 transition";
-    
-    btnCmp.className = mode === 'compact'
-      ? "px-2.5 py-1 rounded border border-sky-300 bg-sky-50 text-sky-800 font-semibold transition"
-      : "px-2.5 py-1 rounded border border-slate-200 bg-white text-slate-600 hover:bg-slate-100 transition";
-  }
-
-  renderMatrix();
-}
-
-function exportMatrixCSV() {
-  let csv = "ID;Agenda;Pôsobnosť;BB;BR;RA;ZV;ZC;ZH;BS;KA;VK;LC;DT;PT;RS;Spolu FTE\n";
-  const distKeys = ["BB", "BR", "RA", "ZV", "ZC", "ZH", "BS", "KA", "VK", "LC", "DT", "PT", "RS"];
-  
-  AGENDAS.forEach(ag => {
-    const row = [
-      ag.id,
-      `"${ag.name}"`,
-      ag.type,
-      ...distKeys.map(d => ag.coveredIn.includes(d) ? "1" : "0"),
-      ag.fteTotal
-    ];
-    csv += row.join(";") + "\n";
-  });
-
-  const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "matica_funkcnej_zodpovednosti_OKR_BBK.csv";
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-
-  showToast("Matica bola exportovaná do CSV.", "success");
 }

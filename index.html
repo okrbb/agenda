@@ -108,11 +108,6 @@
           <i class="fa-solid fa-table-cells"></i>
           <span>Agendy</span>
         </button>
-        <button onclick="switchTab('agendasTab')" id="tabBtn-agendasTab"
-          class="tab-btn py-2.5 px-3 border-b-2 border-transparent text-slate-400 hover:text-slate-200 whitespace-nowrap flex items-center space-x-2 transition">
-          <i class="fa-solid fa-list-check"></i>
-          <span>Katalóg agend</span>
-        </button>
         <button onclick="switchTab('sankeyTab')" id="tabBtn-sankeyTab"
           class="tab-btn py-2.5 px-3 border-b-2 border-transparent text-slate-400 hover:text-slate-200 whitespace-nowrap flex items-center space-x-2 transition">
           <i class="fa-solid fa-diagram-project"></i>
@@ -135,70 +130,9 @@
   <!-- Main Content Container -->
   <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
 
-    <!-- Executive KPI Metrics Strip -->
-    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-6">
-      <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm flex items-center space-x-3">
-        <div class="w-10 h-10 rounded-lg bg-sky-100 text-sky-700 flex items-center justify-center font-bold text-lg">
-          <i class="fa-solid fa-users"></i>
-        </div>
-        <div>
-          <div class="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Celková kapacita</div>
-          <div class="text-xl font-bold text-slate-900">37 <span class="text-xs font-normal text-slate-500"></span>
-          </div>
-        </div>
-      </div>
-
-      <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm flex items-center space-x-3">
-        <div
-          class="w-10 h-10 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-lg">
-          <i class="fa-solid fa-layer-group"></i>
-        </div>
-        <div>
-          <div class="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Územné regióny</div>
-          <div class="text-xl font-bold text-slate-900">4 <span class="text-xs font-normal text-slate-500"></span></div>
-        </div>
-      </div>
-
-      <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm flex items-center space-x-3">
-        <div
-          class="w-10 h-10 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-lg">
-          <i class="fa-solid fa-building-columns"></i>
-        </div>
-        <div>
-          <div class="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Okresné pracoviská</div>
-          <div class="text-xl font-bold text-slate-900">13 <span class="text-xs font-normal text-slate-500"></span>
-          </div>
-        </div>
-      </div>
-
-      <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm flex items-center space-x-3">
-        <div
-          class="w-10 h-10 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center font-bold text-lg">
-          <i class="fa-solid fa-city"></i>
-        </div>
-        <div>
-          <div class="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Spádových obcí</div>
-          <div class="text-xl font-bold text-slate-900">516 <span class="text-xs font-normal text-slate-500"></span>
-          </div>
-        </div>
-      </div>
-
-      <div
-        class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm flex items-center space-x-3 col-span-2 sm:col-span-1">
-        <div class="w-10 h-10 rounded-lg bg-rose-100 text-rose-700 flex items-center justify-center font-bold text-lg">
-          <i class="fa-solid fa-star"></i>
-        </div>
-        <div>
-          <div class="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Celokrajské agendy</div>
-          <div class="text-xl font-bold text-slate-900">3 <span class="text-xs font-normal text-slate-500">[1, 5,
-              7]</span></div>
-        </div>
-      </div>
-    </div>
-
     <!-- TAB 1: SANKEY DIAGRAM (TOK KAPACÍT) -->
     <div id="sankeyTab" class="tab-content hidden space-y-4">
-      <div class="bg-white p-4 sm:p-6 rounded-2xl border border-slate-200 shadow-sm">
+      <div class="bento-panel p-4 sm:p-6 space-y-4">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-100">
           <div>
             <h2 class="text-lg font-bold text-slate-900 flex items-center space-x-2">
@@ -224,6 +158,13 @@
               class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-medium shadow-sm transition flex items-center space-x-1.5">
               <i class="fa-solid fa-arrows-rotate text-slate-400"></i>
               <span>Resetovať</span>
+            </button>
+
+            <button onclick="toggleFullscreen('plotlySankeyWrapper')" id="sankeyFullscreenBtn"
+              class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-medium shadow-sm transition flex items-center space-x-1.5"
+              title="Zobraziť Sankey diagram na celú obrazovku">
+              <i class="fa-solid fa-expand text-slate-500"></i>
+              <span>Celá obrazovka</span>
             </button>
           </div>
         </div>
@@ -287,9 +228,94 @@
       </div>
     </div>
 
-    <!-- TAB 2: KOMPAKTNÁ MATICA POKRYTIA -->
-    <div id="matrixTab" class="tab-content block space-y-4">
-      <div class="bg-white p-4 sm:p-6 rounded-2xl border border-slate-200 shadow-sm">
+    <!-- TAB: AGENDY & MATICA POKRYTIA -->
+    <div id="matrixTab" class="tab-content block space-y-6">
+
+      <!-- Executive KPI Metrics Strip (Bento Grid 2.0) -->
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+        <div class="bento-panel p-3.5 flex items-center space-x-3">
+          <div
+            class="w-10 h-10 rounded-xl bg-sky-100/90 text-sky-700 flex items-center justify-center font-bold text-lg shadow-sm">
+            <i class="fa-solid fa-users"></i>
+          </div>
+          <div>
+            <div class="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Celková kapacita</div>
+            <div class="text-xl font-bold text-slate-900 font-mono-code">37 <span
+                class="text-xs font-normal text-slate-500">FTE</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="bento-panel p-3.5 flex items-center space-x-3">
+          <div
+            class="w-10 h-10 rounded-xl bg-emerald-100/90 text-emerald-700 flex items-center justify-center font-bold text-lg shadow-sm">
+            <i class="fa-solid fa-layer-group"></i>
+          </div>
+          <div>
+            <div class="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Územné regióny</div>
+            <div class="text-xl font-bold text-slate-900 font-mono-code">4 <span
+                class="text-xs font-normal text-slate-500">regióny</span></div>
+          </div>
+        </div>
+
+        <div class="bento-panel p-3.5 flex items-center space-x-3">
+          <div
+            class="w-10 h-10 rounded-xl bg-indigo-100/90 text-indigo-700 flex items-center justify-center font-bold text-lg shadow-sm">
+            <i class="fa-solid fa-building-columns"></i>
+          </div>
+          <div>
+            <div class="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Okresné pracoviská</div>
+            <div class="text-xl font-bold text-slate-900 font-mono-code">13 <span
+                class="text-xs font-normal text-slate-500">pracovísk</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="bento-panel p-3.5 flex items-center space-x-3">
+          <div
+            class="w-10 h-10 rounded-xl bg-amber-100/90 text-amber-700 flex items-center justify-center font-bold text-lg shadow-sm">
+            <i class="fa-solid fa-city"></i>
+          </div>
+          <div>
+            <div class="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Spádových obcí</div>
+            <div class="text-xl font-bold text-slate-900 font-mono-code">516 <span
+                class="text-xs font-normal text-slate-500">obcí</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="bento-panel p-3.5 flex items-center space-x-3 col-span-2 sm:col-span-1">
+          <div
+            class="w-10 h-10 rounded-xl bg-rose-100/90 text-rose-700 flex items-center justify-center font-bold text-lg shadow-sm">
+            <i class="fa-solid fa-star"></i>
+          </div>
+          <div>
+            <div class="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Celokrajské agendy</div>
+            <div class="text-xl font-bold text-slate-900 font-mono-code">3 <span
+                class="text-xs font-normal text-slate-500">[1, 5, 7]</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Katalóg odborných agend krízového riadenia (AG1 – AG7) -->
+      <div class="bento-panel p-4 sm:p-6 space-y-4">
+        <div class="pb-4 border-b border-slate-100">
+          <h2 class="text-lg font-bold text-slate-900 flex items-center space-x-2">
+            <i class="fa-solid fa-list-check text-sky-600"></i>
+            <span>Katalóg odborných agend krízového riadenia (AG1 – AG7)</span>
+          </h2>
+          <p class="text-xs sm:text-sm text-slate-500 mt-0.5">
+            Presná deľba kompetencií, odborné činnosti a personálne alokácie v zmysle organizačného usporiadania.
+          </p>
+        </div>
+
+        <div class="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="agendasCatalogGrid">
+          <!-- Rendered via JavaScript -->
+        </div>
+      </div>
+
+      <!-- Kompaktná matica funkčnej zodpovednosti -->
+      <div class="bento-panel p-4 sm:p-6">
 
         <!-- Header & Matrix Filters -->
         <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-slate-100">
@@ -303,62 +329,59 @@
             </p>
           </div>
 
-          <!-- Region Filter Buttons -->
+          <!-- Region Filter Buttons (Tactical Quick-Filters s počítadlami FTE) -->
           <div class="flex flex-wrap items-center gap-1.5 text-xs font-medium">
             <span class="text-slate-500 mr-1 font-semibold">Filter:</span>
             <button onclick="filterMatrix('all')" id="filter-all"
-              class="px-2.5 py-1 rounded-md bg-slate-900 text-white shadow-sm font-semibold transition">Všetky</button>
+              class="px-3 py-1.5 rounded-lg bg-sky-600 text-white shadow-sm font-semibold transition flex items-center space-x-1.5">
+              <span>Všetky</span>
+              <span class="px-1.5 py-0.2 rounded bg-sky-700/80 text-[10px] text-white font-mono-code">37</span>
+            </button>
             <button onclick="filterMatrix('sever')" id="filter-sever"
-              class="px-2.5 py-1 rounded-md bg-slate-100 text-slate-700 hover:bg-slate-200 transition flex items-center space-x-1">
+              class="px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 transition flex items-center space-x-1.5">
               <span class="w-2 h-2 rounded-full inline-block" style="background-color: #4F6228;"></span>
               <span>Sever</span>
+              <span class="px-1.5 py-0.2 rounded bg-slate-100 text-[10px] text-slate-600 font-mono-code">12</span>
             </button>
             <button onclick="filterMatrix('zapad')" id="filter-zapad"
-              class="px-2.5 py-1 rounded-md bg-slate-100 text-slate-700 hover:bg-slate-200 transition flex items-center space-x-1">
+              class="px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 transition flex items-center space-x-1.5">
               <span class="w-2 h-2 rounded-full inline-block" style="background-color: #7c3aed;"></span>
               <span>Západ</span>
+              <span class="px-1.5 py-0.2 rounded bg-slate-100 text-[10px] text-slate-600 font-mono-code">9</span>
             </button>
             <button onclick="filterMatrix('juh')" id="filter-juh"
-              class="px-2.5 py-1 rounded-md bg-slate-100 text-slate-700 hover:bg-slate-200 transition flex items-center space-x-1">
+              class="px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 transition flex items-center space-x-1.5">
               <span class="w-2 h-2 rounded-full inline-block" style="background-color: #984806;"></span>
               <span>Juh</span>
+              <span class="px-1.5 py-0.2 rounded bg-slate-100 text-[10px] text-slate-600 font-mono-code">8</span>
             </button>
             <button onclick="filterMatrix('vychod')" id="filter-vychod"
-              class="px-2.5 py-1 rounded-md bg-slate-100 text-slate-700 hover:bg-slate-200 transition flex items-center space-x-1">
+              class="px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 transition flex items-center space-x-1.5">
               <span class="w-2 h-2 rounded-full inline-block" style="background-color: #215868;"></span>
               <span>Východ</span>
+              <span class="px-1.5 py-0.2 rounded bg-slate-100 text-[10px] text-slate-600 font-mono-code">8</span>
             </button>
           </div>
         </div>
 
-        <!-- Matrix Controls & Legend -->
-        <div class="py-3 flex flex-wrap items-center justify-between gap-3 text-xs border-b border-slate-100">
+        <!-- Matrix Legend -->
+        <div class="py-3 flex flex-wrap items-center justify-end gap-4 text-xs border-b border-slate-100">
           <div class="flex items-center space-x-2">
-            <span class="text-slate-500">Veľkosť dlaždíc:</span>
-            <button onclick="setMatrixCellMode('standard')" id="matrixModeStandard"
-              class="px-2.5 py-1 rounded border border-sky-300 bg-sky-50 text-sky-800 font-semibold transition">Štandardná</button>
-            <button onclick="setMatrixCellMode('compact')" id="matrixModeCompact"
-              class="px-2.5 py-1 rounded border border-slate-200 bg-white text-slate-600 hover:bg-slate-100 transition">Kompaktná</button>
+            <span class="w-2.5 h-2.5 rounded-full bg-amber-400 ring-1 ring-amber-500"></span>
+            <span class="text-slate-600 font-medium">celokrajská pôsobnosť (KRAJ)</span>
           </div>
-
-          <div class="flex items-center space-x-4">
-            <div class="flex items-center space-x-2">
-              <span class="w-2.5 h-2.5 rounded-full bg-amber-400 ring-1 ring-amber-500"></span>
-              <span class="text-slate-600">celokrajská pôsobnosť (KRAJ)</span>
-            </div>
-            <div class="flex items-center space-x-2">
-              <span class="w-2 h-2 rounded-full bg-slate-200"></span>
-              <span class="text-slate-500">bez priamej alokácie</span>
-            </div>
+          <div class="flex items-center space-x-2">
+            <span class="w-2 h-2 rounded-full bg-slate-200"></span>
+            <span class="text-slate-500">bez priamej alokácie</span>
           </div>
         </div>
 
         <!-- Responsive Matrix Table Container -->
-        <div class="overflow-x-auto mt-4 rounded-xl border border-slate-200">
+        <div class="overflow-x-auto mt-4 rounded-xl border border-slate-200 max-h-[720px] overflow-y-auto">
           <table class="w-full text-left border-collapse" id="coverageTable">
-            <thead>
-              <tr class="bg-slate-900 text-white text-xs font-semibold uppercase tracking-wider">
-                <th class="p-3 w-44 sticky left-0 z-20 bg-slate-900 border-r border-slate-800">Agenda / Kód</th>
+            <thead class="matrix-sticky-header">
+              <tr class="bg-slate-900 text-white text-xs font-semibold uppercase tracking-wider sticky top-0 z-20">
+                <th class="p-3 w-44 matrix-sticky-col z-30 bg-slate-900 border-r border-slate-800">Agenda / Kód</th>
                 <th class="p-3 w-28 text-center border-r border-slate-800">Typ</th>
                 <!-- Region Headers with official palette -->
                 <th colspan="3" class="p-2 text-center border-r border-slate-900/30 text-white font-semibold"
@@ -371,59 +394,44 @@
                   style="background-color: #215868;" data-region="vychod">Banská Bystrica - VÝCHOD</th>
                 <th class="p-3 w-20 text-center bg-slate-900 text-amber-400 font-bold">Spolu FTE</th>
               </tr>
-              <tr class="bg-slate-100 text-slate-700 text-xs font-semibold border-b border-slate-200">
-                <th class="p-2.5 sticky left-0 z-20 bg-slate-100 border-r border-slate-200">Názov agendy</th>
+              <tr class="bg-slate-100 text-slate-700 text-xs font-semibold border-b border-slate-200 sticky top-[41px] z-20">
+                <th class="p-2.5 matrix-sticky-col z-30 bg-slate-100 border-r border-slate-200">Názov agendy</th>
                 <th class="p-2.5 text-center border-r border-slate-200">Pôsobnosť</th>
                 <!-- Districts: BB, BR, RA -->
-                <th class="p-2 text-center border-r border-slate-200 hover:bg-slate-200 cursor-pointer"
-                  onclick="showDistrictModal('BB')" data-dist="BB" data-region="sever" title="Banská Bystrica (7 FTE)">
-                  BB <span class="text-[10px] text-slate-500 font-normal block">7 FTE</span></th>
-                <th class="p-2 text-center border-r border-slate-200 hover:bg-slate-200 cursor-pointer"
-                  onclick="showDistrictModal('BR')" data-dist="BR" data-region="sever" title="Brezno (3 FTE)">BR <span
-                    class="text-[10px] text-slate-500 font-normal block">3 FTE</span></th>
-                <th class="p-2 text-center border-r border-slate-300 hover:bg-slate-200 cursor-pointer"
-                  onclick="showDistrictModal('RA')" data-dist="RA" data-region="sever" title="Revúca (2 FTE)">RA <span
-                    class="text-[10px] text-slate-500 font-normal block">2 FTE</span></th>
+                <th class="p-2.5 text-center border-r border-slate-200 hover:bg-slate-200 cursor-pointer font-bold"
+                  onclick="showDistrictModal('BB')" data-dist="BB" data-region="sever" title="Banská Bystrica (7 FTE)">BB</th>
+                <th class="p-2.5 text-center border-r border-slate-200 hover:bg-slate-200 cursor-pointer font-bold"
+                  onclick="showDistrictModal('BR')" data-dist="BR" data-region="sever" title="Brezno (3 FTE)">BR</th>
+                <th class="p-2.5 text-center border-r border-slate-300 hover:bg-slate-200 cursor-pointer font-bold"
+                  onclick="showDistrictModal('RA')" data-dist="RA" data-region="sever" title="Revúca (2 FTE)">RA</th>
 
                 <!-- Districts: ZV, ZC, ZH, BS -->
-                <th class="p-2 text-center border-r border-slate-200 hover:bg-slate-200 cursor-pointer"
-                  onclick="showDistrictModal('ZV')" data-dist="ZV" data-region="zapad" title="Zvolen (3 FTE)">ZV <span
-                    class="text-[10px] text-slate-500 font-normal block">3 FTE</span></th>
-                <th class="p-2 text-center border-r border-slate-200 hover:bg-slate-200 cursor-pointer"
-                  onclick="showDistrictModal('ZC')" data-dist="ZC" data-region="zapad" title="Žarnovica (2 FTE)">ZC
-                  <span class="text-[10px] text-slate-500 font-normal block">2 FTE</span>
-                </th>
-                <th class="p-2 text-center border-r border-slate-200 hover:bg-slate-200 cursor-pointer"
-                  onclick="showDistrictModal('ZH')" data-dist="ZH" data-region="zapad" title="Žiar nad Hronom (2 FTE)">
-                  ZH <span class="text-[10px] text-slate-500 font-normal block">2 FTE</span></th>
-                <th class="p-2 text-center border-r border-slate-300 hover:bg-slate-200 cursor-pointer"
-                  onclick="showDistrictModal('BS')" data-dist="BS" data-region="zapad" title="Banská Štiavnica (2 FTE)">
-                  BS <span class="text-[10px] text-slate-500 font-normal block">2 FTE</span></th>
+                <th class="p-2.5 text-center border-r border-slate-200 hover:bg-slate-200 cursor-pointer font-bold"
+                  onclick="showDistrictModal('ZV')" data-dist="ZV" data-region="zapad" title="Zvolen (3 FTE)">ZV</th>
+                <th class="p-2.5 text-center border-r border-slate-200 hover:bg-slate-200 cursor-pointer font-bold"
+                  onclick="showDistrictModal('ZC')" data-dist="ZC" data-region="zapad" title="Žarnovica (2 FTE)">ZC</th>
+                <th class="p-2.5 text-center border-r border-slate-200 hover:bg-slate-200 cursor-pointer font-bold"
+                  onclick="showDistrictModal('ZH')" data-dist="ZH" data-region="zapad" title="Žiar nad Hronom (2 FTE)">ZH</th>
+                <th class="p-2.5 text-center border-r border-slate-300 hover:bg-slate-200 cursor-pointer font-bold"
+                  onclick="showDistrictModal('BS')" data-dist="BS" data-region="zapad" title="Banská Štiavnica (2 FTE)">BS</th>
 
                 <!-- Districts: KA, VK, LC -->
-                <th class="p-2 text-center border-r border-slate-200 hover:bg-slate-200 cursor-pointer"
-                  onclick="showDistrictModal('KA')" data-dist="KA" data-region="juh" title="Krupina (2 FTE)">KA <span
-                    class="text-[10px] text-slate-500 font-normal block">2 FTE</span></th>
-                <th class="p-2 text-center border-r border-slate-200 hover:bg-slate-200 cursor-pointer"
-                  onclick="showDistrictModal('VK')" data-dist="VK" data-region="juh" title="Veľký Krtíš (3 FTE)">VK
-                  <span class="text-[10px] text-slate-500 font-normal block">3 FTE</span>
-                </th>
-                <th class="p-2 text-center border-r border-slate-300 hover:bg-slate-200 cursor-pointer"
-                  onclick="showDistrictModal('LC')" data-dist="LC" data-region="juh" title="Lučenec (3 FTE)">LC <span
-                    class="text-[10px] text-slate-500 font-normal block">3 FTE</span></th>
+                <th class="p-2.5 text-center border-r border-slate-200 hover:bg-slate-200 cursor-pointer font-bold"
+                  onclick="showDistrictModal('KA')" data-dist="KA" data-region="juh" title="Krupina (2 FTE)">KA</th>
+                <th class="p-2.5 text-center border-r border-slate-200 hover:bg-slate-200 cursor-pointer font-bold"
+                  onclick="showDistrictModal('VK')" data-dist="VK" data-region="juh" title="Veľký Krtíš (3 FTE)">VK</th>
+                <th class="p-2.5 text-center border-r border-slate-300 hover:bg-slate-200 cursor-pointer font-bold"
+                  onclick="showDistrictModal('LC')" data-dist="LC" data-region="juh" title="Lučenec (3 FTE)">LC</th>
 
                 <!-- Districts: DT, PT, RS -->
-                <th class="p-2 text-center border-r border-slate-200 hover:bg-slate-200 cursor-pointer"
-                  onclick="showDistrictModal('DT')" data-dist="DT" data-region="vychod" title="Detva (2 FTE)">DT <span
-                    class="text-[10px] text-slate-500 font-normal block">2 FTE</span></th>
-                <th class="p-2 text-center border-r border-slate-200 hover:bg-slate-200 cursor-pointer"
-                  onclick="showDistrictModal('PT')" data-dist="PT" data-region="vychod" title="Poltár (2 FTE)">PT <span
-                    class="text-[10px] text-slate-500 font-normal block">2 FTE</span></th>
-                <th class="p-2 text-center border-r border-slate-300 hover:bg-slate-200 cursor-pointer"
-                  onclick="showDistrictModal('RS')" data-dist="RS" data-region="vychod" title="Rimavská Sobota (4 FTE)">
-                  RS <span class="text-[10px] text-slate-500 font-normal block">4 FTE</span></th>
+                <th class="p-2.5 text-center border-r border-slate-200 hover:bg-slate-200 cursor-pointer font-bold"
+                  onclick="showDistrictModal('DT')" data-dist="DT" data-region="vychod" title="Detva (2 FTE)">DT</th>
+                <th class="p-2.5 text-center border-r border-slate-200 hover:bg-slate-200 cursor-pointer font-bold"
+                  onclick="showDistrictModal('PT')" data-dist="PT" data-region="vychod" title="Poltár (2 FTE)">PT</th>
+                <th class="p-2.5 text-center border-r border-slate-300 hover:bg-slate-200 cursor-pointer font-bold"
+                  onclick="showDistrictModal('RS')" data-dist="RS" data-region="vychod" title="Rimavská Sobota (4 FTE)">RS</th>
 
-                <th class="p-2 text-center bg-slate-100 font-bold text-slate-800">37 FTE</th>
+                <th class="p-2.5 text-center bg-slate-100 font-bold text-slate-800">37 FTE</th>
               </tr>
             </thead>
             <tbody id="matrixTableBody" class="divide-y divide-slate-200 text-xs">
@@ -469,18 +477,9 @@
           </table>
         </div>
 
-        <div class="mt-4 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-2">
-          <div>
-            <i class="fa-solid fa-hand-pointer text-slate-400 mr-1"></i> Kliknutím na dlaždicu zobrazíte detailnú
-            kompetenčnú kartu danej agendy.
-          </div>
-          <div class="flex items-center space-x-2">
-            <button onclick="exportMatrixCSV()"
-              class="px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-100 text-slate-700 font-medium transition flex items-center space-x-1">
-              <i class="fa-solid fa-file-csv text-emerald-600"></i>
-              <span>Exportovať do CSV</span>
-            </button>
-          </div>
+        <div class="mt-4 flex items-center text-xs text-slate-500">
+          <i class="fa-solid fa-hand-pointer text-slate-400 mr-1.5"></i>
+          <span>Kliknutím na dlaždicu zobrazíte detailnú kompetenčnú kartu danej agendy.</span>
         </div>
 
       </div>
@@ -491,9 +490,10 @@
 
       <!-- Command Structure Overview -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div class="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-sm">
+        <div class="bento-panel p-5 sm:p-6">
           <div class="flex items-center space-x-3 pb-3 border-b border-slate-100">
-            <div class="w-10 h-10 rounded-lg bg-red-100 text-red-700 flex items-center justify-center text-lg">
+            <div
+              class="w-10 h-10 rounded-xl bg-red-100 text-red-700 flex items-center justify-center text-lg shadow-sm">
               <i class="fa-solid fa-sitemap"></i>
             </div>
             <div>
@@ -519,9 +519,10 @@
           </ul>
         </div>
 
-        <div class="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-sm">
+        <div class="bento-panel p-5 sm:p-6">
           <div class="flex items-center space-x-3 pb-3 border-b border-slate-100">
-            <div class="w-10 h-10 rounded-lg bg-sky-100 text-sky-700 flex items-center justify-center text-lg">
+            <div
+              class="w-10 h-10 rounded-xl bg-sky-100 text-sky-700 flex items-center justify-center text-lg shadow-sm">
               <i class="fa-solid fa-person-military-pointing"></i>
             </div>
             <div>
@@ -550,7 +551,7 @@
       </div>
 
       <!-- Cascade Levels Grid (1, 2, 3) -->
-      <div class="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-sm">
+      <div class="bento-panel p-5 sm:p-6">
         <h3 class="text-base font-bold text-slate-900 mb-1 flex items-center space-x-2">
           <i class="fa-solid fa-stairs text-amber-500"></i>
           <span>Kaskádový model nasadzovania síl a prostriedkov</span>
@@ -561,54 +562,66 @@
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
           <!-- Stupeň 1 -->
-          <div
-            class="p-4 rounded-xl bg-slate-50 border-2 border-emerald-500/50 hover:border-emerald-500 transition relative">
+          <div id="cascadeCardLvl1" onclick="setCascadeLevel(1)"
+            class="p-4 rounded-xl bg-slate-50 border-2 border-emerald-500/50 hover:border-emerald-500 hover:shadow-md ring-4 ring-emerald-400 shadow-lg cursor-pointer transition relative group">
             <div
-              class="absolute -top-3 left-4 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-600 text-white shadow-sm">
-              1. STUPEŇ
+              class="absolute -top-3 left-4 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-600 text-white shadow-sm flex items-center space-x-1">
+              <span>1. STUPEŇ</span>
             </div>
-            <div class="mt-2 text-sm font-bold text-slate-900">Lokálne sily (Prvotný zásah)</div>
+            <div class="mt-2 text-sm font-bold text-slate-900 group-hover:text-emerald-700 transition">Lokálne sily (Prvotný zásah)</div>
             <div class="text-xs text-emerald-700 font-medium mb-3">Vlastný okres výskytu MS</div>
 
             <div class="space-y-2 text-xs text-slate-600">
               <p><strong>Kto zasahuje:</strong> Zamestnanci dislokovaní priamo v okrese, kde MS vznikla.</p>
             </div>
+            <div class="mt-3 pt-2 border-t border-slate-200 text-[11px] text-emerald-700 font-semibold flex items-center justify-between">
+              <span>Aktivovať lokálny režim</span>
+              <i class="fa-solid fa-play text-[9px]"></i>
+            </div>
           </div>
 
           <!-- Stupeň 2 -->
-          <div class="p-4 rounded-xl bg-slate-50 border-2 border-sky-500/50 hover:border-sky-500 transition relative">
+          <div id="cascadeCardLvl2" onclick="setCascadeLevel(2)"
+            class="p-4 rounded-xl bg-slate-50 border-2 border-sky-500/50 hover:border-sky-500 hover:shadow-md cursor-pointer transition relative group">
             <div
-              class="absolute -top-3 left-4 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-sky-600 text-white shadow-sm">
-              2. STUPEŇ
+              class="absolute -top-3 left-4 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-sky-600 text-white shadow-sm flex items-center space-x-1">
+              <span>2. STUPEŇ</span>
             </div>
-            <div class="mt-2 text-sm font-bold text-slate-900">Regionálna podpora</div>
+            <div class="mt-2 text-sm font-bold text-slate-900 group-hover:text-sky-700 transition">Regionálna podpora</div>
             <div class="text-xs text-sky-700 font-medium mb-3">Susedné okresy v rámci regiónu / výnimka z dojazdov</div>
 
             <div class="space-y-2 text-xs text-slate-600">
-              <p><strong>Aktivácia:</strong> Na pokyn vedúceho pracoviska po predchádzajúcom súhlase vedúceho odboru KR.
-              </p>
+              <p><strong>Aktivácia:</strong> Na pokyn vedúceho pracoviska po predchádzajúcom súhlase vedúceho odboru KR.</p>
+            </div>
+            <div class="mt-3 pt-2 border-t border-slate-200 text-[11px] text-sky-700 font-semibold flex items-center justify-between">
+              <span>Aktivovať regionálnu podporu</span>
+              <i class="fa-solid fa-play text-[9px]"></i>
             </div>
           </div>
 
           <!-- Stupeň 3 -->
-          <div
-            class="p-4 rounded-xl bg-slate-50 border-2 border-purple-500/50 hover:border-purple-500 transition relative">
+          <div id="cascadeCardLvl3" onclick="setCascadeLevel(3)"
+            class="p-4 rounded-xl bg-slate-50 border-2 border-purple-500/50 hover:border-purple-500 hover:shadow-md cursor-pointer transition relative group">
             <div
-              class="absolute -top-3 left-4 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-purple-600 text-white shadow-sm">
-              3. STUPEŇ
+              class="absolute -top-3 left-4 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-purple-600 text-white shadow-sm flex items-center space-x-1">
+              <span>3. STUPEŇ</span>
             </div>
-            <div class="mt-2 text-sm font-bold text-slate-900">Krajská výpomoc</div>
-            <div class="text-xs text-purple-700 font-medium mb-3">Rozsiahla udalosť v celom kraji</div>
+            <div class="mt-2 text-sm font-bold text-slate-900 group-hover:text-purple-700 transition">Krajská výpomoc (Celokrajská)</div>
+            <div class="text-xs text-purple-700 font-medium mb-3">Rozsiahla mimoriadna udalosť v celom kraji</div>
 
             <div class="space-y-2 text-xs text-slate-600">
               <p><strong>Aktivácia:</strong> Výlučne na pokyn prednostu OÚ v sídle kraja alebo vedúceho odboru KR.</p>
+            </div>
+            <div class="mt-3 pt-2 border-t border-slate-200 text-[11px] text-purple-700 font-semibold flex items-center justify-between">
+              <span>Aktivovať celokrajskú mobilizáciu</span>
+              <i class="fa-solid fa-play text-[9px]"></i>
             </div>
           </div>
         </div>
       </div>
 
       <!-- Interactive Travel-Time Dispatch Calculator -->
-      <div class="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-sm space-y-6">
+      <div class="bento-panel p-5 sm:p-6 space-y-6">
         <div class="flex flex-col md:flex-row md:items-center gap-4 pb-4 border-b border-slate-100">
           <div>
             <h3 class="text-base font-bold text-slate-900 flex items-center space-x-2">
@@ -667,6 +680,30 @@
                 </optgroup>
               </select>
             </div>
+
+            <!-- Stupeň kaskádového nasadenia toggle -->
+            <div class="pt-1">
+              <label class="text-xs font-bold text-slate-700 uppercase tracking-wider block mb-1.5">
+                Stupeň kaskádového nasadenia:
+              </label>
+              <div class="grid grid-cols-3 gap-1 p-1 bg-slate-200/80 rounded-xl border border-slate-300 text-center">
+                <button type="button" onclick="setCascadeLevel(1)" id="btnCascadeLvl1"
+                  class="px-2 py-1.5 rounded-lg text-xs font-bold bg-emerald-600 text-white shadow-sm transition"
+                  title="1. Stupeň: Lokálne sily okresu">
+                  1. Lokálny
+                </button>
+                <button type="button" onclick="setCascadeLevel(2)" id="btnCascadeLvl2"
+                  class="px-2 py-1.5 rounded-lg text-xs font-semibold bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 transition"
+                  title="2. Stupeň: Susedská a regionálna podpora">
+                  2. Regionálny
+                </button>
+                <button type="button" onclick="setCascadeLevel(3)" id="btnCascadeLvl3"
+                  class="px-2 py-1.5 rounded-lg text-xs font-semibold bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 transition"
+                  title="3. Stupeň: Celokrajská mobilizácia všetkých 4 regiónov">
+                  3. Celokrajský
+                </button>
+              </div>
+            </div>
             <div id="dispatchDistrictMeta" class="text-xs text-slate-600 space-y-1 pt-2 border-t border-slate-200">
               <!-- Rendered via JS -->
             </div>
@@ -690,12 +727,18 @@
                 <span>Mapa susediacich okresov a funkcia vyhľadania posilového pracoviska</span>
               </h4>
             </div>
-            <div class="inline-flex items-center gap-2">
-              <div
-                class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-[10px] font-semibold bg-sky-100 text-sky-800 border border-sky-200">
-                <span class="w-2 h-2 rounded-full bg-sky-600"></span>
-                Kliknite na okres na mape
-              </div>
+            <div class="inline-flex items-center gap-2 flex-wrap">
+              <span id="mapCascadeLevelBadge"
+                class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-900 border border-emerald-300 shadow-sm">
+                <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
+                1. STUPEŇ: Lokálne sily
+              </span>
+              <button id="mapFullscreenBtn" type="button" onclick="toggleFullscreen('districtMapCanvasWrapper')"
+                class="px-2.5 py-1 rounded-full border border-slate-200 bg-white text-[10px] font-semibold text-slate-700 hover:bg-slate-50 shadow-sm transition flex items-center space-x-1"
+                title="Zobraziť mapu na celú obrazovku">
+                <i class="fa-solid fa-expand text-slate-500"></i>
+                <span>Celá obrazovka</span>
+              </button>
               <button id="resetMapSelectionBtn" type="button"
                 class="px-2.5 py-1 rounded-full border border-slate-200 bg-white text-[10px] font-semibold text-slate-700 hover:bg-slate-50 shadow-sm transition">
                 Resetovať výber
@@ -704,7 +747,7 @@
           </div>
 
           <div class="mt-4">
-            <div class="rounded-2xl border border-slate-200 bg-white p-2.5 shadow-sm">
+            <div class="rounded-2xl border border-slate-200 bg-white p-2.5 shadow-sm" id="districtMapCanvasWrapper">
               <div
                 class="relative overflow-hidden rounded-xl border border-slate-200 bg-gradient-to-br from-slate-100 via-white to-slate-200">
                 <canvas id="districtMapCanvas" class="block w-full h-[360px] sm:h-[430px] cursor-crosshair"></canvas>
@@ -745,10 +788,23 @@
 
         <!-- Ranked Available Support Routes -->
         <div class="pt-2">
-          <h4 class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2 flex items-center space-x-1.5">
-            <i class="fa-solid fa-ranking-star text-sky-600"></i>
-            <span>Poradie dostupných trás a posilových pracovísk pre zvolený okres:</span>
-          </h4>
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
+            <h4 class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center space-x-1.5">
+              <i class="fa-solid fa-ranking-star text-sky-600"></i>
+              <span>Poradie dostupných trás a posilových pracovísk pre zvolený okres:</span>
+            </h4>
+            <div class="inline-flex items-center bg-slate-100 p-0.5 rounded-lg border border-slate-200 text-[11px] font-medium self-start sm:self-auto">
+              <button type="button" onclick="setDispatchRouteFilter('all')" id="btnFilterRoutesAll"
+                class="px-2.5 py-1 rounded-md bg-white text-slate-800 font-bold shadow-sm transition">
+                Všetky trasy
+              </button>
+              <button type="button" onclick="setDispatchRouteFilter('fast')" id="btnFilterRoutesFast"
+                class="px-2.5 py-1 rounded-md text-slate-600 hover:text-slate-900 transition flex items-center space-x-1">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span>
+                <span>Iba rýchle (≤ 45 min.)</span>
+              </button>
+            </div>
+          </div>
           <div id="dispatchRankedRoutes" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
             <!-- Injected by JS -->
           </div>
@@ -757,27 +813,7 @@
 
     </div>
 
-    <!-- TAB 4: KATALÓG AGEND (AG1–AG7) -->
-    <div id="agendasTab" class="tab-content hidden space-y-4">
-      <div class="bg-white p-4 sm:p-6 rounded-2xl border border-slate-200 shadow-sm">
-        <div class="pb-4 border-b border-slate-100">
-          <h2 class="text-lg font-bold text-slate-900 flex items-center space-x-2">
-            <i class="fa-solid fa-list-check text-sky-600"></i>
-            <span>Katalóg odborných agend krízového riadenia (AG1 – AG7)</span>
-          </h2>
-          <p class="text-xs sm:text-sm text-slate-500 mt-0.5">
-            Presná deľba kompetencií, odborné činnosti a personálne alokácie v zmysle organizačného usporiadania.
-          </p>
-        </div>
-
-        <div class="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="agendasCatalogGrid">
-          <!-- Rendered via JavaScript -->
-        </div>
-      </div>
-    </div>
-
-
-    <!-- TAB 6: POROVNANIE SYSTÉMOV -->
+    <!-- TAB: POROVNANIE SYSTÉMOV -->
     <div id="comparisonTab" class="tab-content hidden space-y-6">
       <div
         class="bg-gradient-to-r from-slate-900 via-slate-800 to-indigo-950 p-6 rounded-2xl text-white shadow-lg border border-slate-800">
@@ -863,7 +899,7 @@
         </div>
       </div>
 
-      <div class="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+      <div class="bento-panel p-5 sm:p-6 space-y-4">
         <div>
           <h3 class="text-base font-bold text-slate-900 flex items-center space-x-2">
             <i class="fa-solid fa-list-check text-sky-600"></i>
@@ -1002,8 +1038,7 @@
         </div>
       </div>
 
-      <div id="districtComparisonAnchor"
-        class="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+      <div id="districtComparisonAnchor" class="bento-panel p-5 sm:p-6 space-y-4">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
           <div>
             <h3 class="text-base font-bold text-slate-900 flex items-center space-x-2">
@@ -1059,7 +1094,7 @@
                 </td>
                 <td class="p-3 bg-emerald-50/70 text-emerald-900">
                   <strong>4 integrované regióny</strong>. 37 špecializovaných miest. 100% krížová zastupiteľnosť a
-                  operačný dojazd do 20 – 45 min.
+                  najbližšia podpora spravidla do 20 – 45 min. (max. ~50 min. pri RA).
                 </td>
               </tr>
             </tfoot>

@@ -1,13 +1,31 @@
 /* =========================================================================
+   2026 TACTICAL GOVTECH LIGHT & SPATIAL INTELLIGENCE STYLES
    Custom CSS Styles & Micro-interactions for OKR BBK Agenda App
    ========================================================================= */
 
+:root {
+  --glass-bg: rgba(255, 255, 255, 0.88);
+  --glass-border: rgba(226, 232, 240, 0.85);
+  --hud-accent: #0ea5e9;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  --surface-canvas: #f8fafc;
+  --brand-cyan: #0891b2;
+  --status-warning: #d97706;
+  --status-critical: #e11d48;
+  --status-optimal: #059669;
+}
+
 body {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background-color: #f8fafc;
+  background-image: radial-gradient(#e2e8f0 1px, transparent 1px);
+  background-size: 24px 24px;
 }
 
 .font-mono-code {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-mono);
+  font-feature-settings: "tnum";
+  font-variant-numeric: tabular-nums;
 }
 
 /* Custom clean scrollbars */
@@ -29,7 +47,144 @@ body {
   background: #94a3b8;
 }
 
-/* High-contrast halo & crisp legibility for all Sankey labels placed above nodes */
+/* 1. Bento Grid a Glassmorphism Container (Svetlý Tactical štýl) */
+.bento-panel {
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.04), 
+              0 1px 3px 0 rgba(15, 23, 42, 0.02),
+              inset 0 1px 0 0 rgba(255, 255, 255, 0.85);
+  border-radius: 1.25rem;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.bento-panel:hover {
+  border-color: rgba(14, 165, 233, 0.35);
+  box-shadow: 0 10px 30px -4px rgba(14, 165, 233, 0.09), 
+              inset 0 1px 0 0 rgba(255, 255, 255, 0.95);
+}
+
+/* 2. Taktické tlačidlá výberu okresov */
+.district-map-btn {
+  position: relative;
+  overflow: hidden;
+  border-radius: 0.75rem;
+  background: white;
+  border: 1px solid #e2e8f0;
+  padding: 0.55rem 0.7rem;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  text-align: left;
+}
+
+.district-map-btn::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: transparent;
+  transition: background 0.2s ease;
+}
+
+.district-map-btn:hover {
+  transform: translateY(-1px);
+  border-color: #cbd5e1;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+.district-map-btn.active {
+  background: #f0f9ff;
+  border-color: #38bdf8;
+  box-shadow: 0 0 0 1px #38bdf8, 0 4px 14px rgba(14, 165, 233, 0.15);
+}
+
+.district-map-btn.active::before {
+  background: #0284c7;
+}
+
+/* 3. Matica: Heatmap bunky s interaktívnou žiarou & Crosshair */
+.matrix-cell-node {
+  border-radius: 0.5rem;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.matrix-cell-node:hover {
+  transform: scale(1.24);
+  z-index: 30;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
+}
+
+/* Crosshair Highlight pre maticu */
+tr.crosshair-row-highlight {
+  background-color: rgba(240, 249, 255, 0.85) !important;
+}
+
+tr.crosshair-row-highlight td.sticky {
+  background-color: #e0f2fe !important;
+}
+
+td.crosshair-col-highlight {
+  background-color: rgba(240, 249, 255, 0.75) !important;
+}
+
+th.crosshair-col-highlight {
+  background-color: #e0f2fe !important;
+  color: #0369a1 !important;
+}
+
+/* 4. Canvas Glow Filter */
+#districtMapCanvas {
+  filter: drop-shadow(0 4px 16px rgba(0, 0, 0, 0.04));
+  border-radius: 1rem;
+}
+
+/* 5. Taktický pulzujúci maják */
+@keyframes tacticalBeacon {
+  0% { transform: scale(0.95); opacity: 0.95; }
+  50% { transform: scale(1.2); opacity: 0.45; }
+  100% { transform: scale(0.95); opacity: 0.95; }
+}
+
+.beacon-pulse {
+  animation: tacticalBeacon 2s infinite ease-in-out;
+}
+
+/* 6. Speed-meter lineárny bar pre dojazdové trasy */
+.speed-meter-track {
+  height: 4px;
+  background: #e2e8f0;
+  border-radius: 9999px;
+  overflow: hidden;
+  margin-top: 5px;
+}
+
+.speed-meter-fill {
+  height: 100%;
+  border-radius: 9999px;
+  transition: width 0.4s ease-out;
+}
+
+/* 7. Command Palette klávesové značky (Kbd) */
+.cmd-kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.15rem 0.45rem;
+  font-size: 0.7rem;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: #475569;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.375rem;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.04);
+}
+
+/* 8. Sankey High-contrast halo & crisp legibility */
 #plotlySankey text,
 .sankey-node text,
 .node-label text,
@@ -37,7 +192,7 @@ g.node-label text {
   font-weight: 700 !important;
   paint-order: stroke fill !important;
   stroke: #ffffff !important;
-  stroke-width: 4.5px !important;
+  stroke-width: 4px !important;
   stroke-linecap: round !important;
   stroke-linejoin: round !important;
   fill: #0f172a !important;
@@ -46,7 +201,6 @@ g.node-label text {
   user-select: none !important;
 }
 
-/* Allow text elements to be visible beyond default SVG clip boundaries */
 #plotlySankey svg,
 #plotlySankey .sankey {
   overflow: visible !important;
@@ -82,23 +236,120 @@ g.node-label text {
   transform: translateY(10px);
 }
 
-/* District Map interactive quick selector buttons */
-.district-map-btn {
-  border: 1px solid #cbd5e1;
-  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
-  border-radius: 0.9rem;
-  padding: 0.5rem 0.6rem;
-  transition: all 0.15s ease;
-  text-align: left;
+/* =========================================================================
+   STICKY TABLE & ROW HIGHLIGHT ENHANCEMENTS
+   ========================================================================= */
+.matrix-sticky-col {
+  position: sticky !important;
+  left: 0 !important;
+  z-index: 15 !important;
+  box-shadow: 3px 0 6px -2px rgba(0, 0, 0, 0.08);
 }
 
-.district-map-btn:hover {
-  border-color: #7dd3fc;
-  background: linear-gradient(180deg, #f0f9ff 0%, #e0f2fe 100%);
+.matrix-sticky-header {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 25 !important;
 }
 
-.district-map-btn.active {
-  border-color: #0ea5e9;
-  background: linear-gradient(180deg, #e0f2fe 0%, #bae6fd 100%);
-  box-shadow: inset 0 0 0 1px rgba(14, 165, 233, 0.2);
+@keyframes agendaRowPulseAnim {
+  0% {
+    background-color: rgba(14, 165, 233, 0.35);
+    box-shadow: inset 0 0 0 2px rgba(14, 165, 233, 0.8);
+  }
+  50% {
+    background-color: rgba(14, 165, 233, 0.15);
+    box-shadow: inset 0 0 0 1px rgba(14, 165, 233, 0.5);
+  }
+  100% {
+    background-color: transparent;
+    box-shadow: none;
+  }
 }
+
+.agenda-row-pulse {
+  animation: agendaRowPulseAnim 2.5s ease-out forwards;
+}
+
+/* =========================================================================
+   FULLSCREEN REŽIM (Sankey & Mapa)
+   ========================================================================= */
+:fullscreen,
+:-webkit-full-screen {
+  background-color: #f8fafc !important;
+  padding: 1.5rem !important;
+  overflow-y: auto !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+}
+
+:fullscreen canvas,
+:-webkit-full-screen canvas {
+  height: 80vh !important;
+}
+
+:fullscreen #plotlySankey,
+:-webkit-full-screen #plotlySankey {
+  height: 85vh !important;
+}
+
+/* =========================================================================
+   TLAČ A EXPORT DO PDF (@media print)
+   ========================================================================= */
+@media print {
+  @page {
+    size: landscape;
+    margin: 10mm;
+  }
+
+  body {
+    background: #ffffff !important;
+    color: #0f172a !important;
+    font-size: 11pt !important;
+  }
+
+  header,
+  .scroll-top-btn,
+  .tab-btn,
+  button,
+  .no-print,
+  #sankeyFullscreenBtn,
+  #mapFullscreenBtn,
+  #resetMapSelectionBtn,
+  #dispatchDistrictSelect {
+    display: none !important;
+  }
+
+  /* Zabezpečenie zobrazenia aktívneho obsahu */
+  .tab-content {
+    display: block !important;
+    page-break-after: auto;
+  }
+
+  .bento-panel {
+    box-shadow: none !important;
+    border: 1px solid #cbd5e1 !important;
+    break-inside: avoid;
+    margin-bottom: 1.5rem !important;
+    background: #ffffff !important;
+  }
+
+  table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    page-break-inside: avoid;
+  }
+
+  th, td {
+    border-color: #cbd5e1 !important;
+  }
+
+  .matrix-sticky-col {
+    position: static !important;
+    box-shadow: none !important;
+  }
+}
+
