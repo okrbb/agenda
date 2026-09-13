@@ -67,35 +67,50 @@
 
   <!-- Floating Left Navigation Pill Dock -->
   <nav id="floatingNavDock" class="floating-nav-dock" aria-label="Rýchla navigácia feedom">
+    <!-- Tlačidlo na rýchle zbalenie/rozbalenie bočnej navigácie na notebookoch -->
+    <button id="dockCollapseBtn" type="button" class="dock-toggle-pill" onclick="toggleNavDockCollapse()"
+      title="Zbaliť / rozbaliť navigáciu" aria-label="Prepnúť bočnú navigáciu">
+      <i id="dockCollapseIcon" class="fa-solid fa-chevron-left"></i>
+    </button>
     <a href="#section-agendas" class="floating-dock-pill active" data-section="section-agendas"
       title="01. Katalóg odborných agend (AG1 – AG7)">
       <span class="pill-icon"><i class="fa-solid fa-list-check"></i></span>
-      <span class="pill-label">Katalóg agend</span>
-      <span class="pill-num">01</span>
+      <span class="pill-flyout">
+        <span class="pill-label">Katalóg agend</span>
+        <span class="pill-num">01</span>
+      </span>
     </a>
     <a href="#section-matrix" class="floating-dock-pill" data-section="section-matrix"
       title="02. Kompaktná matica funkčnej zodpovednosti">
       <span class="pill-icon"><i class="fa-solid fa-table-cells"></i></span>
-      <span class="pill-label">Matica okresov</span>
-      <span class="pill-num">02</span>
+      <span class="pill-flyout">
+        <span class="pill-label">Matica okresov</span>
+        <span class="pill-num">02</span>
+      </span>
     </a>
     <a href="#section-cascade" class="floating-dock-pill" data-section="section-cascade"
       title="03. Kaskádový model nasadzovania síl">
       <span class="pill-icon"><i class="fa-solid fa-stopwatch"></i></span>
-      <span class="pill-label">Kaskáda & dojazd</span>
-      <span class="pill-num">03</span>
+      <span class="pill-flyout">
+        <span class="pill-label">Kaskáda & dojazd</span>
+        <span class="pill-num">03</span>
+      </span>
     </a>
     <a href="#section-map" class="floating-dock-pill" data-section="section-map"
       title="04. Mapa susediacich okresov a posilové trasy">
       <span class="pill-icon"><i class="fa-solid fa-map-location-dot"></i></span>
-      <span class="pill-label">Mapa podpory</span>
-      <span class="pill-num">04</span>
+      <span class="pill-flyout">
+        <span class="pill-label">Mapa podpory</span>
+        <span class="pill-num">04</span>
+      </span>
     </a>
     <a href="#section-comparison" class="floating-dock-pill" data-section="section-comparison"
       title="05. Zhodnotenie transformácie a porovnanie">
       <span class="pill-icon"><i class="fa-solid fa-scale-balanced"></i></span>
-      <span class="pill-label">Porovnanie</span>
-      <span class="pill-num">05</span>
+      <span class="pill-flyout">
+        <span class="pill-label">Porovnanie</span>
+        <span class="pill-num">05</span>
+      </span>
     </a>
   </nav>
 
@@ -154,7 +169,7 @@
   </header>
 
   <!-- Main Feed Container -->
-  <main class="flex-1 max-w-[1480px] w-full mx-auto px-4 sm:px-6 lg:px-8 lg:pl-28 xl:pl-36 py-8 space-y-10">
+  <main class="flex-1 max-w-[1480px] w-full mx-auto px-4 sm:px-6 lg:px-8 main-feed-container py-8 space-y-10">
 
     <!-- SÚHRNNÉ STRATEGICKÉ UKAZOVATELE (KPI) -->
     <section id="section-kpi" class="feed-section space-y-4">
