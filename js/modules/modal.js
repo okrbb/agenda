@@ -8,15 +8,19 @@
  * v rámci príslušného regiónu (alebo pri celokrajských agendách).
  */
 function getSubstitutionInfo(agendaId, districtId) {
+  if (typeof window !== 'undefined' && window.getSubstitutionInfo && window.getSubstitutionInfo !== getSubstitutionInfo) {
+    return window.getSubstitutionInfo(agendaId, districtId);
+  }
   const ag = getAgenda(agendaId);
   const dist = getDistrict(districtId);
-  if (!ag || !dist) return { partnerId: null, partnerName: null, text: '' };
+  if (!ag || !dist) return { partnerId: null, partnerName: null, allPartners: [], text: '' };
 
   // 1. Celokrajská agenda AG7 (výlučne BB)
   if (agendaId === 'AG7') {
     return {
       partnerId: null,
       partnerName: null,
+      allPartners: [],
       text: 'Agenda s výlučnou celokrajskou pôsobnosťou dislokovaná v sídle kraja (bez zastúpenia iným okresom – metodické riadenie a rozhodovanie zabezpečuje priamo vedúci odboru KR).'
     };
   }
@@ -28,7 +32,8 @@ function getSubstitutionInfo(agendaId, districtId) {
     return {
       partnerId: p.id,
       partnerName: p.name,
-      text: `Krajská agenda: pri neprítomnosti alebo zásahu zamestnanca agendu automaticky preberá partnerské krajské pracovisko <strong>${p.name} (${p.id})</strong>.`
+      allPartners: p ? [p] : [],
+      text: `Krajská agenda: pri neprítomnosti alebo zásahu zamestnanca agendu automaticky preberá partnerské krajské pracovisko <strong>${p ? p.name : ''} (${partnerId})</strong>.`
     };
   }
 
@@ -39,13 +44,14 @@ function getSubstitutionInfo(agendaId, districtId) {
     return {
       partnerId: p.id,
       partnerName: p.name,
-      text: `Krajská agenda: pri neprítomnosti alebo zásahu zamestnanca agendu automaticky preberá partnerské krajské pracovisko <strong>${p.name} (${p.id})</strong>.`
+      allPartners: p ? [p] : [],
+      text: `Krajská agenda: pri neprítomnosti alebo zásahu zamestnanca agendu automaticky preberá partnerské krajské pracovisko <strong>${p ? p.name : ''} (${partnerId})</strong>.`
     };
   }
 
   // 4. Regionálne agendy (AG2, AG3, AG4, AG6) - výhradne v rámci rovnakého úzmeného regiónu
   const reg = REGIONS.find(r => r.districts.some(d => d.id === districtId));
-  if (!reg) return { partnerId: null, partnerName: null, text: '' };
+  if (!reg) return { partnerId: null, partnerName: null, allPartners: [], text: '' };
 
   const partnerDistricts = reg.districts.filter(d => d.id !== districtId && d.ags.includes(agendaId));
   if (partnerDistricts.length > 0) {
@@ -53,6 +59,7 @@ function getSubstitutionInfo(agendaId, districtId) {
     return {
       partnerId: partnerDistricts[0].id,
       partnerName: partnerDistricts[0].name,
+      allPartners: partnerDistricts,
       text: `V rámci regiónu <strong>${reg.shortName}</strong> pri neprítomnosti alebo zásahu zamestnanca agendu automaticky preberá partnerské pracovisko ${partnerNames}.`
     };
   }
@@ -60,6 +67,7 @@ function getSubstitutionInfo(agendaId, districtId) {
   return {
     partnerId: null,
     partnerName: null,
+    allPartners: [],
     text: `V regióne ${reg.shortName} je agenda zabezpečená týmto pracoviskom.`
   };
 }
@@ -137,7 +145,7 @@ function showAgendaModal(agendaId) {
   const modal = document.getElementById('infoModal');
 
   if (modalTitle) modalTitle.textContent = `${ag.id} - ${ag.name}`;
-  if (modalSubtitle) modalSubtitle.textContent = `Typ: ${ag.type === 'KRAJ' ? 'Celokrajská agenda' : 'Regionálna agenda'} • Kapacita: ${ag.fteTotal} FTE`;
+  if (modalSubtitle) modalSubtitle.textContent = `Typ: ${ag.type === 'KRAJ' ? 'Celokrajská agenda' : 'Regionálna agenda'}`;
   
   if (iconBox) {
     iconBox.style.backgroundColor = ag.color;
@@ -147,12 +155,9 @@ function showAgendaModal(agendaId) {
   const distHtml = ag.coveredIn.map(dId => {
     const d = getDistrict(dId);
     return `
-      <div class="p-2 rounded-lg bg-white border border-slate-200 flex items-center justify-between">
-        <div class="flex items-center space-x-2">
-          <span class="font-bold text-slate-800 text-xs">${d.name} (${d.id})</span>
-          <span class="text-[11px] text-slate-500">${d.regionShort}</span>
-        </div>
-        <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-sky-100 text-sky-800">${d.fte} FTE</span>
+      <div class="p-2.5 rounded-lg bg-white border border-slate-200 flex items-center justify-between hover:border-slate-300 transition">
+        <span class="font-bold text-slate-800 text-xs">${d.name} (${d.id})</span>
+        <span class="text-[11px] font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200/80">${d.regionShort}</span>
       </div>
     `;
   }).join('');

@@ -96,3 +96,7 @@ const AGENDAS = [
     coveredIn: ["BB"]
   }
 ];
+
+if (typeof window !== 'undefined') {
+  window.AGENDAS = AGENDAS;
+}

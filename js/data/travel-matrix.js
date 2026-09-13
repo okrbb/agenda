@@ -141,3 +141,7 @@ const DISPATCH_TACTICAL_RULES = {
     reason: "1. najbližší: Poltár (30 min, 26 km, VÝCHOD) a Lučenec (30 min, 31 km, JUH) | 2. najbližší: Detva (50 min, 64 km, VÝCHOD) a Revúca (1:00 h, 58 km, SEVER)."
   }
 };
+
+if (typeof window !== 'undefined') {
+  window.RAW_TRAVEL_MATRIX = RAW_TRAVEL_MATRIX;
+}

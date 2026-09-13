@@ -90,3 +90,9 @@ const DISTRICT_COMPARISON_DATA = [
   { id: "ZH", name: "Žiar nad Hronom", villages: 35, fte: 2, region: "ZÁPAD", isCritical: true, oldNote: "2 zamestnanci na 35 obcí a 7 agend. Vysoká priemyselná záťaž.", newNote: "Zabezpečuje agendy AG3 a AG6 v rámci regiónu ZÁPAD. Zastupiteľnosť agendy AG3 je pracoviskom Zvolen a agendy AG6 pracoviskom Banská Štiavnica." },
   { id: "ZV", name: "Zvolen", villages: 26, fte: 3, region: "ZÁPAD", oldNote: "3 zamestnanci na 7 agend a 26 obcí, duplicita s krajským sídlom Banská Bystrica.", newNote: "Zabezpečuje agendu AG5 na úrovni kraja a agendy AG2 a AG3 v rámci regiónu ZÁPAD. Zastupiteľnosť krajskej agendy AG5 je pracoviskom Banská Bystrica. Zastupiteľnosť agendy AG2 je pracoviskom Žarnovica a agendy AG3 pracoviskom Žiar nad Hronom." }
 ];
+
+if (typeof window !== 'undefined') {
+  window.REGIONS = REGIONS;
+  window.DISTRICT_DICT = DISTRICT_DICT;
+  window.DISTRICT_COMPARISON_DATA = DISTRICT_COMPARISON_DATA;
+}

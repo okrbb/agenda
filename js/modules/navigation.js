@@ -1,48 +1,109 @@
 /* =========================================================================
-   NAVIGATION MODULE
-   Správa záložiek (tabov) a plynulého posunu
+   NAVIGATION & SCROLLSPY MODULE
+   Plávajúce ľavé menu (Pill Dock), plynulý posun sekcií a automatický ScrollSpy
    ========================================================================= */
 
-let currentTab = 'matrixTab';
+// Mapovanie pôvodných ID tabov na ID sekcií feedu pre spätnú kompatibilitu
+const TAB_TO_SECTION_MAP = {
+  'matrixTab': 'section-matrix',
+  'agendasTab': 'section-agendas',
+  'cascadeTab': 'section-cascade',
+  'comparisonTab': 'section-comparison',
+  'mapTab': 'section-map'
+};
 
-function switchTab(tabId) {
-  window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
-  currentTab = tabId;
-  document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-  const activeContent = document.getElementById(tabId);
-  if (activeContent) activeContent.classList.remove('hidden');
+/**
+ * Plynulé posunutie na konkrétnu sekciu feedu
+ * @param {string} sectionId - ID cieľovej sekcie (s alebo bez prefixu)
+ */
+function scrollToSection(sectionId) {
+  const targetId = TAB_TO_SECTION_MAP[sectionId] || sectionId;
+  const targetEl = document.getElementById(targetId);
+  if (!targetEl) return;
 
-  document.querySelectorAll('.tab-btn').forEach(btn => {
-    btn.classList.remove('border-sky-500', 'text-sky-400', 'border-amber-400', 'text-amber-300', 'font-semibold');
-    btn.classList.add('border-transparent', 'text-slate-400');
-  });
-  const activeBtn = document.getElementById('tabBtn-' + tabId);
-  if (activeBtn) {
-    if (tabId === 'comparisonTab') {
-      activeBtn.classList.add('border-amber-400', 'text-amber-300', 'font-semibold');
-    } else {
-      activeBtn.classList.add('border-sky-500', 'text-sky-400', 'font-semibold');
-    }
-    activeBtn.classList.remove('border-transparent', 'text-slate-400');
-  }
-
-  if (tabId === 'sankeyTab') {
+  // Ak ide o sekciu s mapou, obnovíme canvas
+  if ((targetId === 'section-cascade' || targetId === 'section-map') && typeof renderCascadeMap === 'function') {
     setTimeout(() => {
-      Plotly.Plots.resize('plotlySankey').then(() => {
-        if (typeof alignSankeyLabels === 'function') alignSankeyLabels();
-      });
-    }, 100);
-  }
-
-  if (tabId === 'cascadeTab') {
-    setTimeout(() => {
-      if (typeof renderCascadeMap === 'function') renderCascadeMap();
-      if (typeof runDispatchSimulation === 'function') runDispatchSimulation();
+      renderCascadeMap();
     }, 120);
   }
+
+  targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
+/**
+ * Spätná kompatibilita pre switchTab (napr. volania z modálov a tabuliek)
+ */
+function switchTab(tabId) {
+  scrollToSection(tabId);
+}
+
+/**
+ * Rýchly posun na porovnávaciu tabuľku okresov
+ */
 function scrollToComparisonMatrix() {
   const el = document.getElementById('districtComparisonAnchor');
-  if (el) el.scrollIntoView({ behavior: 'smooth' });
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+/**
+ * Inicializácia obojsmerného ScrollSpy pre plávajúci Pill Dock
+ */
+function initScrollSpy() {
+  const dockPills = document.querySelectorAll('.floating-dock-pill');
+  if (!dockPills.length) return;
+
+  const sectionIds = Array.from(dockPills).map(pill => pill.getAttribute('data-section')).filter(Boolean);
+  const sections = sectionIds.map(id => document.getElementById(id)).filter(Boolean);
+
+  if (!sections.length) return;
+
+  function setActivePill(activeId) {
+    dockPills.forEach(pill => {
+      const pillSection = pill.getAttribute('data-section');
+      if (pillSection === activeId) {
+        pill.classList.add('active');
+        pill.setAttribute('aria-current', 'true');
+      } else {
+        pill.classList.remove('active');
+        pill.removeAttribute('aria-current');
+      }
+    });
+  }
+
+  // Použitie IntersectionObserver s upraveným horným/dolným offsetom
+  const observerOptions = {
+    root: null,
+    rootMargin: '-18% 0px -60% 0px',
+    threshold: 0
+  };
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        setActivePill(entry.target.id);
+      }
+    });
+  }, observerOptions);
+
+  sections.forEach(sec => observer.observe(sec));
+
+  // Kliknutie na pill v docku
+  dockPills.forEach(pill => {
+    pill.addEventListener('click', (e) => {
+      e.preventDefault();
+      const secId = pill.getAttribute('data-section');
+      if (secId) {
+        scrollToSection(secId);
+        setActivePill(secId);
+      }
+    });
+  });
+}
+
+// Inicializácia pri načítaní DOM
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initScrollSpy);
+} else {
+  initScrollSpy();
 }

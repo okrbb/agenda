@@ -309,7 +309,7 @@ function runDispatchSimulation() {
                 <span class="beacon-pulse absolute inline-flex h-full w-full rounded-full ${beaconPulseColor} opacity-75"></span>
                 <span class="relative inline-flex rounded-full h-3 w-3 ${beaconColor}"></span>
               </span>
-              <span>Taktické rozhodnutie:</span>
+              <span>Rozhodnutie:</span>
             </div>
             <div class="text-sm font-extrabold text-slate-900 leading-snug">${hudDecision}</div>
             <p class="text-xs text-slate-700 mt-2.5 leading-relaxed bg-white/90 p-2.5 rounded-xl border border-slate-200/80 shadow-sm">

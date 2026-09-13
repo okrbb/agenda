@@ -35,34 +35,44 @@ function renderAgendasCatalog() {
 
   AGENDAS.forEach(ag => {
     const card = document.createElement('div');
-    card.className = "bg-white p-4.5 rounded-xl border border-slate-200 hover:border-sky-400 hover:shadow-md transition flex flex-col justify-between cursor-pointer group";
+    card.className = "bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 hover:border-sky-400 hover:shadow-md transition flex flex-col justify-between cursor-pointer group";
     card.title = `Kliknite pre zobrazenie agendy ${ag.id} v matici funkčnej zodpovednosti`;
     card.onclick = () => highlightAgendaInMatrix(ag.id);
+    card.onmouseenter = () => {
+      if (typeof highlightAgendaOnMap === 'function') {
+        highlightAgendaOnMap(ag.id);
+      }
+    };
+    card.onmouseleave = () => {
+      if (typeof clearAgendaOnMap === 'function') {
+        clearAgendaOnMap();
+      }
+    };
 
     card.innerHTML = `
       <div>
-        <div class="flex items-start justify-between gap-2 mb-2">
-          <div class="flex items-center space-x-2">
-            <span class="w-7 h-7 rounded-lg text-white font-bold text-xs flex items-center justify-center shadow-sm group-hover:scale-105 transition" style="background-color: ${ag.color}">${ag.num}</span>
-            <span class="font-bold text-slate-900 text-sm group-hover:text-sky-600 transition">${ag.id}</span>
+        <div class="flex items-start justify-between gap-2 mb-3">
+          <div class="flex items-center space-x-2.5">
+            <span class="w-8 h-8 rounded-xl text-white font-bold text-xs flex items-center justify-center shadow-sm group-hover:scale-105 transition" style="background-color: ${ag.color}">${ag.num}</span>
+            <span class="font-bold text-slate-900 text-base group-hover:text-sky-600 transition">${ag.id}</span>
           </div>
-          <span class="px-2 py-0.5 text-[10px] font-bold rounded-full uppercase tracking-wider ${ag.type === 'KRAJ' ? 'bg-amber-100 text-amber-900 border border-amber-300' : 'bg-slate-200 text-slate-700'}">
+          <span class="px-2.5 py-0.5 text-[10px] font-bold rounded-full uppercase tracking-wider ${ag.type === 'KRAJ' ? 'bg-amber-100 text-amber-900 border border-amber-300' : 'bg-slate-100 text-slate-700 border border-slate-200'}">
             ${ag.type}
           </span>
         </div>
-        <h4 class="font-bold text-slate-800 text-xs sm:text-sm mb-2">${ag.name}</h4>
-        <p class="text-xs text-slate-600 mb-3">${ag.desc}</p>
+        <h4 class="font-bold text-slate-900 text-sm sm:text-base mb-2 leading-snug">${ag.name}</h4>
+        <p class="text-xs sm:text-sm text-slate-600 mb-4 leading-relaxed">${ag.desc}</p>
       </div>
 
-      <div class="pt-3 border-t border-slate-200 text-xs">
-        <div class="flex items-center justify-between text-slate-500 mb-1">
-          <span>Personálna kapacita:</span>
-          <span class="font-bold text-slate-800">${ag.fteTotal} FTE</span>
+      <div class="pt-3.5 border-t border-slate-100 text-xs space-y-2">
+        <div class="flex items-center justify-between text-slate-500">
+          <span class="font-medium">Personálna kapacita:</span>
+          <span class="font-bold text-slate-900 font-mono-code">${ag.fteTotal} FTE</span>
         </div>
-        <div class="text-[11px] text-slate-500">
-          <strong>Garantujúce okresy:</strong> ${ag.coveredIn.join(', ')}
+        <div class="text-[11px] sm:text-xs text-slate-500">
+          <strong class="text-slate-700">Garantujúce okresy:</strong> ${ag.coveredIn.join(', ')}
         </div>
-        <div class="mt-2.5 pt-2 border-t border-slate-100 text-[11px] text-sky-600 font-semibold flex items-center justify-between">
+        <div class="mt-2.5 pt-2 border-t border-slate-100 text-[11px] sm:text-xs text-sky-600 font-semibold flex items-center justify-between">
           <span class="flex items-center space-x-1.5 group-hover:translate-x-1 transition">
             <i class="fa-solid fa-arrow-down text-[10px]"></i>
             <span>Zobraziť v matici & detail</span>

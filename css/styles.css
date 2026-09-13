@@ -184,27 +184,6 @@ th.crosshair-col-highlight {
   box-shadow: 0 1px 0 rgba(0, 0, 0, 0.04);
 }
 
-/* 8. Sankey High-contrast halo & crisp legibility */
-#plotlySankey text,
-.sankey-node text,
-.node-label text,
-g.node-label text {
-  font-weight: 700 !important;
-  paint-order: stroke fill !important;
-  stroke: #ffffff !important;
-  stroke-width: 4px !important;
-  stroke-linecap: round !important;
-  stroke-linejoin: round !important;
-  fill: #0f172a !important;
-  letter-spacing: 0.02em !important;
-  cursor: default !important;
-  user-select: none !important;
-}
-
-#plotlySankey svg,
-#plotlySankey .sankey {
-  overflow: visible !important;
-}
 
 /* Floating Scroll to Top button */
 .scroll-top-btn {
@@ -272,7 +251,7 @@ g.node-label text {
 }
 
 /* =========================================================================
-   FULLSCREEN REŽIM (Sankey & Mapa)
+   FULLSCREEN REŽIM (Mapa)
    ========================================================================= */
 :fullscreen,
 :-webkit-full-screen {
@@ -291,10 +270,6 @@ g.node-label text {
   height: 80vh !important;
 }
 
-:fullscreen #plotlySankey,
-:-webkit-full-screen #plotlySankey {
-  height: 85vh !important;
-}
 
 /* =========================================================================
    TLAČ A EXPORT DO PDF (@media print)
@@ -316,7 +291,6 @@ g.node-label text {
   .tab-btn,
   button,
   .no-print,
-  #sankeyFullscreenBtn,
   #mapFullscreenBtn,
   #resetMapSelectionBtn,
   #dispatchDistrictSelect {
@@ -352,4 +326,394 @@ g.node-label text {
     box-shadow: none !important;
   }
 }
+
+/* =========================================================================
+   2026 FLOATING PILL DOCK & EXECUTIVE FEED STYLES
+   ========================================================================= */
+
+html {
+  scroll-behavior: smooth;
+}
+
+.feed-section {
+  scroll-margin-top: 5.5rem;
+  transition: opacity 0.3s ease;
+}
+
+/* Ľavý plávajúci dock pre desktop - samostatné ostrovčeky bez spoločného rámika */
+.floating-nav-dock {
+  position: fixed;
+  left: 1.25rem;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 45;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  width: auto;
+  max-height: 90vh;
+  pointer-events: none;
+}
+
+/* Každá položka ako samostatná plávajúca svetlá sklenená kapsula */
+.floating-dock-pill {
+  pointer-events: auto;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.55rem 0.95rem;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.90);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgba(226, 232, 240, 0.95);
+  box-shadow: 0 4px 18px -2px rgba(15, 23, 42, 0.08), 
+              0 1px 3px 0 rgba(15, 23, 42, 0.04), 
+              inset 0 1px 0 0 rgba(255, 255, 255, 0.95);
+  color: #475569;
+  font-size: 0.78rem;
+  font-weight: 600;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+  text-decoration: none;
+  user-select: none;
+}
+
+.floating-dock-pill:hover {
+  background: #ffffff;
+  color: #0284c7;
+  border-color: rgba(14, 165, 233, 0.45);
+  transform: translateX(6px) scale(1.02);
+  box-shadow: 0 10px 25px -4px rgba(14, 165, 233, 0.2), 
+              0 2px 6px -1px rgba(14, 165, 233, 0.1);
+}
+
+.floating-dock-pill.active {
+  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+  color: #ffffff;
+  border-color: rgba(56, 189, 248, 0.85);
+  box-shadow: 0 10px 24px -2px rgba(14, 165, 233, 0.42), 
+              0 0 14px rgba(56, 189, 248, 0.3);
+  transform: translateX(8px) scale(1.03);
+}
+
+.floating-dock-pill .pill-num {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 0.12rem 0.4rem;
+  border-radius: 9999px;
+  background: #f1f5f9;
+  color: #64748b;
+  border: 1px solid #e2e8f0;
+  transition: all 0.2s ease;
+}
+
+.floating-dock-pill:hover .pill-num {
+  background: #e0f2fe;
+  color: #0284c7;
+  border-color: #bae6fd;
+}
+
+.floating-dock-pill.active .pill-num {
+  background: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.35);
+  font-weight: 800;
+}
+
+.floating-dock-pill .pill-icon {
+  font-size: 0.95rem;
+  width: 1.25rem;
+  text-align: center;
+  color: #0284c7;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.floating-dock-pill.active .pill-icon {
+  color: #ffffff;
+}
+
+.floating-dock-pill:hover .pill-icon,
+.floating-dock-pill.active .pill-icon {
+  transform: scale(1.12);
+}
+
+.floating-dock-pill .pill-label {
+  white-space: nowrap;
+  letter-spacing: 0.01em;
+}
+
+/* Skrytie textových popisov na stredných desktopoch (kompaktné kruhové ostrovčeky) */
+@media (min-width: 1024px) and (max-width: 1279px) {
+  .floating-dock-pill .pill-label,
+  .floating-dock-pill .pill-num {
+    display: none;
+  }
+  .floating-dock-pill {
+    padding: 0.65rem;
+    width: 2.75rem;
+    height: 2.75rem;
+    justify-content: center;
+  }
+}
+
+/* Responzívny spodný plávajúci dock pre mobily a tablety (< 1024px) */
+@media (max-width: 1023px) {
+  .floating-nav-dock {
+    left: 50%;
+    top: auto;
+    bottom: 1rem;
+    transform: translateX(-50%);
+    flex-direction: row;
+    gap: 0.45rem;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0;
+    max-width: calc(100vw - 1.5rem);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .floating-nav-dock::-webkit-scrollbar {
+    display: none;
+  }
+  .floating-dock-pill {
+    padding: 0.6rem;
+    width: 2.75rem;
+    height: 2.75rem;
+    justify-content: center;
+    border-radius: 9999px;
+    transform: none !important;
+  }
+  .floating-dock-pill:hover {
+    transform: none !important;
+  }
+  .floating-dock-pill.active {
+    transform: translateY(-2px) !important;
+  }
+  .floating-dock-pill .pill-label,
+  .floating-dock-pill .pill-num {
+    display: none;
+  }
+  .floating-dock-pill .pill-icon {
+    font-size: 1rem;
+    width: auto;
+  }
+}
+
+/* Sekčné hlavičky a štítky vo feede */
+.section-header-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.2rem 0.65rem;
+  border-radius: 9999px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  background: rgba(14, 165, 233, 0.1);
+  color: #0284c7;
+  border: 1px solid rgba(14, 165, 233, 0.25);
+}
+
+.feed-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 1.5rem 0;
+  position: relative;
+}
+
+.feed-divider::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(226, 232, 240, 0.8), transparent);
+}
+
+/* =========================================================================
+   SCROLL PROGRESS BAR & DISTRICT FOCUS & COMMAND PALETTE
+   ========================================================================= */
+
+/* Indikátor prečítania materiálu pod hlavičkou */
+.scroll-progress-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 2.5px;
+  background: linear-gradient(90deg, #38bdf8 0%, #0284c7 50%, #10b981 100%);
+  z-index: 50;
+  transition: width 0.06s ease-out;
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.65);
+}
+
+/* Zvýraznenie stĺpca pri fokuse na okres v matici */
+th.district-focus-col {
+  background-color: #0284c7 !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3) !important;
+}
+
+td.district-focus-col {
+  background-color: rgba(224, 242, 254, 0.75) !important;
+  border-left: 2px solid #0284c7 !important;
+  border-right: 2px solid #0284c7 !important;
+}
+
+/* Jemné stmavenie a blur pozadia pre Command Palette */
+.cmd-palette-backdrop {
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* =========================================================================
+   2E. STICKY PRVÝ STĹPEC MATICE
+   ========================================================================= */
+.matrix-sticky-col {
+  position: sticky !important;
+  left: 0 !important;
+  box-shadow: 4px 0 8px -2px rgba(15, 23, 42, 0.08);
+}
+thead tr:first-child .matrix-sticky-col {
+  z-index: 35 !important;
+}
+thead tr:nth-child(2) .matrix-sticky-col {
+  z-index: 34 !important;
+}
+tbody .matrix-sticky-col {
+  z-index: 25 !important;
+}
+
+/* =========================================================================
+   1A. SIMULÁCIA VÝPADKU OKRESU V MATICI
+   ========================================================================= */
+th.district-outage-active {
+  background-color: #e11d48 !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 15px rgba(225, 29, 72, 0.6) !important;
+  animation: outagePulse 2s infinite;
+}
+@keyframes outagePulse {
+  0%, 100% { box-shadow: 0 0 15px rgba(225, 29, 72, 0.7); }
+  50% { box-shadow: 0 0 25px rgba(225, 29, 72, 0.95); }
+}
+
+td.district-outage-col {
+  background: repeating-linear-gradient(
+    45deg,
+    rgba(254, 226, 226, 0.8),
+    rgba(254, 226, 226, 0.8) 10px,
+    rgba(254, 205, 211, 0.8) 10px,
+    rgba(254, 205, 211, 0.8) 20px
+  ) !important;
+  border-left: 2px solid #e11d48 !important;
+  border-right: 2px solid #e11d48 !important;
+  opacity: 0.75;
+}
+
+td.district-substitute-active {
+  background-color: #ecfdf5 !important;
+  border: 2px solid #10b981 !important;
+  box-shadow: 0 0 14px rgba(16, 185, 129, 0.45) !important;
+  position: relative !important;
+  padding-top: 4px !important;
+  padding-bottom: 20px !important;
+  z-index: 10;
+  animation: substituteGlow 2.5s infinite;
+}
+@keyframes substituteGlow {
+  0%, 100% { box-shadow: 0 0 10px rgba(16, 185, 129, 0.4); }
+  50% { box-shadow: 0 0 20px rgba(16, 185, 129, 0.7); }
+}
+
+.subst-focus-badge {
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 9.5px;
+  font-weight: 800;
+  line-height: 1.1;
+  text-transform: uppercase;
+  white-space: nowrap;
+  letter-spacing: 0.04em;
+  background-color: #064e3b;
+  color: #ffffff;
+  border: 1px solid #34d399;
+  border-radius: 4px;
+  padding: 1.5px 5px;
+  box-shadow: 0 2px 5px rgba(6, 78, 59, 0.4);
+  z-index: 25;
+  pointer-events: none;
+}
+
+.subst-outage-chip {
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 9.5px;
+  font-weight: 900;
+  line-height: 1.1;
+  text-transform: uppercase;
+  white-space: nowrap;
+  letter-spacing: 0.04em;
+  background-color: #047857;
+  color: #ffffff;
+  border: 1px solid #6ee7b7;
+  border-radius: 4px;
+  padding: 1.5px 5px;
+  box-shadow: 0 2px 6px rgba(4, 120, 87, 0.45);
+  z-index: 25;
+  pointer-events: none;
+  animation: bounceMini 2s infinite;
+}
+@keyframes bounceMini {
+  0%, 100% { transform: translate(-50%, 0); }
+  50% { transform: translate(-50%, -2px); }
+}
+
+/* =========================================================================
+   2F. BOHATÝ TOOLTIP PRE HLAVIČKY OKRESOV
+   ========================================================================= */
+.district-header-tooltip {
+  position: fixed;
+  z-index: 9999;
+  max-width: 300px;
+  background: rgba(15, 23, 42, 0.96);
+  color: #f8fafc;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 0.875rem;
+  padding: 0.85rem;
+  font-size: 0.75rem;
+  box-shadow: 0 14px 30px -4px rgba(0, 0, 0, 0.45), 0 8px 12px -6px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.15s ease-out, transform 0.15s ease-out;
+}
+.district-header-tooltip.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+
+
 

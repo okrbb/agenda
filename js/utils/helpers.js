@@ -190,3 +190,73 @@ function getMapDistrictAtPos(clientX, clientY) {
 
   return closestId;
 }
+
+/**
+ * Určenie presného partnerského pracoviska pre zastupiteľnosť danej agendy
+ * v rámci príslušného regiónu (alebo pri celokrajských agendách).
+ */
+function getSubstitutionInfo(agendaId, districtId) {
+  const ag = getAgenda(agendaId);
+  const dist = getDistrict(districtId);
+  if (!ag || !dist) return { partnerId: null, partnerName: null, allPartners: [], text: '' };
+
+  // 1. Celokrajská agenda AG7 (výlučne BB)
+  if (agendaId === 'AG7') {
+    return {
+      partnerId: null,
+      partnerName: null,
+      allPartners: [],
+      text: 'Agenda s výlučnou celokrajskou pôsobnosťou dislokovaná v sídle kraja (bez zastúpenia iným okresom – metodické riadenie a rozhodovanie zabezpečuje priamo vedúci odboru KR).'
+    };
+  }
+
+  // 2. Krajská agenda AG1 (BB <-> BR)
+  if (agendaId === 'AG1') {
+    const partnerId = (districtId === 'BB') ? 'BR' : 'BB';
+    const p = getDistrict(partnerId);
+    return {
+      partnerId: p.id,
+      partnerName: p.name,
+      allPartners: p ? [p] : [],
+      text: `Krajská agenda: pri neprítomnosti alebo zásahu zamestnanca agendu automaticky preberá partnerské krajské pracovisko <strong>${p ? p.name : ''} (${partnerId})</strong>.`
+    };
+  }
+
+  // 3. Krajská agenda AG5 (BB <-> ZV)
+  if (agendaId === 'AG5') {
+    const partnerId = (districtId === 'BB') ? 'ZV' : 'BB';
+    const p = getDistrict(partnerId);
+    return {
+      partnerId: p.id,
+      partnerName: p.name,
+      allPartners: p ? [p] : [],
+      text: `Krajská agenda: pri neprítomnosti alebo zásahu zamestnanca agendu automaticky preberá partnerské krajské pracovisko <strong>${p ? p.name : ''} (${partnerId})</strong>.`
+    };
+  }
+
+  // 4. Regionálne agendy (AG2, AG3, AG4, AG6) - výhradne v rámci rovnakého úzmeného regiónu
+  const reg = REGIONS.find(r => r.districts.some(d => d.id === districtId));
+  if (!reg) return { partnerId: null, partnerName: null, allPartners: [], text: '' };
+
+  const partnerDistricts = reg.districts.filter(d => d.id !== districtId && d.ags.includes(agendaId));
+  if (partnerDistricts.length > 0) {
+    const partnerNames = partnerDistricts.map(p => `<strong>${p.name} (${p.id})</strong>`).join(', ');
+    return {
+      partnerId: partnerDistricts[0].id,
+      partnerName: partnerDistricts[0].name,
+      allPartners: partnerDistricts,
+      text: `V rámci regiónu <strong>${reg.shortName}</strong> pri neprítomnosti alebo zásahu zamestnanca agendu automaticky preberá partnerské pracovisko ${partnerNames}.`
+    };
+  }
+
+  return {
+    partnerId: null,
+    partnerName: null,
+    allPartners: [],
+    text: `V regióne ${reg.shortName} je agenda zabezpečená týmto pracoviskom.`
+  };
+}
+
+if (typeof window !== 'undefined') {
+  window.getSubstitutionInfo = getSubstitutionInfo;
+}

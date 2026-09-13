@@ -10,38 +10,39 @@ function updateScrollTopButton() {
   scrollToTopBtn.classList.toggle('hidden', !shouldShow);
 }
 
+function updateScrollProgressBar() {
+  const bar = document.getElementById('scrollProgressBar');
+  if (!bar) return;
+  const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+  if (docHeight > 0) {
+    const pct = Math.min(100, Math.max(0, (window.scrollY / docHeight) * 100));
+    bar.style.width = `${pct}%`;
+  }
+}
+
 window.addEventListener('DOMContentLoaded', () => {
   const scrollToTopBtn = document.getElementById('scrollToTopBtn');
 
   // Reset scroll position on initial load
   window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
 
-  // 1. Render Plotly Sankey diagram
-  renderSankey();
-  setTimeout(() => {
-    if (window.Plotly) {
-      Plotly.Plots.resize('plotlySankey').then(() => {
-        if (typeof alignSankeyLabels === 'function') alignSankeyLabels();
-      });
-    }
-  }, 150);
-
-  // 2. Render Matrix
+  // 1. Render Matrix
   renderMatrix();
 
-  // 3. Render Catalog & Regions
+  // 2. Render Catalog & Regions
   renderAgendasCatalog();
   renderRegionsOverview();
   renderComparisonTable('all');
 
-  // 4. Render Travel & Cascade Map
+  // 3. Render Travel & Cascade Map
   renderTravelMatrixTable('KA');
   initCascadeMap();
   setCascadeLevel(1, false);
   runDispatchSimulation();
 
-  // 5. Initialize UI state
+  // 4. Initialize UI state
   updateScrollTopButton();
+  updateScrollProgressBar();
 
   // Scroll to top button action
   if (scrollToTopBtn) {
@@ -53,17 +54,17 @@ window.addEventListener('DOMContentLoaded', () => {
 
 window.addEventListener('scroll', () => {
   updateScrollTopButton();
+  updateScrollProgressBar();
 }, { passive: true });
 
 window.addEventListener('resize', () => {
   setTimeout(() => {
-    if (typeof alignSankeyLabels === 'function') alignSankeyLabels();
     if (typeof renderCascadeMap === 'function') renderCascadeMap();
   }, 150);
 });
 
 /* =========================================================================
-   FULLSCREEN CONTROLLER (Sankey & Map)
+   FULLSCREEN CONTROLLER (Mapa)
    ========================================================================= */
 function toggleFullscreen(elementId) {
   const elem = document.getElementById(elementId);
@@ -88,11 +89,6 @@ function toggleFullscreen(elementId) {
 
 document.addEventListener('fullscreenchange', () => {
   setTimeout(() => {
-    if (window.Plotly) {
-      Plotly.Plots.resize('plotlySankey').then(() => {
-        if (typeof alignSankeyLabels === 'function') alignSankeyLabels();
-      });
-    }
     if (typeof renderCascadeMap === 'function') {
       renderCascadeMap();
     }

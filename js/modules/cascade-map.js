@@ -14,8 +14,28 @@ const mapState = {
   arrivedCount: 0,
   totalDispatched: 0,
   animationRunning: false,
-  animationFrameId: null
+  animationFrameId: null,
+  highlightedAgendaDistricts: [],
+  highlightedAgendaColor: null,
+  highlightedAgendaName: null
 };
+
+function highlightAgendaOnMap(agId) {
+  const ag = (window.AGENDAS || []).find(a => a.id === agId);
+  if (!ag) return;
+  mapState.highlightedAgendaDistricts = ag.coveredIn || [];
+  mapState.highlightedAgendaColor = ag.color || '#0284c7';
+  mapState.highlightedAgendaName = `${ag.id} • ${ag.name}`;
+}
+
+function clearAgendaOnMap() {
+  mapState.highlightedAgendaDistricts = [];
+  mapState.highlightedAgendaColor = null;
+  mapState.highlightedAgendaName = null;
+}
+
+window.highlightAgendaOnMap = highlightAgendaOnMap;
+window.clearAgendaOnMap = clearAgendaOnMap;
 
 /**
  * Výpočet riadiaceho bodu (Bézier Control Point) pre zakrivenú trajektóriu.
@@ -708,7 +728,20 @@ function renderCascadeMap() {
     }
 
     // Fotónový svetelný kruh: pre susedov v 2. stupni alebo jemný standby kruh pre vlastný región v 1. stupni
-    if (isNeighborActive && supportPalette) {
+    const isAgendaGuarantor = mapState.highlightedAgendaDistricts.includes(id);
+
+    if (isAgendaGuarantor) {
+      const agColor = mapState.highlightedAgendaColor || '#0284c7';
+      const pulseSize = radius + 6 + Math.sin(mapState.wavePulse * 4) * 3;
+      ctx.beginPath();
+      ctx.arc(coord.x, coord.y, pulseSize, 0, Math.PI * 2);
+      ctx.strokeStyle = agColor;
+      ctx.lineWidth = 3;
+      ctx.shadowColor = agColor;
+      ctx.shadowBlur = 14;
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+    } else if (isNeighborActive && supportPalette) {
       ctx.beginPath();
       ctx.arc(coord.x, coord.y, radius + 5, 0, Math.PI * 2);
       ctx.strokeStyle = supportPalette.soft || 'rgba(8, 145, 178, 0.3)';
@@ -723,7 +756,10 @@ function renderCascadeMap() {
     }
 
     ctx.save();
-    if (isSelected) {
+    if (isAgendaGuarantor) {
+      ctx.shadowColor = mapState.highlightedAgendaColor || '#0284c7';
+      ctx.shadowBlur = 18;
+    } else if (isSelected) {
       ctx.shadowColor = isLevel1 ? '#10b981' : '#e11d48';
       ctx.shadowBlur = 20;
     } else if (isNeighborActive && supportPalette) {
