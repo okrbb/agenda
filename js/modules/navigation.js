@@ -101,9 +101,47 @@ function initScrollSpy() {
   });
 }
 
+/**
+ * Zbalenie / rozbalenie bočného navigačného docku
+ */
+function toggleNavDockCollapse() {
+  const dock = document.getElementById('floatingNavDock');
+  const icon = document.getElementById('dockCollapseIcon');
+  if (!dock) return;
+  const isCollapsed = dock.classList.toggle('is-collapsed');
+  if (icon) {
+    icon.className = isCollapsed ? 'fa-solid fa-chevron-right' : 'fa-solid fa-chevron-left';
+  }
+  try {
+    localStorage.setItem('okr_nav_dock_collapsed', isCollapsed ? 'true' : 'false');
+  } catch (e) {}
+}
+
+/**
+ * Obnovenie preferencie zbalenia navigačného docku
+ */
+function restoreNavDockState() {
+  const dock = document.getElementById('floatingNavDock');
+  const icon = document.getElementById('dockCollapseIcon');
+  if (!dock) return;
+  try {
+    if (localStorage.getItem('okr_nav_dock_collapsed') === 'true') {
+      dock.classList.add('is-collapsed');
+      if (icon) icon.className = 'fa-solid fa-chevron-right';
+    }
+  } catch (e) {}
+}
+
+window.toggleNavDockCollapse = toggleNavDockCollapse;
+
 // Inicializácia pri načítaní DOM
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initScrollSpy);
-} else {
+function initNavigation() {
   initScrollSpy();
+  restoreNavDockState();
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initNavigation);
+} else {
+  initNavigation();
 }
