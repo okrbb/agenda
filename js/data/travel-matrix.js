@@ -5,27 +5,27 @@
 
 const RAW_TRAVEL_MATRIX = {
   BB: {
-    BS: { km: 47, time: "0:45:00", fast: false, slow: false },
-    BR: { km: 45, time: "0:45:00", fast: false, slow: false },
+    BS: { km: 47, time: "0:45:00", fast: false, slow: false, mountainPass: true, passName: "Štiavnické vrchy" },
+    BR: { km: 45, time: "0:45:00", fast: false, slow: false, mountainPass: true, passName: "Horehronie / Nízke Tatry" },
     DT: { km: 40, time: "0:40:00", fast: false, slow: false },
     KA: { km: 50, time: "0:45:00", fast: false, slow: false },
     LC: { km: 80, time: "1:00:00", fast: false, slow: false },
     PT: { km: 85, time: "1:05:00", fast: false, slow: false },
     RS: { km: 105, time: "1:20:00", fast: false, slow: false },
-    RA: { km: 93, time: "1:30:00", fast: false, slow: true },
+    RA: { km: 93, time: "1:30:00", fast: false, slow: true, mountainPass: true, passName: "Muránska planina / Zbojská" },
     VK: { km: 80, time: "1:15:00", fast: false, slow: false },
     ZV: { km: 22, time: "0:20:00", fast: true, slow: false },
     ZC: { km: 56, time: "0:40:00", fast: false, slow: false },
     ZH: { km: 42, time: "0:30:00", fast: true, slow: false }
   },
   BS: {
-    KA: { km: 20, time: "0:25:00", fast: true, slow: false }
+    KA: { km: 20, time: "0:25:00", fast: true, slow: false, mountainPass: true, passName: "Štiavnické Bane" }
   },
   BR: {
-    DT: { km: 54, time: "0:54:00", fast: false, slow: false },
-    PT: { km: 60, time: "1:05:00", fast: false, slow: false },
-    RS: { km: 70, time: "1:15:00", fast: false, slow: false },
-    RA: { km: 50, time: "0:53:00", fast: false, slow: false },
+    DT: { km: 54, time: "0:54:00", fast: false, slow: false, mountainPass: true, passName: "Poľana / Hriňová" },
+    PT: { km: 60, time: "1:05:00", fast: false, slow: false, mountainPass: true, passName: "Kokava / Klenovec" },
+    RS: { km: 70, time: "1:15:00", fast: false, slow: false, mountainPass: true, passName: "sedlo Zbojská" },
+    RA: { km: 50, time: "0:53:00", fast: false, slow: false, mountainPass: true, passName: "sedlo Zbojská (I/72)" },
     ZV: { km: 64, time: "1:00:00", fast: false, slow: false }
   },
   DT: {
@@ -54,7 +54,7 @@ const RAW_TRAVEL_MATRIX = {
     LC: { km: 36, time: "0:35:00", fast: true, slow: false }
   },
   ZV: {
-    BS: { km: 33, time: "0:35:00", fast: true, slow: false },
+    BS: { km: 33, time: "0:35:00", fast: true, slow: false, mountainPass: true, passName: "Štiavnické vrchy" },
     DT: { km: 29, time: "0:30:00", fast: true, slow: false },
     KA: { km: 30, time: "0:30:00", fast: true, slow: false },
     LC: { km: 60, time: "0:40:00", fast: false, slow: false },
@@ -63,11 +63,11 @@ const RAW_TRAVEL_MATRIX = {
     ZH: { km: 25, time: "0:20:00", fast: true, slow: false }
   },
   ZC: {
-    BS: { km: 22, time: "0:30:00", fast: true, slow: false },
+    BS: { km: 22, time: "0:30:00", fast: true, slow: false, mountainPass: true, passName: "Štiavnické vrchy / Vyhne" },
     ZH: { km: 20, time: "0:15:00", fast: true, slow: false }
   },
   ZH: {
-    BS: { km: 35, time: "0:35:00", fast: true, slow: false }
+    BS: { km: 35, time: "0:35:00", fast: true, slow: false, mountainPass: true, passName: "Štiavnické vrchy" }
   }
 };
 

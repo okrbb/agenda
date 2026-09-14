@@ -267,23 +267,20 @@ function launchCascadeConvoys(distId) {
   if (level === 1) {
     mapState.totalDispatched = 0;
     mapState.activeConvoys = [];
-    const regionalDistricts = Object.keys(DISTRICT_DICT).filter(id => id !== distId && DISTRICT_DICT[id].regionId === targetMeta.regionId);
-    const regionalNames = regionalDistricts.map(id => DISTRICT_DICT[id].name).join(', ');
-    addMapLogEntry(`🟢 1. STUPEŇ KASKÁDY: Udalosť v okrese ${target.name} rieši výhradne vlastné pracovisko (${targetMeta?.fte || 2} FTE).`, 'emerald');
-    if (regionalDistricts.length > 0) {
-      addMapLogEntry(`⏳ Partnerské pracoviská regiónu ${targetMeta.region} (${regionalNames}) sú pripravené pomôcť v pohotovosti (zatiaľ nevysielajú posily).`, 'neutral');
-    }
     return;
   }
 
-  // 2. STUPEŇ: Regionálna podpora (susedské okresy do ~45 min po cestnej sieti)
+  const busySet = (mapState && mapState.busyDistricts) ? mapState.busyDistricts : new Set();
+
+  // 2. STUPEŇ: Regionálna podpora (susedské okresy po cestnej sieti)
   if (level === 2) {
-    const neighbors = target.neighbors || [];
-    mapState.totalDispatched = neighbors.length;
+    const rawNeighbors = target.neighbors || [];
+    // Okres viazaný vlastnou MU nevysiela posilu
+    const availableNeighbors = rawNeighbors.filter(nId => !busySet.has(nId));
 
-    addMapLogEntry(`🔷 2. STUPEŇ KASKÁDY: Aktivovaná regionálna podpora a pravidlo dojazdov pre okres ${target.name}.`, 'cyan');
+    mapState.totalDispatched = availableNeighbors.length;
 
-    neighbors.forEach((neighborId, index) => {
+    availableNeighbors.forEach((neighborId, index) => {
       setTimeout(() => {
         if (mapState.selectedDistrictId !== distId || mapState.cascadeLevel !== 2) return;
 
@@ -299,8 +296,6 @@ function launchCascadeConvoys(distId) {
           color: palette.fill,
           unitName: `${neighbor.name} → ${target.name}`
         });
-
-        addMapLogEntry(`➡️ ${neighbor.name} odoslala posilu do ${target.name}.`, 'cyan');
       }, index * 260);
     });
     return;
@@ -311,16 +306,15 @@ function launchCascadeConvoys(distId) {
     const allOtherIds = Object.keys(DISTRICT_DICT).filter(id => id !== distId);
     
     // Zoradenie podľa dojazdu
-    const sorted = allOtherIds.map(id => {
+    const sortedAll = allOtherIds.map(id => {
       const pair = getPairData(distId, id);
       const minutes = pair ? parseTimeToMinutes(pair.time) : 999;
       return { id, minutes, km: pair ? pair.km : 0 };
     }).sort((a, b) => a.minutes - b.minutes);
 
-    mapState.totalDispatched = sorted.length;
+    const sorted = sortedAll.filter(item => !busySet.has(item.id));
 
-    addMapLogEntry(`🚨 3. STUPEŇ KASKÁDY: Celokrajská mobilizácia pre okres ${target.name}!`, 'rose');
-    addMapLogEntry(`🏛️ Krajský štáb BB a okresné pracoviská vyrážajú po cestných koridoroch kraja.`, 'rose');
+    mapState.totalDispatched = sorted.length;
 
     sorted.forEach((item, index) => {
       const otherId = item.id;
@@ -366,16 +360,6 @@ function launchCascadeConvoys(distId) {
           isHQ: isHQ,
           unitName: `${isHQ ? '🏛️ Krajský štáb BB' : otherDist.name} → ${target.name}`
         });
-
-        if (isHQ) {
-          addMapLogEntry(`⭐ VÝJAZD KRAJSKÉHO ŠTÁBU: Banská Bystrica vysiela špecialistov po cestnej trase do ${target.name}.`, 'rose');
-        } else if (wave === 1 && index === 0) {
-          addMapLogEntry(`⚡ I. VLNA (do 45 min): Výjazd ${otherDist.name} po trase ${roadPath.join(' → ')}.`, 'cyan');
-        } else if (wave === 2 && index === 3) {
-          addMapLogEntry(`🚚 II. VLNA (45–75 min): Posily z ďalších regiónov na cestnej trase.`, 'amber');
-        } else if (wave === 3 && index === 7) {
-          addMapLogEntry(`🛡️ III. VLNA (vzdialené zálohy): Konvoje na diaľkových cestných ťahoch.`, 'rose');
-        }
       }, waveDelay);
     });
   }
@@ -482,15 +466,19 @@ function renderCascadeMap() {
       ctx.moveTo(coordA.x, coordA.y);
       ctx.quadraticCurveTo(cp.x, cp.y, coordB.x, coordB.y);
 
+      const pairData = (typeof getPairData === 'function') ? getPairData(idA, idB) : null;
+      const isMountainPass = !!(pairData && pairData.mountainPass);
+      const isWinter = !!(mapState && mapState.winterMode);
+
       if (curLevel === 1) {
         // V 1. stupni: iba spojnice v rámci vlastného regiónu sú jemne zvýraznené ako linky pohotovosti
         if (isConnectedToActive && isSameRegion) {
-          ctx.strokeStyle = 'rgba(16, 185, 129, 0.65)';
+          ctx.strokeStyle = isWinter && isMountainPass ? 'rgba(56, 189, 248, 0.85)' : 'rgba(16, 185, 129, 0.65)';
           ctx.lineWidth = 1.8;
           ctx.setLineDash([4, 4]);
           ctx.shadowBlur = 0;
         } else {
-          ctx.strokeStyle = 'rgba(148, 163, 184, 0.22)';
+          ctx.strokeStyle = isWinter && isMountainPass ? 'rgba(56, 189, 248, 0.35)' : 'rgba(148, 163, 184, 0.22)';
           ctx.lineWidth = 1.0;
           ctx.setLineDash([]);
           ctx.shadowBlur = 0;
@@ -498,13 +486,13 @@ function renderCascadeMap() {
       } else if (curLevel === 2) {
         // V 2. stupni: susedské spojnice (aj cez hranicu regiónu) sú aktívne
         if (isConnectedToActive && edgePalette) {
-          ctx.strokeStyle = edgePalette.fill;
+          ctx.strokeStyle = isWinter && isMountainPass ? '#0284c7' : edgePalette.fill;
           ctx.lineWidth = 2.8;
-          ctx.shadowColor = edgePalette.glow || edgePalette.fill;
+          ctx.shadowColor = isWinter && isMountainPass ? '#38bdf8' : (edgePalette.glow || edgePalette.fill);
           ctx.shadowBlur = 10;
           ctx.setLineDash([]);
         } else {
-          ctx.strokeStyle = 'rgba(148, 163, 184, 0.42)';
+          ctx.strokeStyle = isWinter && isMountainPass ? 'rgba(56, 189, 248, 0.55)' : 'rgba(148, 163, 184, 0.42)';
           ctx.lineWidth = 1.3;
           ctx.shadowBlur = 0;
           ctx.setLineDash([]);
@@ -519,13 +507,13 @@ function renderCascadeMap() {
           ctx.shadowBlur = 10;
           ctx.setLineDash([]);
         } else if (isConnectedToActive && edgePalette) {
-          ctx.strokeStyle = edgePalette.fill;
+          ctx.strokeStyle = isWinter && isMountainPass ? '#0284c7' : edgePalette.fill;
           ctx.lineWidth = 2.2;
-          ctx.shadowColor = edgePalette.glow || edgePalette.fill;
+          ctx.shadowColor = isWinter && isMountainPass ? '#38bdf8' : (edgePalette.glow || edgePalette.fill);
           ctx.shadowBlur = 6;
           ctx.setLineDash([]);
         } else {
-          ctx.strokeStyle = 'rgba(148, 163, 184, 0.35)';
+          ctx.strokeStyle = isWinter && isMountainPass ? 'rgba(56, 189, 248, 0.45)' : 'rgba(148, 163, 184, 0.35)';
           ctx.lineWidth = 1.1;
           ctx.shadowBlur = 0;
           ctx.setLineDash([]);
@@ -535,6 +523,17 @@ function renderCascadeMap() {
       ctx.stroke();
       ctx.shadowBlur = 0;
       ctx.setLineDash([]);
+
+      // Zobrazenie snehovej vločky v strede horského priechodu v zimnom režime
+      if (isWinter && isMountainPass) {
+        const midP = getBezierPoint(coordA, cp, coordB, 0.5);
+        ctx.save();
+        ctx.font = '10px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('❄️', midP.x, midP.y);
+        ctx.restore();
+      }
     });
   });
 
@@ -640,8 +639,6 @@ function renderCascadeMap() {
           alpha: 0.9,
           color: convoy.color
         });
-
-        addMapLogEntry(`🚒 ${convoy.unitName} dorazila na miesto zásahu.`, 'emerald');
       }
     }
   }
@@ -755,6 +752,19 @@ function renderCascadeMap() {
       ctx.stroke();
     }
 
+    const isBusyNode = mapState.busyDistricts && mapState.busyDistricts.has(id);
+    if (isBusyNode && !isSelected) {
+      const busyPulse = radius + 5 + Math.sin(mapState.wavePulse * 4) * 3;
+      ctx.beginPath();
+      ctx.arc(coord.x, coord.y, busyPulse, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(239, 68, 68, 0.85)';
+      ctx.lineWidth = 2.5;
+      ctx.shadowColor = '#ef4444';
+      ctx.shadowBlur = 10;
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+    }
+
     ctx.save();
     if (isAgendaGuarantor) {
       ctx.shadowColor = mapState.highlightedAgendaColor || '#0284c7';
@@ -762,6 +772,9 @@ function renderCascadeMap() {
     } else if (isSelected) {
       ctx.shadowColor = isLevel1 ? '#10b981' : '#e11d48';
       ctx.shadowBlur = 20;
+    } else if (isBusyNode) {
+      ctx.shadowColor = '#ef4444';
+      ctx.shadowBlur = 16;
     } else if (isNeighborActive && supportPalette) {
       ctx.shadowColor = supportPalette.glow || '#0284c7';
       ctx.shadowBlur = 14;
@@ -778,6 +791,8 @@ function renderCascadeMap() {
     ctx.arc(coord.x, coord.y, radius, 0, Math.PI * 2);
     if (isSelected) {
       ctx.fillStyle = isLevel1 ? '#059669' : '#e11d48';
+    } else if (isBusyNode) {
+      ctx.fillStyle = '#fef2f2'; // jemne červené podfarbenie pre zaneprázdnený okres
     } else if (isRegionalStandby) {
       ctx.fillStyle = '#ecfdf5'; // mentolovo biela pre standby v regióne
     } else if (isNeighborActive && supportPalette) {
@@ -787,9 +802,11 @@ function renderCascadeMap() {
     }
     ctx.fill();
 
-    ctx.lineWidth = isSelected ? 3.5 : (isRegionalStandby ? 2.5 : (isNeighborActive ? 3 : 2));
+    ctx.lineWidth = isSelected ? 3.5 : (isBusyNode ? 3 : (isRegionalStandby ? 2.5 : (isNeighborActive ? 3 : 2)));
     if (isSelected) {
       ctx.strokeStyle = isLevel1 ? '#a7f3d0' : '#ffe4e6';
+    } else if (isBusyNode) {
+      ctx.strokeStyle = '#ef4444';
     } else if (isRegionalStandby) {
       ctx.strokeStyle = '#10b981';
     } else if (isNeighborActive && supportPalette) {
@@ -803,6 +820,8 @@ function renderCascadeMap() {
     // Vnútorný štítok
     if (isSelected) {
       ctx.fillStyle = '#ffffff';
+    } else if (isBusyNode) {
+      ctx.fillStyle = '#991b1b';
     } else if (isRegionalStandby) {
       ctx.fillStyle = '#065f46';
     } else if (isNeighborActive) {
@@ -815,10 +834,13 @@ function renderCascadeMap() {
     ctx.textBaseline = 'middle';
     ctx.fillText(id, coord.x, coord.y + 0.5);
 
-    // Stavový piktogram (majáčik / štít / krajský štáb / pohotovosť)
+    // Stavový piktogram (majáčik / štít / krajský štáb / pohotovosť / výstraha MU)
     if (isSelected) {
       ctx.font = '12px sans-serif';
       ctx.fillText(isLevel1 ? '🟢' : '🚨', coord.x + radius - 4, coord.y - radius + 4);
+    } else if (isBusyNode) {
+      ctx.font = '12px sans-serif';
+      ctx.fillText('⚠️', coord.x + radius - 4, coord.y - radius + 4);
     } else if (id === 'BB' && isLevel3) {
       ctx.font = '12px sans-serif';
       ctx.fillText('🏛️', coord.x + radius - 4, coord.y - radius + 4);
@@ -888,16 +910,4 @@ function initCascadeMap() {
       resetDispatchSelection();
     });
   }
-
-  const clearLogsBtn = document.getElementById('clearMapLogsBtn');
-  if (clearLogsBtn) {
-    clearLogsBtn.addEventListener('click', () => {
-      const logs = document.getElementById('mapMissionLogs');
-      if (logs) {
-        logs.innerHTML = '<div class="text-[11px] text-slate-500 italic">Denník bol vymazaný.</div>';
-      }
-    });
-  }
-
-  addMapLogEntry('Mapa pripravená. Kliknutím na okres sa aktivuje výpočet posilového pracoviska.', 'cyan');
 }

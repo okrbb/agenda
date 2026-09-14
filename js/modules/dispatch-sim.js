@@ -3,34 +3,6 @@
    Kalkulátor dojazdových časov, taktické pravidlá, speed-metere a simulácia zásahu
    ========================================================================= */
 
-function addMapLogEntry(text, type = 'neutral') {
-  const logs = document.getElementById('mapMissionLogs');
-  if (!logs) return;
-
-  const time = new Date().toLocaleTimeString('sk-SK');
-  const item = document.createElement('div');
-  const tone = type === 'rose'
-    ? 'border-rose-200 bg-rose-50/80 text-rose-800'
-    : type === 'cyan'
-      ? 'border-sky-200 bg-sky-50/80 text-sky-800'
-      : type === 'emerald'
-        ? 'border-emerald-200 bg-emerald-50/80 text-emerald-800'
-        : 'border-slate-200 bg-slate-50/80 text-slate-600';
-
-  item.className = `rounded-xl border p-2.5 shadow-sm ${tone}`;
-  item.innerHTML = `
-    <div class="flex items-start gap-2">
-      <span class="text-[10px] text-slate-500 pt-0.5 font-mono-code">${time}</span>
-      <span class="flex-1 leading-relaxed text-xs">${text}</span>
-    </div>
-  `;
-
-  logs.prepend(item);
-  while (logs.children.length > 12) {
-    logs.removeChild(logs.lastChild);
-  }
-}
-
 function renderTravelMatrixTable(selectedDistrict = "KA") {
   const tbody = document.getElementById('travelMatrixBody');
   if (!tbody) return;
@@ -157,6 +129,110 @@ function resetDispatchSelection() {
   }
 }
 
+// Inicializácia taktických stavov v mapState
+if (typeof mapState !== 'undefined') {
+  if (!mapState.busyDistricts) mapState.busyDistricts = new Set();
+  if (typeof mapState.winterMode === 'undefined') mapState.winterMode = false;
+}
+
+function setWinterMode(enable) {
+  if (typeof mapState !== 'undefined') {
+    mapState.winterMode = !!enable;
+  }
+
+  const btnSummer = document.getElementById('btnSeasonSummer');
+  const btnWinter = document.getElementById('btnSeasonWinter');
+  const lbl = document.getElementById('winterModeStatusLabel');
+
+  if (btnSummer && btnWinter) {
+    if (mapState.winterMode) {
+      btnWinter.className = "py-1.5 px-2.5 rounded-lg font-bold bg-sky-100 text-sky-900 border border-sky-300 shadow-sm flex items-center justify-center space-x-1.5 transition text-xs";
+      btnSummer.className = "py-1.5 px-2.5 rounded-lg font-medium text-slate-600 hover:text-slate-800 flex items-center justify-center space-x-1.5 transition text-xs";
+      if (lbl) lbl.innerHTML = '<span class="text-sky-700 font-bold flex items-center space-x-1"><i class="fa-regular fa-snowflake"></i><span>Zima (+20% hory)</span></span>';
+      if (typeof showToast === 'function') {
+        showToast("❄️ Aktivovaný zimný režim: trasy cez horské priechody (Zbojská, Štiavnica) prepočítané s prirážkou +20%", "info");
+      }
+    } else {
+      btnSummer.className = "py-1.5 px-2.5 rounded-lg font-bold bg-amber-50 text-amber-900 border border-amber-300 shadow-sm flex items-center justify-center space-x-1.5 transition text-xs";
+      btnWinter.className = "py-1.5 px-2.5 rounded-lg font-medium text-slate-600 hover:text-sky-800 flex items-center justify-center space-x-1.5 transition text-xs";
+      if (lbl) lbl.textContent = "Štandard (Leto)";
+      if (typeof showToast === 'function') {
+        showToast("☀️ Nastavený letný štandardný režim ciest", "info");
+      }
+    }
+  }
+
+  if (typeof renderCascadeMap === 'function') {
+    renderCascadeMap();
+  }
+  runDispatchSimulation();
+}
+
+function handleBusyDistrictChange(districtId) {
+  if (typeof mapState !== 'undefined') {
+    if (!mapState.busyDistricts) mapState.busyDistricts = new Set();
+    mapState.busyDistricts.clear();
+    if (districtId) {
+      mapState.busyDistricts.add(districtId);
+    }
+  }
+
+  const badge = document.getElementById('busyDistrictBadge');
+  if (badge) {
+    if (districtId) {
+      badge.classList.remove('hidden');
+      badge.innerHTML = `<i class="fa-solid fa-ban mr-1"></i>Okres ${districtId} nedostupný (viazaný vlastnou MU)`;
+    } else {
+      badge.classList.add('hidden');
+    }
+  }
+
+  if (districtId && typeof showToast === 'function') {
+    const meta = DISTRICT_DICT[districtId];
+    showToast(`Okres ${meta ? meta.name : districtId} viazaný vlastnou MU: personál a technika nevyrážajú na výpomoc`, "warning");
+  }
+
+  if (typeof renderCascadeMap === 'function') {
+    renderCascadeMap();
+  }
+  runDispatchSimulation();
+}
+
+function resetTacticalConditions() {
+  if (typeof mapState !== 'undefined') {
+    mapState.winterMode = false;
+    if (mapState.busyDistricts) mapState.busyDistricts.clear();
+  }
+
+  const select = document.getElementById('busyDistrictSelect');
+  if (select) select.value = '';
+
+  const badge = document.getElementById('busyDistrictBadge');
+  if (badge) badge.classList.add('hidden');
+
+  const btnSummer = document.getElementById('btnSeasonSummer');
+  const btnWinter = document.getElementById('btnSeasonWinter');
+  const lbl = document.getElementById('winterModeStatusLabel');
+  if (btnSummer && btnWinter) {
+    btnSummer.className = "py-1.5 px-2.5 rounded-lg font-bold bg-amber-50 text-amber-900 border border-amber-300 shadow-sm flex items-center justify-center space-x-1.5 transition text-xs";
+    btnWinter.className = "py-1.5 px-2.5 rounded-lg font-medium text-slate-600 hover:text-sky-800 flex items-center justify-center space-x-1.5 transition text-xs";
+    if (lbl) lbl.textContent = "Štandard (Leto)";
+  }
+
+  if (typeof showToast === 'function') {
+    showToast("Taktické podmienky boli resetované na predvolené.", "info");
+  }
+
+  if (typeof renderCascadeMap === 'function') {
+    renderCascadeMap();
+  }
+  runDispatchSimulation();
+}
+
+window.setWinterMode = setWinterMode;
+window.handleBusyDistrictChange = handleBusyDistrictChange;
+window.resetTacticalConditions = resetTacticalConditions;
+
 function runDispatchSimulation() {
   const select = document.getElementById('dispatchDistrictSelect');
   if (!select) return;
@@ -176,6 +252,18 @@ function runDispatchSimulation() {
 
   const metaBox = document.getElementById('dispatchDistrictMeta');
   if (metaBox) {
+    const pairBB = getPairData(distId, 'BB');
+    let bbDisplayTime = '-';
+    if (distId === 'BB') {
+      bbDisplayTime = '0 min (v sídle)';
+    } else if (pairBB) {
+      let bbMins = parseTimeToMinutes(pairBB.time);
+      if (mapState.winterMode && pairBB.mountainPass) bbMins = Math.round(bbMins * 1.20);
+      const bbH = Math.floor(bbMins / 60);
+      const bbM = Math.round(bbMins % 60);
+      bbDisplayTime = `${bbH > 0 ? bbH + ':' + (bbM < 10 ? '0' : '') + bbM + ' h' : bbM + ' min'} (${pairBB.km} km)`;
+    }
+
     metaBox.innerHTML = `
       <div class="flex justify-between">
         <span class="text-slate-500">Príslušnosť k regiónu:</span>
@@ -186,21 +274,45 @@ function runDispatchSimulation() {
         <span class="font-bold text-slate-800">${targetMeta.fte} FTE</span>
       </div>
       <div class="flex justify-between">
-        <span class="text-slate-500">Dojazd z krajského sídla (BB):</span>
+        <span class="text-slate-500">Dojazd:</span>
         <span class="font-bold ${distId === 'RA' ? 'text-amber-700' : 'text-slate-800'}">
-          ${distId === 'BB' ? '0 min (v sídle)' : (getPairData(distId, 'BB') ? getPairData(distId, 'BB').time + ' (' + getPairData(distId, 'BB').km + ' km)' : '-')}
+          ${bbDisplayTime}
         </span>
       </div>
     `;
   }
 
   const availableRoutes = [];
+  const isWinter = !!(mapState && mapState.winterMode);
+  const busySet = (mapState && mapState.busyDistricts) ? mapState.busyDistricts : new Set();
+
   Object.keys(DISTRICT_DICT).forEach(otherId => {
     if (otherId === distId) return;
     const pair = getPairData(distId, otherId);
     if (pair) {
       const otherMeta = DISTRICT_DICT[otherId];
       const isSameRegion = (otherMeta.regionId === targetMeta.regionId);
+      const isBusy = busySet.has(otherId);
+      const isMountain = !!pair.mountainPass;
+
+      const baseMins = parseTimeToMinutes(pair.time);
+      let effectiveMins = baseMins;
+      let winterDelay = 0;
+
+      if (isWinter) {
+        if (isMountain) {
+          winterDelay = Math.round(baseMins * 0.20); // +20% cez horské priechody
+          effectiveMins += winterDelay;
+        } else {
+          winterDelay = Math.round(baseMins * 0.05); // +5% nížinný zimný tranzit
+          effectiveMins += winterDelay;
+        }
+      }
+
+      const h = Math.floor(effectiveMins / 60);
+      const m = Math.round(effectiveMins % 60);
+      const formattedTime = (h === 0) ? `${m} min` : `${h}:${m < 10 ? '0' : ''}${m} h`;
+
       availableRoutes.push({
         id: otherId,
         name: otherMeta.name,
@@ -209,29 +321,41 @@ function runDispatchSimulation() {
         fte: otherMeta.fte,
         isSameRegion: isSameRegion,
         km: pair.km,
-        time: pair.time,
-        minutes: parseTimeToMinutes(pair.time),
-        fast: pair.fast,
-        slow: pair.slow
+        baseTime: pair.time,
+        baseMinutes: baseMins,
+        time: formattedTime,
+        minutes: effectiveMins,
+        effectiveMinutes: effectiveMins,
+        mountainPass: isMountain,
+        passName: pair.passName || null,
+        winterDelay: winterDelay,
+        isBusy: isBusy,
+        fast: effectiveMins <= 45,
+        slow: effectiveMins > 90
       });
     }
   });
 
-  availableRoutes.sort((a, b) => a.minutes - b.minutes);
+  // Zoradenie: primárne dostupné okresy zoradené podľa času, viazané (nedostupné) okresy na koniec
+  availableRoutes.sort((a, b) => {
+    if (a.isBusy !== b.isBusy) {
+      return a.isBusy ? 1 : -1;
+    }
+    return a.effectiveMinutes - b.effectiveMinutes;
+  });
 
-  const bestRegional = availableRoutes.find(r => r.isSameRegion);
-  const bestCrossBorder = availableRoutes.find(r => !r.isSameRegion);
+  // Primárne vyberáme nezaneprázdnené pracoviská; ak sú všetky viazané, berieme zoradené
+  const bestRegional = availableRoutes.find(r => r.isSameRegion && !r.isBusy) || availableRoutes.find(r => r.isSameRegion);
+  const bestCrossBorder = availableRoutes.find(r => !r.isSameRegion && !r.isBusy) || availableRoutes.find(r => !r.isSameRegion);
 
-  const ruleData = DISPATCH_TACTICAL_RULES[distId] || {
-    decision: `AKTIVOVAŤ NAJRÝCHLEJŠIU PODPORU (${availableRoutes[0]?.name})`,
-    primaryDistrict: availableRoutes[0]?.id || "BB",
-    reason: "Nasadzuje sa pracovisko s najkratším preukázateľným dojazdovým časom."
-  };
+  const topPick = availableRoutes[0];
+  const normalSorted = [...availableRoutes].sort((a, b) => a.baseMinutes - b.baseMinutes);
+  const normalFastest = normalSorted[0];
 
   // Taktické rozhodnutie a štýl podľa stupňa kaskády
   const curLvl = mapState.cascadeLevel || 2;
-  let hudDecision = ruleData.decision;
-  let hudReason = ruleData.reason;
+  let hudDecision = "";
+  let hudReason = "";
   let hudBadgeClass = "bg-sky-100 text-sky-800 border-sky-200";
   let hudBadgeText = "2. STUPEŇ KASKÁDY (Regionálna podpora)";
   let hudCardBorder = "border-sky-200 bg-gradient-to-br from-white via-sky-50/30 to-blue-50/40";
@@ -259,73 +383,167 @@ function runDispatchSimulation() {
     beaconColor = "bg-purple-700";
     beaconPulseColor = "bg-purple-500";
     textColor = "text-purple-800";
+  } else {
+    // 2. STUPEŇ KASKÁDY - Dynamické taktické vyhodnotenie
+    const brRoute = availableRoutes.find(r => r.id === 'BR');
+    const rsRoute = availableRoutes.find(r => r.id === 'RS');
+    const ptRoute = availableRoutes.find(r => r.id === 'PT');
+
+    const busyId = (busySet && busySet.size > 0) ? Array.from(busySet)[0] : null;
+    const busyMeta = busyId ? DISTRICT_DICT[busyId] : null;
+    const secondPick = availableRoutes.filter(r => !r.isBusy && r.id !== topPick?.id)[0];
+
+    // Špecifický kľúčový prípad pre okres Revúca (RA) a Brezno
+    if (distId === 'RA' && busySet.has('BR')) {
+      if (isWinter) {
+        hudDecision = `NÁHRADNÁ POSILA: AKTIVOVAŤ RIMAVSKÚ SOBOTU (${rsRoute?.time || '1:02 h'})`;
+        hudReason = `⚠️ <strong>Pracovisko Brezno rieši vlastnú mimoriadnu udalosť</strong> (kapacity sú viazané lokálne a nevyrážajú na výpomoc) a horské sedlo <strong>Zbojská (I/72)</strong> má zimné zdržanie (+20%). Systém automaticky presmeroval primárnu výpomoc na južný koridor – <strong>Rimavská Sobota (${rsRoute?.time || '1:02 h'}, ${rsRoute?.km || 58} km, VÝCHOD)</strong>, 2. záloha Poltár (${ptRoute?.time || '1:08 h'}).`;
+      } else {
+        hudDecision = `NÁHRADNÁ POSILA: AKTIVOVAŤ RIMAVSKÚ SOBOTU (${rsRoute?.time || '1:00 h'})`;
+        hudReason = `⚠️ <strong>Pracovisko Brezno rieši vlastnú mimoriadnu udalosť</strong> (kapacity sú viazané lokálne a nevyrážajú). Systém aktivuje ako primárnu dostupnú posilu <strong>Rimavskú Sobotu (${rsRoute?.time || '1:00 h'}, ${rsRoute?.km || 58} km, VÝCHOD)</strong>, záloha Poltár (${ptRoute?.time || '1:05 h'}).`;
+      }
+      hudCardBorder = "border-amber-300 bg-gradient-to-br from-white via-amber-50/40 to-orange-50/30";
+      beaconColor = "bg-amber-600";
+      beaconPulseColor = "bg-amber-400";
+      textColor = "text-amber-800";
+    } else if (busyId) {
+      // DYNAMICKÝ SCENÁR: Ľubovoľný okres v kraji má vlastnú mimoriadnu udalosť
+      hudCardBorder = "border-amber-300 bg-gradient-to-br from-white via-amber-50/40 to-orange-50/30";
+      beaconColor = "bg-amber-600";
+      beaconPulseColor = "bg-amber-400";
+      textColor = "text-amber-800";
+
+      if (distId === busyId) {
+        // Zvolený zasiahnutý okres je sám vyťažený vlastnou MU
+        hudDecision = `EXTERNÁ PODPORA PRE ${targetMeta.name.toUpperCase()} (KAPACITY VIAZANÉ)`;
+        hudReason = `⚠️ Okresné pracovisko <strong>${targetMeta.name}</strong> rieši mimoriadnu udalosť na vlastnom území a jeho sily sú plne vyťažené. Výpomoc musí prísť z vonku. Ako primárna posila sa nasadzuje <strong>${topPick.name} (${topPick.time}, ${topPick.km} km, ${topPick.region})</strong>${secondPick ? `, 2. záloha ${secondPick.name} (${secondPick.time})` : ''}.`;
+      } else if (normalFastest && normalFastest.isBusy) {
+        // Najrýchlejšie susedné pracovisko má vlastnú MU -> Náhradná posila
+        hudDecision = `NÁHRADNÁ POSILA: AKTIVOVAŤ ${topPick.name.toUpperCase()} (${topPick.time})`;
+        hudReason = `⚠️ Najbližšie pracovisko <strong>${normalFastest.name} (${normalFastest.id})</strong> rieši vlastnú mimoriadnu udalosť a jeho kapacity sú viazané lokálne (nevyrážajú na výpomoc). Systém automaticky presmeroval primárnu pomoc na najbližšie voľné pracovisko <strong>${topPick.name} (${topPick.time}, ${topPick.km} km, ${topPick.region})</strong>${secondPick ? `, 2. záloha ${secondPick.name} (${secondPick.time})` : ''}.`;
+      } else {
+        // Iné pracovisko v kraji má MU (je vyradené z posíl)
+        hudDecision = `VÝLUKA PRACOVISKA ${busyMeta.name.toUpperCase()}: AKTIVOVAŤ ${topPick.name.toUpperCase()} (${topPick.time})`;
+        hudReason = `⚠️ Pracovisko <strong>${busyMeta.name} (${busyId})</strong> rieši vlastnú mimoriadnu udalosť a je vyradené z plánu výpomoci (kapacity viazané). Pre okres ${targetMeta.name} nasadzuje systém ako primárnu posilu <strong>${topPick.name} (${topPick.time}, ${topPick.km} km, ${topPick.region})</strong>${secondPick ? `, 2. záloha ${secondPick.name} (${secondPick.time})` : ''}.`;
+      }
+
+      if (isWinter && topPick && topPick.mountainPass) {
+        hudReason += ` ❄️ Trasa posily navyše prechádza cez <strong>${topPick.passName || 'horský priechod'}</strong> so zimným zdržaním (+20%).`;
+      }
+    } else if (distId === 'RA') {
+      // Štandardné podmienky pre RA bez viazanej MU
+      if (isWinter) {
+        hudDecision = `ZIMNÝ REŽIM: AKTIVOVAŤ RIMAVSKÚ SOBOTU (${rsRoute?.time || '1:02 h'})`;
+        hudReason = `❄️ <strong>Zimný režim:</strong> Prechod cez horské sedlo <strong>Zbojská (cesta I/72)</strong> predlžuje dojazd z Brezna na <strong>${brRoute?.time || '1:04 h'}</strong>. Rýchlejšou a bezpečnejšou primárnou posilou z juhu sa stáva <strong>Rimavská Sobota (${rsRoute?.time || '1:02 h'}, ${rsRoute?.km || 58} km, VÝCHOD)</strong>.`;
+        hudCardBorder = "border-sky-300 bg-gradient-to-br from-white via-sky-50/40 to-blue-50/30";
+        beaconColor = "bg-sky-600";
+        beaconPulseColor = "bg-sky-400";
+        textColor = "text-sky-800";
+      } else {
+        hudDecision = "AKTIVOVAŤ BREZNO (53 min) ALEBO RIMAVSKÚ SOBOTU (1:00 h)";
+        hudReason = "1. najbližší: Brezno (53 min, 50 km, SEVER) | 2. najbližší: Rimavská Sobota (1:00 h, 58 km, VÝCHOD). Sídlo kraja Banská Bystrica má kritický dojazd až 1:30 h (93 km).";
+      }
+    } else if (isWinter && topPick && topPick.mountainPass) {
+      // Zimný režim pre horské trasy
+      hudDecision = `ZIMNÝ REŽIM: AKTIVOVAŤ ${topPick.name.toUpperCase()} (${topPick.time})`;
+      hudReason = `❄️ Trasa posily prechádza cez exponovaný horský úsek <strong>${topPick.passName || 'horský priechod'}</strong> (+20% zimná prirážka). Odporúča sa zvýšená opatrnosť výjazdovej skupiny.`;
+      hudCardBorder = "border-sky-300 bg-gradient-to-br from-white via-sky-50/40 to-blue-50/30";
+      beaconColor = "bg-sky-600";
+      beaconPulseColor = "bg-sky-400";
+      textColor = "text-sky-800";
+    } else {
+      // Bežné taktické pravidlo
+      const defaultRule = DISPATCH_TACTICAL_RULES[distId];
+      if (defaultRule) {
+        hudDecision = defaultRule.decision;
+        hudReason = defaultRule.reason;
+      } else {
+        hudDecision = `AKTIVOVAŤ ${topPick ? topPick.name.toUpperCase() : 'BB'} (${topPick ? topPick.time : ''})`;
+        hudReason = `1. najbližšia podpora: <strong>${topPick.name} (${topPick.time}, ${topPick.km} km, ${topPick.region})</strong>${secondPick ? ` | 2. záložná podpora: <strong>${secondPick.name} (${secondPick.time}, ${secondPick.km} km, ${secondPick.region})</strong>` : ''}. Nasadzuje sa pracovisko s najkratším preukázateľným dojazdovým časom.`;
+      }
+    }
   }
 
   const resultBox = document.getElementById('dispatchResultBox');
   if (resultBox) {
-    resultBox.innerHTML = `
-      <!-- Porovnávacia karta (Bento panel) -->
-      <div class="bento-panel p-4 flex flex-col justify-between">
-        <div>
-            <div class="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center justify-between">
-              <span>Porovnanie dojazdov do ${distId}</span>
-              <span class="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 font-semibold border border-slate-200">${availableRoutes.length} trás</span>
-            </div>
-            
-            <div class="space-y-2 text-xs">
-              <div class="p-2.5 rounded-xl bg-white border border-slate-200 shadow-sm">
-                <div class="text-slate-500 text-[11px] font-medium flex justify-between">
-                  <span>Vlastný región (${targetMeta.region}):</span>
-                  <span class="font-bold text-slate-800">${bestRegional ? bestRegional.name : 'Iba vlastné sily'}</span>
-                </div>
-                <div class="text-sm font-extrabold text-slate-900 mt-0.5 font-mono-code">
-                  ${bestRegional ? bestRegional.time + ' (' + bestRegional.km + ' km)' : 'Bez ďalšieho pracoviska'}
-                </div>
-              </div>
+    const isSpecialWinter = isWinter;
+    const isSpecialBusy = busySet.size > 0;
 
-              <div class="p-2.5 rounded-xl bg-sky-50/70 border border-sky-200 shadow-sm">
-                <div class="text-sky-800 text-[11px] font-medium flex justify-between">
-                  <span>Najrýchlejšia susedná výpomoc:</span>
-                  <span class="font-bold text-sky-950">${bestCrossBorder ? bestCrossBorder.name + ' (' + bestCrossBorder.region + ')' : 'Nie je potrebná'}</span>
-                </div>
-                <div class="text-sm font-extrabold text-sky-950 mt-0.5 font-mono-code">
-                  ${bestCrossBorder ? bestCrossBorder.time + ' (' + bestCrossBorder.km + ' km)' : '-'}
-                </div>
+    resultBox.innerHTML = `
+      <!-- 1. Karta taktického rozhodnutia (Tactical HUD Card s majákom) -->
+      <div class="bento-panel p-4 flex flex-col justify-between ${hudCardBorder} shadow-sm">
+        <div>
+          <div class="flex items-center space-x-2 ${textColor} font-bold text-xs uppercase tracking-wider mb-2">
+            <span class="relative flex h-3 w-3">
+              <span class="beacon-pulse absolute inline-flex h-full w-full rounded-full ${beaconPulseColor} opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-3 w-3 ${beaconColor}"></span>
+            </span>
+            <span>Rozhodnutie:</span>
+          </div>
+          <div class="text-sm font-extrabold text-slate-900 leading-snug">${hudDecision}</div>
+          <p class="text-xs text-slate-700 mt-2.5 leading-relaxed bg-white/90 p-2.5 rounded-xl border border-slate-200/80 shadow-sm">
+            ${hudReason}
+          </p>
+        </div>
+        
+        <div class="mt-3 pt-2.5 border-t border-slate-100 text-[11px] text-slate-600 flex items-center justify-between">
+          <span>Režim nasadenia:</span>
+          <span class="px-2 py-0.5 rounded-md border font-bold uppercase tracking-wider text-[10px] ${hudBadgeClass}">${hudBadgeText}</span>
+        </div>
+      </div>
+
+      <!-- 2. Porovnávacia karta dojazdov -->
+      <div class="bento-panel p-4 flex flex-col justify-between shadow-sm">
+        <div>
+          <div class="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2.5 flex items-center justify-between">
+            <span>Porovnanie dojazdov do ${distId}</span>
+            <span class="text-[10px] text-slate-400 font-medium font-mono-code">${targetMeta.name}</span>
+          </div>
+          
+          <div class="space-y-2 text-xs">
+            <div class="p-2.5 rounded-xl bg-white border border-slate-200 shadow-sm">
+              <div class="text-slate-500 text-[11px] font-medium flex justify-between">
+                <span>Vlastný región (${targetMeta.region}):</span>
+                <span class="font-bold text-slate-800">${bestRegional ? bestRegional.name : 'Iba vlastné sily'}</span>
+              </div>
+              <div class="text-sm font-extrabold text-slate-900 mt-0.5 font-mono-code flex items-center justify-between">
+                <span>${bestRegional ? bestRegional.time + ' (' + bestRegional.km + ' km)' : 'Bez ďalšieho pracoviska'}</span>
+                ${bestRegional && bestRegional.isBusy ? '<span class="text-[10px] font-bold text-rose-600 bg-rose-50 px-1.5 py-0.2 rounded border border-rose-200">Vlastná MU</span>' : ''}
+              </div>
+            </div>
+
+            <div class="p-2.5 rounded-xl bg-sky-50/70 border border-sky-200 shadow-sm">
+              <div class="text-sky-800 text-[11px] font-medium flex justify-between">
+                <span>Najrýchlejšia susedná výpomoc:</span>
+                <span class="font-bold text-sky-950">${bestCrossBorder ? bestCrossBorder.name + ' (' + bestCrossBorder.region + ')' : 'Nie je potrebná'}</span>
+              </div>
+              <div class="text-sm font-extrabold text-sky-950 mt-0.5 font-mono-code flex items-center justify-between">
+                <span>${bestCrossBorder ? bestCrossBorder.time + ' (' + bestCrossBorder.km + ' km)' : '-'}</span>
+                ${bestCrossBorder && bestCrossBorder.mountainPass && isWinter ? '<span class="text-[10px] font-bold text-sky-700 bg-sky-100 px-1.5 py-0.2 rounded border border-sky-300">❄️ Horský prechod</span>' : ''}
               </div>
             </div>
           </div>
+        </div>
 
-          <div class="mt-3 pt-2.5 border-t border-slate-100 text-[11px] text-slate-500 flex items-center justify-between">
+        <div class="mt-3 pt-2.5 border-t border-slate-100 space-y-2">
+          <div class="text-[11px] text-slate-500 flex items-center justify-between">
             <span>Sídlo kraja Banská Bystrica:</span>
             <span class="font-bold text-slate-800 font-mono-code">${distId === 'BB' ? 'V sídle' : (getPairData(distId, 'BB') ? getPairData(distId, 'BB').time : '-')}</span>
           </div>
-        </div>
-
-        <!-- Karta taktického rozhodnutia (Tactical HUD Card s majákom) -->
-        <div class="bento-panel p-4 flex flex-col justify-between ${hudCardBorder} shadow-md">
-          <div>
-            <div class="flex items-center space-x-2 ${textColor} font-bold text-xs uppercase tracking-wider mb-2">
-              <span class="relative flex h-3 w-3">
-                <span class="beacon-pulse absolute inline-flex h-full w-full rounded-full ${beaconPulseColor} opacity-75"></span>
-                <span class="relative inline-flex rounded-full h-3 w-3 ${beaconColor}"></span>
-              </span>
-              <span>Rozhodnutie:</span>
+          <div class="pt-1.5 border-t border-slate-100/80 flex items-center justify-between flex-wrap gap-1.5">
+            <span class="text-[10px] text-slate-400 font-medium">Stav simulácie:</span>
+            <div class="flex items-center space-x-1.5">
+              ${isSpecialWinter ? '<span class="text-[10px] px-2 py-0.5 rounded-full bg-sky-100 text-sky-800 font-bold border border-sky-200"><i class="fa-regular fa-snowflake mr-1"></i>Zima aktívna</span>' : ''}
+              ${isSpecialBusy ? '<span class="text-[10px] px-2 py-0.5 rounded-full bg-rose-100 text-rose-800 font-bold border border-rose-200"><i class="fa-solid fa-triangle-exclamation mr-1"></i>MU simulácia</span>' : ''}
+              <span class="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 font-semibold border border-slate-200">${availableRoutes.length} trás</span>
             </div>
-            <div class="text-sm font-extrabold text-slate-900 leading-snug">${hudDecision}</div>
-            <p class="text-xs text-slate-700 mt-2.5 leading-relaxed bg-white/90 p-2.5 rounded-xl border border-slate-200/80 shadow-sm">
-              ${hudReason}
-            </p>
-          </div>
-          
-          <div class="mt-3 pt-2.5 border-t border-slate-100 text-[11px] text-slate-600 flex items-center justify-between">
-            <span>Režim nasadenia:</span>
-            <span class="px-2 py-0.5 rounded-md border font-bold uppercase tracking-wider text-[10px] ${hudBadgeClass}">${hudBadgeText}</span>
           </div>
         </div>
-      `;
+      </div>
+    `;
   }
 
-  renderDispatchResults(distId, ruleData, availableRoutes);
+  renderDispatchResults(distId, { decision: hudDecision, reason: hudReason }, availableRoutes);
 }
 
 function setCascadeLevel(level, showNotification = true) {
@@ -434,50 +652,72 @@ function renderRankedRoutesCards() {
     const isTopPick = (idx === 0);
 
     // Speed-meter výpočet (relatívne k 90 min)
-    const pct = Math.min(100, Math.max(8, (r.minutes / 90) * 100));
-    const barColor = r.minutes <= 25
-      ? '#10b981'
-      : r.minutes <= 45
-        ? '#0ea5e9'
-        : r.minutes <= 75
-          ? '#f59e0b'
-          : '#ef4444';
+    const pct = r.isBusy ? 0 : Math.min(100, Math.max(8, (r.minutes / 90) * 100));
+    const barColor = r.isBusy
+      ? '#cbd5e1'
+      : (r.minutes <= 25
+        ? '#10b981'
+        : r.minutes <= 45
+          ? '#0ea5e9'
+          : r.minutes <= 75
+            ? '#f59e0b'
+            : '#ef4444');
 
-    pill.className = `p-3 rounded-xl border transition flex flex-col justify-between ${isTopPick
-      ? 'bg-emerald-50/70 border-emerald-300 shadow-sm ring-1 ring-emerald-400/50'
-      : 'bg-white border-slate-200 hover:border-slate-300 hover:shadow-sm'
-      }`;
+    const cardBorderBg = r.isBusy
+      ? 'bg-slate-50/80 border-slate-200 text-slate-400 opacity-70'
+      : (isTopPick
+        ? 'bg-emerald-50/70 border-emerald-300 shadow-sm ring-1 ring-emerald-400/50'
+        : 'bg-white border-slate-200 hover:border-slate-300 hover:shadow-sm');
+
+    pill.className = `p-3 rounded-xl border transition flex flex-col justify-between ${cardBorderBg}`;
+
+    let badgeExtraHtml = '';
+    if (r.isBusy) {
+      badgeExtraHtml += `<span class="px-1.5 py-0.2 rounded text-[9px] font-bold bg-rose-100 text-rose-800 border border-rose-300"><i class="fa-solid fa-ban mr-0.5"></i>Vlastná MU (nedostupný)</span>`;
+    }
+    if (mapState && mapState.winterMode && r.mountainPass && !r.isBusy) {
+      badgeExtraHtml += `<span class="px-1.5 py-0.2 rounded text-[9px] font-bold bg-sky-100 text-sky-800 border border-sky-300"><i class="fa-regular fa-snowflake mr-0.5"></i>+${r.winterDelay}m (${r.passName})</span>`;
+    }
 
     pill.innerHTML = `
-      <div class="flex items-center justify-between text-xs">
-        <div class="flex items-center space-x-2.5">
-          <div class="w-6 h-6 rounded-lg flex items-center justify-center font-bold text-[11px] ${isTopPick ? 'bg-emerald-600 text-white shadow-sm' : 'bg-slate-100 text-slate-700'
+      <div class="flex items-start justify-between text-xs">
+        <div class="flex items-start space-x-2.5">
+          <div class="w-6 h-6 rounded-lg flex items-center justify-center font-bold text-[11px] shrink-0 mt-0.5 ${r.isBusy ? 'bg-slate-300 text-slate-600' : (isTopPick ? 'bg-emerald-600 text-white shadow-sm' : 'bg-slate-100 text-slate-700')
       }">
             ${idx + 1}
           </div>
           <div>
-            <div class="font-bold text-slate-900 flex items-center space-x-1.5">
+            <div class="font-bold ${r.isBusy ? 'text-slate-600' : 'text-slate-900'} flex items-center space-x-1.5 flex-wrap gap-y-1">
               <span>${r.name}</span>
               <span class="font-mono-code text-[11px] text-slate-400">(${r.id})</span>
               ${r.isSameRegion
         ? '<span class="px-1.5 py-0.2 rounded text-[9px] font-bold bg-blue-50 text-blue-700 border border-blue-200">Región</span>'
         : '<span class="px-1.5 py-0.2 rounded text-[9px] font-bold bg-amber-50 text-amber-700 border border-amber-200">Sused</span>'
       }
+              ${badgeExtraHtml}
             </div>
-            <div class="text-[11px] text-slate-500">${r.region} • ${r.km} km</div>
+            <div class="text-[11px] text-slate-500 mt-0.5">${r.region} • ${r.km} km</div>
           </div>
         </div>
 
-        <div class="text-right">
-          <span class="font-extrabold font-mono-code ${r.fast ? 'text-emerald-700' : (r.slow ? 'text-amber-700' : 'text-slate-800')} text-xs">
-            ${r.time}
-          </span>
-          <span class="block text-[10px] text-slate-400 font-normal font-mono-code">${Math.round(r.minutes)} min</span>
+        <div class="text-right shrink-0 pl-2">
+          ${r.isBusy ? `
+            <span class="font-extrabold font-mono-code text-rose-600 text-xs flex items-center justify-end gap-1">
+              <i class="fa-solid fa-ban text-[10px]"></i> Nedostupný
+            </span>
+            <span class="block text-[10px] text-slate-400 font-normal">vlastná MU (nevyráža)</span>
+          ` : `
+            ${(r.effectiveMinutes !== r.baseMinutes) ? `<span class="block text-[10px] text-slate-400 line-through font-mono-code">${r.baseTime}</span>` : ''}
+            <span class="font-extrabold font-mono-code ${r.fast ? 'text-emerald-700' : (r.slow ? 'text-amber-700' : 'text-slate-800')} text-xs">
+              ${r.time}
+            </span>
+            <span class="block text-[10px] text-slate-400 font-normal font-mono-code">${Math.round(r.minutes)} min</span>
+          `}
         </div>
       </div>
 
       <!-- Lineárny Speed-Meter -->
-      <div class="speed-meter-track w-full mt-2">
+      <div class="speed-meter-track w-full mt-2.5">
         <div class="speed-meter-fill" style="width: ${pct}%; background-color: ${barColor};"></div>
       </div>
     `;
