@@ -680,44 +680,51 @@ function renderRankedRoutesCards() {
     }
 
     pill.innerHTML = `
-      <div class="flex items-start justify-between text-xs">
-        <div class="flex items-start space-x-2.5">
+      <div class="flex items-start justify-between gap-2 text-xs">
+        <div class="flex items-start gap-2.5 min-w-0">
           <div class="w-6 h-6 rounded-lg flex items-center justify-center font-bold text-[11px] shrink-0 mt-0.5 ${r.isBusy ? 'bg-slate-300 text-slate-600' : (isTopPick ? 'bg-emerald-600 text-white shadow-sm' : 'bg-slate-100 text-slate-700')
       }">
             ${idx + 1}
           </div>
-          <div>
-            <div class="font-bold ${r.isBusy ? 'text-slate-600' : 'text-slate-900'} flex items-center space-x-1.5 flex-wrap gap-y-1">
-              <span>${r.name}</span>
-              <span class="font-mono-code text-[11px] text-slate-400">(${r.id})</span>
-              ${r.isSameRegion
-        ? '<span class="px-1.5 py-0.2 rounded text-[9px] font-bold bg-blue-50 text-blue-700 border border-blue-200">Región</span>'
-        : '<span class="px-1.5 py-0.2 rounded text-[9px] font-bold bg-amber-50 text-amber-700 border border-amber-200">Sused</span>'
-      }
-              ${badgeExtraHtml}
+
+          <div class="min-w-0">
+            <div class="font-bold ${r.isBusy ? 'text-slate-600' : 'text-slate-900'} truncate text-[15px] leading-tight">
+              ${r.id}
             </div>
-            <div class="text-[11px] text-slate-500 mt-0.5">${r.region} • ${r.km} km</div>
+
+            <div class="mt-1 flex flex-col items-start gap-0.5 text-[10px] text-slate-500">
+              <span class="px-1.5 py-0.5 rounded font-bold ${r.isSameRegion ? 'bg-blue-50 text-blue-700 border border-blue-200' : 'bg-amber-50 text-amber-700 border border-amber-200'}">
+                ${r.isSameRegion ? 'Región' : 'Sused'}
+              </span>
+              <span class="font-medium leading-tight">${r.region}</span>
+              ${badgeExtraHtml ? `<div class="flex flex-col gap-0.5 mt-0.5">${badgeExtraHtml}</div>` : ''}
+            </div>
           </div>
         </div>
 
-        <div class="text-right shrink-0 pl-2">
+        <div class="text-right shrink-0 pl-1">
           ${r.isBusy ? `
             <span class="font-extrabold font-mono-code text-rose-600 text-xs flex items-center justify-end gap-1">
               <i class="fa-solid fa-ban text-[10px]"></i> Nedostupný
             </span>
-            <span class="block text-[10px] text-slate-400 font-normal">vlastná MU (nevyráža)</span>
+            <span class="block text-[10px] text-slate-400 font-normal">vlastná MU</span>
           ` : `
             ${(r.effectiveMinutes !== r.baseMinutes) ? `<span class="block text-[10px] text-slate-400 line-through font-mono-code">${r.baseTime}</span>` : ''}
-            <span class="font-extrabold font-mono-code ${r.fast ? 'text-emerald-700' : (r.slow ? 'text-amber-700' : 'text-slate-800')} text-xs">
+            <span class="font-extrabold font-mono-code ${r.fast ? 'text-emerald-700' : (r.slow ? 'text-amber-700' : 'text-slate-800')} text-[15px] leading-none">
               ${r.time}
             </span>
-            <span class="block text-[10px] text-slate-400 font-normal font-mono-code">${Math.round(r.minutes)} min</span>
+            <span class="block text-[10px] text-slate-400 font-normal font-mono-code mt-0.5">${Math.round(r.minutes)} min</span>
           `}
         </div>
       </div>
 
+      <div class="mt-2.5 flex items-center justify-between text-[10px] text-slate-500">
+        <span class="font-medium">${r.km} km</span>
+        <span class="font-medium ${r.fast ? 'text-emerald-600' : (r.slow ? 'text-amber-600' : 'text-slate-500')}">${r.fast ? 'Rýchly' : (r.slow ? 'Dlhší' : 'Stredný')}</span>
+      </div>
+
       <!-- Lineárny Speed-Meter -->
-      <div class="speed-meter-track w-full mt-2.5">
+      <div class="speed-meter-track w-full mt-2">
         <div class="speed-meter-fill" style="width: ${pct}%; background-color: ${barColor};"></div>
       </div>
     `;

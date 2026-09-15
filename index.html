@@ -69,43 +69,38 @@
   <nav id="floatingNavDock" class="floating-nav-dock" aria-label="Rýchla navigácia feedom">
     <!-- Tlačidlo na rýchle zbalenie/rozbalenie bočnej navigácie na notebookoch -->
     <button id="dockCollapseBtn" type="button" class="dock-toggle-pill" onclick="toggleNavDockCollapse()"
-      title="Zbaliť / rozbaliť navigáciu" aria-label="Prepnúť bočnú navigáciu">
+      aria-label="Prepnúť bočnú navigáciu">
       <i id="dockCollapseIcon" class="fa-solid fa-chevron-left"></i>
     </button>
-    <a href="#section-agendas" class="floating-dock-pill active" data-section="section-agendas"
-      title="01. Katalóg odborných agend (AG1 – AG7)">
+    <a href="#section-agendas" class="floating-dock-pill active" data-section="section-agendas">
       <span class="pill-icon"><i class="fa-solid fa-list-check"></i></span>
       <span class="pill-flyout">
         <span class="pill-label">Katalóg agend</span>
         <span class="pill-num">01</span>
       </span>
     </a>
-    <a href="#section-matrix" class="floating-dock-pill" data-section="section-matrix"
-      title="02. Kompaktná matica funkčnej zodpovednosti">
+    <a href="#section-matrix" class="floating-dock-pill" data-section="section-matrix">
       <span class="pill-icon"><i class="fa-solid fa-table-cells"></i></span>
       <span class="pill-flyout">
         <span class="pill-label">Matica okresov</span>
         <span class="pill-num">02</span>
       </span>
     </a>
-    <a href="#section-cascade" class="floating-dock-pill" data-section="section-cascade"
-      title="03. Kaskádový model nasadzovania síl">
+    <a href="#section-cascade" class="floating-dock-pill" data-section="section-cascade">
       <span class="pill-icon"><i class="fa-solid fa-stopwatch"></i></span>
       <span class="pill-flyout">
         <span class="pill-label">Kaskáda & dojazd</span>
         <span class="pill-num">03</span>
       </span>
     </a>
-    <a href="#section-map" class="floating-dock-pill" data-section="section-map"
-      title="04. Mapa susediacich okresov a posilové trasy">
+    <a href="#section-map" class="floating-dock-pill" data-section="section-map">
       <span class="pill-icon"><i class="fa-solid fa-map-location-dot"></i></span>
       <span class="pill-flyout">
         <span class="pill-label">Mapa podpory</span>
         <span class="pill-num">04</span>
       </span>
     </a>
-    <a href="#section-comparison" class="floating-dock-pill" data-section="section-comparison"
-      title="05. Zhodnotenie transformácie a porovnanie">
+    <a href="#section-comparison" class="floating-dock-pill" data-section="section-comparison">
       <span class="pill-icon"><i class="fa-solid fa-scale-balanced"></i></span>
       <span class="pill-flyout">
         <span class="pill-label">Porovnanie</span>
@@ -255,15 +250,19 @@
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2.5 border-b border-slate-200">
         <div class="flex items-center space-x-2.5">
           <span class="section-header-tag"><i class="fa-solid fa-list-check"></i> Sekcia 01</span>
-          <h2 class="text-base sm:text-lg font-bold text-slate-900">Katalóg odborných agend krízového riadenia (AG1 –
-            AG7)</h2>
+          <h2 class="text-base sm:text-lg font-bold text-slate-900">Katalóg odborných agend a funkčných zodpovedností</h2>
         </div>
-        <span class="text-xs text-slate-500 font-medium">7 špecializovaných okruhov • garancia odbornosti</span>
+        <span class="text-xs text-slate-500 font-medium">7 špecializovaných okruhov • jasná odborná zodpovednosť</span>
       </div>
       <div class="bento-panel p-4 sm:p-6 space-y-4">
-        <div class="pb-3 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-          <p class="text-xs sm:text-sm text-slate-600">
+        <div class="board-cta">
+          <p class="text-xs sm:text-sm text-slate-700 leading-relaxed max-w-4xl">
+            Katalog definuje siedem odborných agend, ktoré pokrývajú prioritné činnosti v krízovom riadení a zároveň vytvárajú stabilný základ pre prechod od územného k funkčnému modelu zodpovednosti.
           </p>
+        </div>
+
+        <div class="pb-3 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <span class="board-stat">7 špecializovaných okruhov</span>
           <span class="text-[11px] font-medium text-slate-500 bg-slate-100 px-2.5 py-1 rounded-lg shrink-0">
             <i class="fa-solid fa-hand-pointer text-slate-400 mr-1"></i> Kliknutím na kartu zobrazíte detail v matici
           </span>
@@ -285,9 +284,9 @@
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2.5 border-b border-slate-200">
         <div class="flex items-center space-x-2.5">
           <span class="section-header-tag"><i class="fa-solid fa-table-cells"></i> Sekcia 02</span>
-          <h2 class="text-base sm:text-lg font-bold text-slate-900">Kompaktná matica funkčnej zodpovednosti</h2>
+          <h2 class="text-base sm:text-lg font-bold text-slate-900">Matica funkčnej zodpovednosti a rozdelenia kapacít</h2>
         </div>
-        <span class="text-xs text-slate-500 font-medium">13 okresných pracovísk • farebné kódovanie deľby práce</span>
+        <span class="text-xs text-slate-500 font-medium">13 okresných pracovísk • transparentné rozdelenie kompetencií</span>
       </div>
       <!-- Kompaktná matica funkčnej zodpovednosti -->
       <div class="bento-panel p-4 sm:p-6">
@@ -328,9 +327,9 @@
           <div>
             <h2 class="text-lg font-bold text-slate-900 flex items-center space-x-2">
               <i class="fa-solid fa-table-cells text-sky-600"></i>
-              <p class="text-xs sm:text-sm text-slate-500 mt-0.5">
-                Skonsolidovaný prehľad 7 odborných agend naprieč 13 okresnými pracoviskami BBK.
-              </p>
+              <span class="text-xs sm:text-sm text-slate-500 mt-0.5 font-medium">
+                Jednotná matica zodpovednosti pre všetkých 13 okresných pracovísk, </br>s jasnými kompetenciami, zdrojmi a priestorom pre náhradný výkon.
+              </span>
             </h2>
           </div>
 
@@ -405,53 +404,40 @@
                 <th class="p-2.5 text-center border-r border-slate-200">Pôsobnosť</th>
                 <!-- Districts: BB, BR, RA -->
                 <th class="p-2.5 text-center border-r border-slate-200 hover:bg-sky-100 cursor-pointer font-bold"
-                  onclick="setDistrictFocus('BB')" data-dist="BB" data-region="sever"
-                  title="Kliknite pre fokus na okres Banská Bystrica (7 FTE)">
+                  onclick="setDistrictFocus('BB')" data-dist="BB" data-region="sever">
                   BB</th>
                 <th class="p-2.5 text-center border-r border-slate-200 hover:bg-sky-100 cursor-pointer font-bold"
-                  onclick="setDistrictFocus('BR')" data-dist="BR" data-region="sever"
-                  title="Kliknite pre fokus na okres Brezno (3 FTE)">BR</th>
+                  onclick="setDistrictFocus('BR')" data-dist="BR" data-region="sever">BR</th>
                 <th class="p-2.5 text-center border-r border-slate-300 hover:bg-sky-100 cursor-pointer font-bold"
-                  onclick="setDistrictFocus('RA')" data-dist="RA" data-region="sever"
-                  title="Kliknite pre fokus na okres Revúca (2 FTE)">RA</th>
+                  onclick="setDistrictFocus('RA')" data-dist="RA" data-region="sever">RA</th>
 
                 <!-- Districts: ZV, ZC, ZH, BS -->
                 <th class="p-2.5 text-center border-r border-slate-200 hover:bg-sky-100 cursor-pointer font-bold"
-                  onclick="setDistrictFocus('ZV')" data-dist="ZV" data-region="zapad"
-                  title="Kliknite pre fokus na okres Zvolen (3 FTE)">ZV</th>
+                  onclick="setDistrictFocus('ZV')" data-dist="ZV" data-region="zapad">ZV</th>
                 <th class="p-2.5 text-center border-r border-slate-200 hover:bg-sky-100 cursor-pointer font-bold"
-                  onclick="setDistrictFocus('ZC')" data-dist="ZC" data-region="zapad"
-                  title="Kliknite pre fokus na okres Žarnovica (2 FTE)">ZC</th>
+                  onclick="setDistrictFocus('ZC')" data-dist="ZC" data-region="zapad">ZC</th>
                 <th class="p-2.5 text-center border-r border-slate-200 hover:bg-sky-100 cursor-pointer font-bold"
-                  onclick="setDistrictFocus('ZH')" data-dist="ZH" data-region="zapad"
-                  title="Kliknite pre fokus na okres Žiar nad Hronom (2 FTE)">
+                  onclick="setDistrictFocus('ZH')" data-dist="ZH" data-region="zapad">
                   ZH</th>
                 <th class="p-2.5 text-center border-r border-slate-300 hover:bg-sky-100 cursor-pointer font-bold"
-                  onclick="setDistrictFocus('BS')" data-dist="BS" data-region="zapad"
-                  title="Kliknite pre fokus na okres Banská Štiavnica (2 FTE)">
+                  onclick="setDistrictFocus('BS')" data-dist="BS" data-region="zapad">
                   BS</th>
 
                 <!-- Districts: KA, VK, LC -->
                 <th class="p-2.5 text-center border-r border-slate-200 hover:bg-sky-100 cursor-pointer font-bold"
-                  onclick="setDistrictFocus('KA')" data-dist="KA" data-region="juh"
-                  title="Kliknite pre fokus na okres Krupina (2 FTE)">KA</th>
+                  onclick="setDistrictFocus('KA')" data-dist="KA" data-region="juh">KA</th>
                 <th class="p-2.5 text-center border-r border-slate-200 hover:bg-sky-100 cursor-pointer font-bold"
-                  onclick="setDistrictFocus('VK')" data-dist="VK" data-region="juh"
-                  title="Kliknite pre fokus na okres Veľký Krtíš (3 FTE)">VK</th>
+                  onclick="setDistrictFocus('VK')" data-dist="VK" data-region="juh">VK</th>
                 <th class="p-2.5 text-center border-r border-slate-300 hover:bg-sky-100 cursor-pointer font-bold"
-                  onclick="setDistrictFocus('LC')" data-dist="LC" data-region="juh"
-                  title="Kliknite pre fokus na okres Lučenec (3 FTE)">LC</th>
+                  onclick="setDistrictFocus('LC')" data-dist="LC" data-region="juh">LC</th>
 
                 <!-- Districts: DT, PT, RS -->
                 <th class="p-2.5 text-center border-r border-slate-200 hover:bg-sky-100 cursor-pointer font-bold"
-                  onclick="setDistrictFocus('DT')" data-dist="DT" data-region="vychod"
-                  title="Kliknite pre fokus na okres Detva (2 FTE)">DT</th>
+                  onclick="setDistrictFocus('DT')" data-dist="DT" data-region="vychod">DT</th>
                 <th class="p-2.5 text-center border-r border-slate-200 hover:bg-sky-100 cursor-pointer font-bold"
-                  onclick="setDistrictFocus('PT')" data-dist="PT" data-region="vychod"
-                  title="Kliknite pre fokus na okres Poltár (2 FTE)">PT</th>
+                  onclick="setDistrictFocus('PT')" data-dist="PT" data-region="vychod">PT</th>
                 <th class="p-2.5 text-center border-r border-slate-300 hover:bg-sky-100 cursor-pointer font-bold"
-                  onclick="setDistrictFocus('RS')" data-dist="RS" data-region="vychod"
-                  title="Kliknite pre fokus na okres Rimavská Sobota (4 FTE)">
+                  onclick="setDistrictFocus('RS')" data-dist="RS" data-region="vychod">
                   RS</th>
 
                 <th class="p-2.5 text-center bg-slate-100 font-bold text-slate-800">37 FTE</th>
@@ -520,10 +506,9 @@
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2.5 border-b border-slate-200">
         <div class="flex items-center space-x-2.5">
           <span class="section-header-tag"><i class="fa-solid fa-stopwatch"></i> Sekcia 03</span>
-          <h2 class="text-base sm:text-lg font-bold text-slate-900">Kaskádový model nasadzovania síl & Pravidlo
-            dojazdových časov</h2>
+          <h2 class="text-base sm:text-lg font-bold text-slate-900">Kaskádový model nasadzovania síl a rozhodovanie podľa dojazdových časov</h2>
         </div>
-        <span class="text-xs text-slate-500 font-medium">Strategické a operačné riadenie • výnimka z regionality</span>
+        <span class="text-xs text-slate-500 font-medium">Strategické riadenie • operatívna koordinácia • rýchlejší zásah</span>
       </div>
       <!-- Command Structure Overview -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -535,23 +520,21 @@
             </div>
             <div>
               <h3 class="font-bold text-slate-900 text-base">Strategická úroveň</h3>
-              <p class="text-xs text-slate-500">Krízový štáb okresného úradu v sídle kraja</p>
+              <p class="text-xs text-slate-500">Koordinačný bod pre rozhodovanie v celom kraji</p>
             </div>
           </div>
           <ul class="mt-4 space-y-3 text-xs sm:text-sm text-slate-600">
             <li class="flex items-start space-x-2.5">
               <i class="fa-solid fa-user-tie text-red-600 mt-1 text-xs"></i>
-              <span><strong>Predseda krízového štábu:</strong> Prednosta Okresného úradu Banská Bystrica. Vyhlasuje a
-                odvoláva mimoriadnu situáciu. Riadi záchranné práce. Ukladá úlohy formou príkazu.</span>
+              <span><strong>Predseda krízového štábu:</strong> Prednosta okresného úradu rozhoduje o vyhlásení a ukončení mimoriadnej situácie a stanovuje prioritné úlohy v príkazovom režime.</span>
             </li>
             <li class="flex items-start space-x-2.5">
               <i class="fa-solid fa-user-gear text-red-600 mt-1 text-xs"></i>
-              <span><strong>Zástupca predsedu:</strong> Vedúci odboru krízového riadenia OÚ Banská Bystrica. Riadi
-                celokrajské kapacity a koordináciu záchranných prác.</span>
+              <span><strong>Zástupca predsedu:</strong> Vedúci odboru krízového riadenia koordinuje krajské zdroje, mobilizáciu a operatívnu synchronizáciu zásahov.</span>
             </li>
             <li class="flex items-start space-x-2.5">
               <i class="fa-solid fa-bullhorn text-red-600 mt-1 text-xs"></i>
-              <span>Prijíma zásadné rozhodnutia, schvaľuje presun personálu z iných regiónov (3. stupeň).</span>
+              <span>Schvaľuje presun personálu medzi regiónmi a aktivuje najvyšší stupeň kaskádovej pomoci vtedy, keď lokálne kapacity nestačia.</span>
             </li>
           </ul>
         </div>
@@ -570,18 +553,15 @@
           <ul class="mt-4 space-y-3 text-xs sm:text-sm text-slate-600">
             <li class="flex items-start space-x-2.5">
               <i class="fa-solid fa-id-badge text-sky-600 mt-1 text-xs"></i>
-              <span><strong>Vedúci výjazdovej skupiny:</strong> Vedúci okresného pracoviska, na ktorom je vyhlásená MS.
-                Koná na základe písomného poverenia.</span>
+              <span><strong>Vedúci výjazdovej skupiny:</strong> Vedúci okresného pracoviska vystupuje ako jediný rozhodujúci operatívny bod na mieste pôsobenia a vykonáva poverenie v zmysle príkazu.</span>
             </li>
             <li class="flex items-start space-x-2.5">
               <i class="fa-solid fa-people-group text-sky-600 mt-1 text-xs"></i>
-              <span><strong>Podriadenosť posíl:</strong> Všetci zamestnanci vyslaní na výpomoc z iných pracovísk okresov
-                alebo regiónov operačne podliehajú tomuto vedúcemu.</span>
+              <span><strong>Podriadenosť posíl:</strong> Všetci zamestnanci vyslaní z iných okresov alebo regiónov sú operačne podriadení tomuto vedúcemu až do ukončenia zásahu.</span>
             </li>
             <li class="flex items-start space-x-2.5">
               <i class="fa-solid fa-walkie-talkie text-sky-600 mt-1 text-xs"></i>
-              <span><strong>Jediný styčný bod:</strong> Vedúci pracoviska je autorizovaný styčný bod, ktorý reportuje
-                vedúcemu odboru KR a sekretariátu KŠ.</span>
+              <span><strong>Jediný styčný bod:</strong> Vedúci pracoviska je autorizovaný zástupca pre komunikáciu so štábom, koordináciu reportingu a zabezpečenie continuity of command.</span>
             </li>
           </ul>
         </div>
@@ -591,10 +571,10 @@
       <div class="bento-panel p-5 sm:p-6">
         <h3 class="text-base font-bold text-slate-900 mb-1 flex items-center space-x-2">
           <i class="fa-solid fa-stairs text-amber-500"></i>
-          <span>Kaskádový model nasadzovania síl a prostriedkov</span>
+          <span>Princíp kaskádového nasadzovania</span>
         </h3>
-        <p class="text-xs sm:text-sm text-slate-500 mb-6">
-          Postupná mobilizácia personálnych kapacít podľa závažnosti a trvania mimoriadnej udalosti.
+        <p class="text-xs sm:text-sm text-slate-500 mb-6 leading-relaxed">
+          Mobilizácia sa stupňuje podľa závažnosti udalosti, dostupnosti kapacít a času potrebného na dosiahnutie operatívnej účinnosti priamo na mieste zásahu.
         </p>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -666,12 +646,18 @@
 
       <!-- SEKCIA 04: PRAVIDLO DOJAZDOVÝCH ČASOV -->
       <section id="section-map" class="feed-section space-y-4">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2.5 border-b border-slate-200">
-          <div class="flex items-center space-x-2.5">
-            <span class="section-header-tag"><i class="fa-solid fa-stopwatch"></i> Sekcia 04</span>
-            <h2 class="text-base sm:text-lg font-bold text-slate-900">Pravidlo dojazdových časov (Výnimka z regionality)</h2>
+        <div class="section-heading-shell pb-2.5 border-b border-slate-200">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div class="flex items-center space-x-2.5">
+              <span class="section-header-tag"><i class="fa-solid fa-stopwatch"></i> Sekcia 04</span>
+              <h2 class="text-base sm:text-lg font-bold text-slate-900">Pravidlo dojazdových časov a výnimka z regionality</h2>
+            </div>
+            <span class="text-xs text-slate-500 font-medium">Rýchlejšia pomoc pri kratšom dojazde z iného regiónu</span>
           </div>
-          <span class="text-xs text-slate-500 font-medium">Výnimka z regionality pri rýchlejšom dojazde zo susedného regiónu</span>
+          <div class="section-spotlight">
+            <span class="section-kicker">Rýchly rozhodovací model</span>
+            <span class="section-insight">Najrýchlejšia podpora: do 45 min.</span>
+          </div>
         </div>
 
         <div class="bento-panel p-5 sm:p-6 space-y-6">
@@ -679,11 +665,10 @@
           <div>
             <h3 class="text-base font-bold text-slate-900 flex items-center space-x-2">
               <i class="fa-solid fa-stopwatch text-sky-600"></i>
-              <span>Pravidlo dojazdových časov (Výnimka z regionality)</span>
+              <span>Pravidlo výnimky z regionality</span>
             </h3>
-            <p class="text-xs text-slate-500 mt-0.5">
-              Ak je dojazdový čas zo susedného regiónu preukázateľne kratší než z vlastného regiónu, vedúci odboru
-              aktivuje rýchlejšiu pomoc bez ohľadu na príslušnosť k regiónu.
+            <p class="text-xs text-slate-500 mt-0.5 leading-relaxed">
+              Ak je dojazdový čas zo susedného regiónu preukázateľne kratší ako z vlastného regiónu, vedúci odboru aktivuje okamžitú podporu bez zbytočného čakania na formálne limity regiónov.
             </p>
           </div>
           <!-- Quick filters/indicators -->
@@ -908,6 +893,30 @@
                   </div>
                 </div>
               </div>
+
+              <div class="bento-panel p-5 sm:p-6 space-y-4 mt-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-100">
+                  <h4 class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center space-x-1.5">
+                    <i class="fa-solid fa-route text-sky-600"></i>
+                    <span>Dojazdové alternatívy pre zvolený okres:</span>
+                  </h4>
+                  <div
+                    class="inline-flex items-center bg-slate-100 p-0.5 rounded-lg border border-slate-200 text-[11px] font-medium self-start sm:self-auto">
+                    <button type="button" onclick="setDispatchRouteFilter('all')" id="btnFilterRoutesAll"
+                      class="px-2.5 py-1 rounded-md bg-white text-slate-800 font-bold shadow-sm transition">
+                      Všetky trasy
+                    </button>
+                    <button type="button" onclick="setDispatchRouteFilter('fast')" id="btnFilterRoutesFast"
+                      class="px-2.5 py-1 rounded-md text-slate-600 hover:text-slate-900 transition flex items-center space-x-1">
+                      <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span>
+                      <span>Iba rýchle (≤ 45 min.)</span>
+                    </button>
+                  </div>
+                </div>
+                <div id="dispatchRankedRoutes" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2.5">
+                  <!-- Injected by JS -->
+                </div>
+              </div>
             </div>
           </div>
 
@@ -916,52 +925,31 @@
 
       <div class="feed-divider"></div>
 
-      <div class="bento-panel p-5 sm:p-6 space-y-4">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-100">
-          <h4 class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center space-x-1.5">
-            <i class="fa-solid fa-route text-sky-600"></i>
-            <span>Dojazdové alternatívy pre zvolený okres:</span>
-          </h4>
-          <div
-            class="inline-flex items-center bg-slate-100 p-0.5 rounded-lg border border-slate-200 text-[11px] font-medium self-start sm:self-auto">
-            <button type="button" onclick="setDispatchRouteFilter('all')" id="btnFilterRoutesAll"
-              class="px-2.5 py-1 rounded-md bg-white text-slate-800 font-bold shadow-sm transition">
-              Všetky trasy
-            </button>
-            <button type="button" onclick="setDispatchRouteFilter('fast')" id="btnFilterRoutesFast"
-              class="px-2.5 py-1 rounded-md text-slate-600 hover:text-slate-900 transition flex items-center space-x-1">
-              <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span>
-              <span>Iba rýchle (≤ 45 min.)</span>
-            </button>
-          </div>
-        </div>
-        <div id="dispatchRankedRoutes" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2.5">
-          <!-- Injected by JS -->
-        </div>
-      </div>
-
-      <div class="feed-divider"></div>
-
     <!-- SEKCIA 05: STRATEGICKÁ TRANSFORMÁCIA & POROVNANIE -->
     <section id="section-comparison" class="feed-section space-y-6">
       <!-- Alias pre spätnú kompatibilitu -->
       <div id="comparisonTab" class="hidden"></div>
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2.5 border-b border-slate-200">
-        <div class="flex items-center space-x-2.5">
-          <span class="section-header-tag"><i class="fa-solid fa-scale-balanced"></i> Sekcia 05</span>
-          <h2 class="text-base sm:text-lg font-bold text-slate-900">Zhodnotenie transformácie systému</h2>
+      <div class="section-heading-shell pb-2.5 border-b border-slate-200">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div class="flex items-center space-x-2.5">
+            <span class="section-header-tag"><i class="fa-solid fa-scale-balanced"></i> Sekcia 05</span>
+            <h2 class="text-base sm:text-lg font-bold text-slate-900">Výhody a efekt transformácie systému</h2>
+          </div>
+          <span class="text-xs text-slate-500 font-medium">Porovnanie pôvodného a nového modelu koordinácie</span>
         </div>
-        <span class="text-xs text-slate-500 font-medium">Porovnanie pôvodného a nového usporiadania</span>
+        <div class="section-spotlight">
+          <span class="section-kicker">Kľúčový benefit</span>
+          <span class="section-insight">Redukcia roztrieštenosti: -59,3 %</span>
+        </div>
       </div>
       <div
         class="bg-gradient-to-r from-slate-900 via-slate-800 to-indigo-950 p-6 rounded-2xl text-white shadow-lg border border-slate-800">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-700/80">
           <div>
-            <h2 class="text-xl sm:text-2xl font-black text-white">Prečo je nový systém preukázateľne lepší, efektívnejší
-              a odolnejší?</h2>
-            <p class="text-xs sm:text-sm text-slate-300 mt-1 max-w-3xl">
-              Prechod z izolovaného okresného modelu (13 izolovaných ostrovov) na 4 funkčné územné regióny so
-              špecializovanou maticou zodpovednosti a kaskádovým zásahom.
+            <span class="board-label bg-slate-800 text-slate-200 border-slate-600">Board-level view</span>
+            <h2 class="text-xl sm:text-2xl font-black text-white mt-3">Prečo je nový model efektívnejší, rýchlejší a odolnejší?</h2>
+            <p class="text-xs sm:text-sm text-slate-300 mt-1 max-w-3xl leading-relaxed">
+              Prechod z izolovaného okresného modelu na 4 funkčné územné regióny zvyšuje koordináciu, skracuje čas na mobilizáciu a znižuje riziko duplicitného nasadenia pri krízových zásahoch.
             </p>
           </div>
           <div class="flex items-center space-x-2 shrink-0">

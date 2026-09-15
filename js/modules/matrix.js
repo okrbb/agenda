@@ -54,7 +54,7 @@ function renderMatrix() {
             <span>${ag.id}</span>
             <i class="fa-solid fa-circle-question text-[10px] text-slate-400 group-hover:text-sky-500 transition"></i>
           </div>
-          <div class="text-[11px] text-slate-500 truncate max-w-[150px]" title="${ag.name}">${ag.shortName}</div>
+          <div class="text-[11px] text-slate-500 truncate max-w-[150px]">${ag.shortName}</div>
         </div>
       </div>
     `;
@@ -86,9 +86,8 @@ function renderMatrix() {
         td.innerHTML = `
           <div onclick="showCellDetail('${ag.id}', '${d.id}')" 
                class="matrix-cell-node mx-auto ${sizeClasses} cursor-pointer flex items-center justify-center relative" 
-               style="background: linear-gradient(135deg, ${ag.color} 0%, ${ag.color}dd 100%);" 
-               title="${ag.id} (${ag.shortName}) - OÚ ${d.id}">
-            ${isKraj ? '<span class="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-amber-400 ring-2 ring-white shadow-sm" title="Celokrajská pôsobnosť"></span>' : ''}
+              style="background: linear-gradient(135deg, ${ag.color} 0%, ${ag.color}dd 100%);">
+            ${isKraj ? '<span class="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-amber-400 ring-2 ring-white shadow-sm"></span>' : ''}
           </div>
         `;
       } else {
@@ -119,7 +118,7 @@ function renderMatrix() {
     table._hasCrosshairLeave = true;
   }
 
-  // 2F. Inicializácia bohatých tooltipov pre hlavičky okresov
+  // Initialize the rich tooltip for district headers.
   initDistrictHeaderTooltips();
 }
 
