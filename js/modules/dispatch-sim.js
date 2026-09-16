@@ -356,33 +356,33 @@ function runDispatchSimulation() {
   const curLvl = mapState.cascadeLevel || 2;
   let hudDecision = "";
   let hudReason = "";
-  let hudBadgeClass = "bg-sky-100 text-sky-800 border-sky-200";
+  let hudBadgeClass = "bg-sky-100 text-sky-900 border-sky-300";
   let hudBadgeText = "2. STUPEŇ KASKÁDY (Regionálna podpora)";
-  let hudCardBorder = "border-sky-200 bg-gradient-to-br from-white via-sky-50/30 to-blue-50/40";
+  let hudCardBorder = "border-sky-300 bg-gradient-to-br from-white via-sky-50/40 to-blue-50/40";
   let beaconColor = "bg-sky-600";
   let beaconPulseColor = "bg-sky-400";
-  let textColor = "text-sky-700";
+  let textColor = "text-sky-800";
 
   if (curLvl === 1) {
     const regionalDistricts = Object.keys(DISTRICT_DICT).filter(id => id !== distId && DISTRICT_DICT[id].regionId === targetMeta.regionId);
     const regionalNames = regionalDistricts.map(id => `${DISTRICT_DICT[id].name} (${id})`).join(', ');
     hudDecision = `LOKÁLNY ZÁSAH PRACOVISKOM ${distId}`;
     hudReason = `Udalosť rieši výhradne konkrétny okres ${targetMeta.name} (${targetMeta.fte} FTE). Okresy v danom regióne ${targetMeta.region} (${regionalNames || 'žiadne ďalšie'}) sú v pohotovosti a pripravené pomôcť, zatiaľ však nevysielajú posily. Ostatné regióny kraja nie sú aktivované ani zvýraznené.`;
-    hudBadgeClass = "bg-emerald-100 text-emerald-800 border-emerald-200";
+    hudBadgeClass = "bg-emerald-100 text-emerald-900 border-emerald-300";
     hudBadgeText = "1. STUPEŇ KASKÁDY (Lokálne sily)";
-    hudCardBorder = "border-emerald-200 bg-gradient-to-br from-white via-emerald-50/30 to-teal-50/40";
+    hudCardBorder = "border-emerald-300 bg-gradient-to-br from-white via-emerald-50/40 to-teal-50/40 ring-1 ring-emerald-400/40";
     beaconColor = "bg-emerald-600";
     beaconPulseColor = "bg-emerald-400";
-    textColor = "text-emerald-700";
+    textColor = "text-emerald-800";
   } else if (curLvl === 3) {
     hudDecision = `CELOKRAJSKÁ MOBILIZÁCIA VŠETKÝCH 4 REGIÓNOV`;
     hudReason = `Mimoriadna udalosť krajského významu. Mobilizuje sa celý BB kraj a posily zo všetkých 13 okresov BBK fázované do 3 vĺn (I. vlna vlastný región, II. vlna susedské regióny, III. vlna celý kraj).`;
-    hudBadgeClass = "bg-purple-100 text-purple-900 border-purple-300";
+    hudBadgeClass = "bg-rose-100 text-rose-900 border-rose-300";
     hudBadgeText = "3. STUPEŇ KASKÁDY (Celokrajská výpomoc)";
-    hudCardBorder = "border-purple-300 bg-gradient-to-br from-white via-purple-50/40 to-rose-50/40 ring-1 ring-purple-400/50";
-    beaconColor = "bg-purple-700";
-    beaconPulseColor = "bg-purple-500";
-    textColor = "text-purple-800";
+    hudCardBorder = "border-rose-300 bg-gradient-to-br from-white via-rose-50/40 to-pink-50/40 ring-1 ring-rose-400/50";
+    beaconColor = "bg-rose-600";
+    beaconPulseColor = "bg-rose-400";
+    textColor = "text-rose-800";
   } else {
     // 2. STUPEŇ KASKÁDY - Dynamické taktické vyhodnotenie
     const brRoute = availableRoutes.find(r => r.id === 'BR');
@@ -550,25 +550,32 @@ function setCascadeLevel(level, showNotification = true) {
   const lvlNum = parseInt(level, 10) || 1;
   mapState.cascadeLevel = lvlNum;
 
+  // Level configuration
+  const lvlConfig = {
+    1: { color: 'emerald', hex: '#059669', name: 'Lokálne sily', btnBg: 'bg-emerald-600', ring: 'ring-emerald-500/80', border: 'border-emerald-500' },
+    2: { color: 'sky', hex: '#0284c7', name: 'Regionálna podpora', btnBg: 'bg-sky-600', ring: 'ring-sky-500/80', border: 'border-sky-500' },
+    3: { color: 'rose', hex: '#e11d48', name: 'Celokrajská mobilizácia', btnBg: 'bg-rose-600', ring: 'ring-rose-500/80', border: 'border-rose-500' }
+  };
+
   // Aktualizácia tlačidiel v simulátore
   [1, 2, 3].forEach(l => {
     const btn = document.getElementById(`btnCascadeLvl${l}`);
     if (btn) {
       if (l === lvlNum) {
-        btn.className = `px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm transition flex items-center space-x-1.5 ${l === 1 ? 'bg-emerald-600 text-white shadow-emerald-200' : (l === 2 ? 'bg-sky-600 text-white shadow-sky-200' : 'bg-purple-700 text-white ring-2 ring-purple-400 shadow-purple-200')
-          }`;
+        btn.className = `px-3 py-1.5 rounded-xl text-xs font-bold shadow-sm transition flex items-center justify-center ${lvlConfig[l].btnBg} text-white ring-2 ${lvlConfig[l].ring}`;
       } else {
-        btn.className = "px-3 py-1.5 rounded-lg text-xs font-semibold bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 transition flex items-center space-x-1.5";
+        btn.className = "px-3 py-1.5 rounded-xl text-xs font-semibold bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 transition flex items-center justify-center";
       }
     }
 
     // Prehľadové karty kaskády
     const card = document.getElementById(`cascadeCardLvl${l}`);
     if (card) {
+      card.style.borderTop = `4px solid ${lvlConfig[l].hex}`;
       if (l === lvlNum) {
-        card.classList.add('ring-4', l === 1 ? 'ring-emerald-400' : (l === 2 ? 'ring-sky-400' : 'ring-purple-500'), 'shadow-lg');
+        card.className = `p-5 rounded-2xl bg-white ${lvlConfig[l].border} ring-2 ${lvlConfig[l].ring} shadow-md cursor-pointer transition relative group flex flex-col justify-between`;
       } else {
-        card.classList.remove('ring-4', 'ring-emerald-400', 'ring-sky-400', 'ring-purple-500', 'shadow-lg');
+        card.className = "p-5 rounded-2xl bg-slate-50/60 border border-slate-200 hover:border-slate-300 hover:shadow-sm cursor-pointer transition relative group flex flex-col justify-between opacity-85 hover:opacity-100";
       }
     }
   });
@@ -577,20 +584,20 @@ function setCascadeLevel(level, showNotification = true) {
   const badge = document.getElementById('mapCascadeLevelBadge');
   if (badge) {
     if (lvlNum === 1) {
-      badge.className = "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-900 border border-emerald-300 shadow-sm";
+      badge.className = "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-900 border border-emerald-300 shadow-sm";
       badge.innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-600"></span> 1. STUPEŇ: Lokálne sily';
     } else if (lvlNum === 2) {
-      badge.className = "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-sky-100 text-sky-900 border border-sky-300 shadow-sm";
+      badge.className = "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-sky-50 text-sky-900 border border-sky-300 shadow-sm";
       badge.innerHTML = '<span class="w-2 h-2 rounded-full bg-sky-600"></span> 2. STUPEŇ: Regionálna podpora';
     } else {
-      badge.className = "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-purple-100 text-purple-950 border border-purple-300 shadow-sm animate-pulse";
-      badge.innerHTML = '<span class="w-2 h-2 rounded-full bg-purple-700"></span> 3. STUPEŇ: CELOKRAJSKÁ MOBILIZÁCIA';
+      badge.className = "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-rose-50 text-rose-900 border border-rose-300 shadow-sm";
+      badge.innerHTML = '<span class="w-2 h-2 rounded-full bg-rose-600"></span> 3. STUPEŇ: Celokrajská mobilizácia';
     }
   }
 
   runDispatchSimulation();
   if (showNotification && typeof showToast === 'function') {
-    showToast(`Aktivovaný ${lvlNum}. stupeň kaskády: ${lvlNum === 1 ? 'Lokálne sily' : (lvlNum === 2 ? 'Regionálna podpora' : 'Celokrajská mobilizácia')}`, lvlNum === 3 ? "warning" : "info");
+    showToast(`Aktivovaný ${lvlNum}. stupeň kaskády: ${lvlConfig[lvlNum].name}`, "info");
   }
 }
 

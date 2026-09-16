@@ -37,24 +37,25 @@ function renderMatrix() {
     { id: "DT", region: "vychod" }, { id: "PT", region: "vychod" }, { id: "RS", region: "vychod" }
   ];
 
-  AGENDAS.forEach(ag => {
+  AGENDAS.forEach((ag, index) => {
     const tr = document.createElement('tr');
-    tr.className = "hover:bg-sky-50/60 transition group";
+    tr.className = `${index % 2 === 0 ? 'bg-white' : 'bg-slate-50/60'} hover:bg-sky-50/50 transition group border-b border-slate-200/80`;
     tr.setAttribute('data-agenda', ag.id);
 
-    // Col 1: Agenda code and title
+    // Col 1: Agenda code and title with colored strip indicator and distinct badge!
     const tdAgenda = document.createElement('td');
-    tdAgenda.className = "p-2.5 font-medium matrix-sticky-col bg-white group-hover:bg-sky-50/90 border-r border-slate-200 cursor-pointer transition";
+    tdAgenda.className = "p-2.5 font-medium matrix-sticky-col bg-white group-hover:bg-slate-50 border-r border-slate-200 cursor-pointer transition";
+    tdAgenda.style.borderLeft = `4px solid ${ag.color}`;
     tdAgenda.onclick = () => showAgendaModal(ag.id);
     tdAgenda.innerHTML = `
       <div class="flex items-center space-x-2.5">
-        <span class="w-6 h-6 rounded-md flex items-center justify-center text-[11px] font-bold text-white shadow-sm" style="background-color: ${ag.color}">${ag.num}</span>
+        <span class="px-2 py-0.5 rounded-lg text-white font-mono-code text-[11px] font-bold tracking-tight shrink-0 shadow-sm" style="background-color: ${ag.color};">AG 0${ag.num}</span>
         <div>
-          <div class="font-bold text-slate-900 flex items-center space-x-1">
+          <div class="font-bold text-slate-950 flex items-center space-x-1 text-xs group-hover:text-sky-700 transition">
             <span>${ag.id}</span>
-            <i class="fa-solid fa-circle-question text-[10px] text-slate-400 group-hover:text-sky-500 transition"></i>
+            <i class="fa-solid fa-circle-question text-[10px] text-slate-400 group-hover:text-slate-900 transition"></i>
           </div>
-          <div class="text-[11px] text-slate-500 truncate max-w-[150px]">${ag.shortName}</div>
+          <div class="text-[11px] text-slate-500 font-medium truncate max-w-[155px]">${ag.shortName}</div>
         </div>
       </div>
     `;
@@ -64,16 +65,18 @@ function renderMatrix() {
     const tdType = document.createElement('td');
     tdType.className = "p-2.5 text-center border-r border-slate-200";
     if (ag.type === 'KRAJ') {
-      tdType.innerHTML = `<span class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-amber-100 text-amber-900 border border-amber-300">KRAJ</span>`;
+      tdType.innerHTML = `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 text-[10px] font-bold rounded-full bg-amber-50 text-amber-900 border border-amber-300 shadow-sm"><span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>KRAJ</span>`;
     } else {
-      tdType.innerHTML = `<span class="px-2 py-0.5 text-[10px] font-semibold rounded-full bg-slate-100 text-slate-700">Región</span>`;
+      tdType.innerHTML = `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 text-[10px] font-semibold rounded-full bg-slate-100 text-slate-700 border border-slate-200"><span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>Región</span>`;
     }
     tr.appendChild(tdType);
 
-    // Cols for each of the 13 districts: Interactive Heatmap Pods
-    districtsList.forEach(d => {
+    // Cols for each of the 13 districts: Modern Color-Coded Precision Pods
+    districtsList.forEach((d, dIdx) => {
       const td = document.createElement('td');
-      td.className = "p-1.5 text-center border-r border-slate-200 transition-colors duration-150";
+      // Put a distinct border between regions (after RA index 2, after BS index 6, after LC index 9)
+      const isRegionBorder = d.id === 'RA' || d.id === 'BS' || d.id === 'LC';
+      td.className = `p-1.5 text-center ${isRegionBorder ? 'border-r-2 border-slate-300' : 'border-r border-slate-200/80'} transition-colors duration-150`;
       td.setAttribute('data-dist', d.id);
       td.setAttribute('data-region', d.region);
 
@@ -85,9 +88,10 @@ function renderMatrix() {
         
         td.innerHTML = `
           <div onclick="showCellDetail('${ag.id}', '${d.id}')" 
-               class="matrix-cell-node mx-auto ${sizeClasses} cursor-pointer flex items-center justify-center relative" 
-              style="background: linear-gradient(135deg, ${ag.color} 0%, ${ag.color}dd 100%);">
-            ${isKraj ? '<span class="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-amber-400 ring-2 ring-white shadow-sm"></span>' : ''}
+               class="matrix-cell-node mx-auto w-6 h-6 rounded-md cursor-pointer flex items-center justify-center relative transition-all duration-150 shadow-sm hover:scale-110"
+               style="background-color: ${ag.color};"
+               title="${ag.name} - okres ${d.id}">
+            ${isKraj ? '<span class="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-amber-400 ring-2 ring-white shadow-sm" title="Celokrajská pôsobnosť (KRAJ)"></span>' : ''}
           </div>
         `;
       } else {
@@ -104,8 +108,8 @@ function renderMatrix() {
 
     // Col total FTE for this agenda
     const tdTotal = document.createElement('td');
-    tdTotal.className = "p-2.5 text-center font-bold text-slate-800 bg-slate-50";
-    tdTotal.innerHTML = `<span class="px-2 py-0.5 rounded bg-slate-200/80 text-slate-700 font-mono-code">${ag.fteTotal} FTE</span>`;
+    tdTotal.className = "p-2.5 text-center font-bold text-slate-900 bg-slate-50";
+    tdTotal.innerHTML = `<span class="px-2.5 py-0.5 rounded-full text-white font-mono-code text-[11px] font-bold shadow-sm" style="background-color: ${ag.color};">${ag.fteTotal} FTE</span>`;
     tr.appendChild(tdTotal);
 
     tbody.appendChild(tr);
@@ -137,9 +141,9 @@ function filterMatrix(regionKey) {
     const btn = document.getElementById('filter-' + def.key);
     if (btn) {
       if (def.key === regionKey) {
-        btn.className = "px-3 py-1.5 rounded-lg bg-sky-600 text-white shadow-sm font-semibold transition flex items-center space-x-1.5";
+        btn.className = "px-3 py-1.5 rounded-full bg-slate-950 text-white shadow-sm font-semibold transition flex items-center space-x-1.5";
       } else {
-        btn.className = "px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition flex items-center space-x-1.5";
+        btn.className = "px-3 py-1.5 rounded-full bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 transition flex items-center space-x-1.5";
       }
     }
   });
