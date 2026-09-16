@@ -178,7 +178,7 @@ function renderComparisonTable(filter = 'all') {
     tr.className = `hover:bg-slate-100/70 transition ${rowBg}`;
 
     const isCriticalBadge = d.isCritical
-      ? '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 text-rose-800 border border-rose-200 shadow-sm" title="Kritické ohrozenie v starom systéme"><i class="fa-solid fa-triangle-exclamation text-rose-600"></i>2 FTE (Vysoké riziko)</span>'
+      ? '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 text-rose-800 border border-rose-200 shadow-sm" title="Kritické ohrozenie v starom systéme"><i class="fa-solid fa-triangle-exclamation text-rose-600"></i>(Vysoké riziko)</span>'
       : '';
 
     const regColor = regionDotColors[d.region] || '#64748b';
