@@ -358,7 +358,7 @@ function launchCascadeConvoys(distId) {
           color: waveColor,
           wave: wave,
           isHQ: isHQ,
-          unitName: `${isHQ ? '🏛️ Krajský štáb BB' : otherDist.name} → ${target.name}`
+          unitName: `${isHQ ? 'Krajský štáb BB' : otherDist.name} → ${target.name}`
         });
       }, waveDelay);
     });
@@ -471,18 +471,11 @@ function renderCascadeMap() {
       const isWinter = !!(mapState && mapState.winterMode);
 
       if (curLevel === 1) {
-        // V 1. stupni: iba spojnice v rámci vlastného regiónu sú jemne zvýraznené ako linky pohotovosti
-        if (isConnectedToActive && isSameRegion) {
-          ctx.strokeStyle = isWinter && isMountainPass ? 'rgba(56, 189, 248, 0.85)' : 'rgba(16, 185, 129, 0.65)';
-          ctx.lineWidth = 1.8;
-          ctx.setLineDash([4, 4]);
-          ctx.shadowBlur = 0;
-        } else {
-          ctx.strokeStyle = isWinter && isMountainPass ? 'rgba(56, 189, 248, 0.35)' : 'rgba(148, 163, 184, 0.22)';
-          ctx.lineWidth = 1.0;
-          ctx.setLineDash([]);
-          ctx.shadowBlur = 0;
-        }
+        // V lokálnom režime (1. stupeň): cesty nemusia byť zvýraznené, zostávajú v neutrálnom podmaze
+        ctx.strokeStyle = isWinter && isMountainPass ? 'rgba(56, 189, 248, 0.35)' : 'rgba(148, 163, 184, 0.22)';
+        ctx.lineWidth = 1.0;
+        ctx.setLineDash([]);
+        ctx.shadowBlur = 0;
       } else if (curLevel === 2) {
         // V 2. stupni: susedské spojnice (aj cez hranicu regiónu) sú aktívne
         if (isConnectedToActive && edgePalette) {
@@ -524,43 +517,30 @@ function renderCascadeMap() {
       ctx.shadowBlur = 0;
       ctx.setLineDash([]);
 
-      // Zobrazenie snehovej vločky v strede horského priechodu v zimnom režime
-      if (isWinter && isMountainPass) {
+      // Zobrazenie označenia horského priechodu v zimnom režime (iba pri aktívnej medziregionálnej preprave)
+      if (isWinter && isMountainPass && curLevel > 1) {
         const midP = getBezierPoint(coordA, cp, coordB, 0.5);
         ctx.save();
-        ctx.font = '10px sans-serif';
+        
+        // Decentný podkladový kruh pre zreteľnosť nad spojnicou ciest
+        ctx.beginPath();
+        ctx.arc(midP.x, midP.y, 6.5, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.92)';
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(14, 165, 233, 0.45)';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        // Snehová vločka
+        ctx.font = '10px "Segoe UI Symbol", -apple-system, sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText('❄️', midP.x, midP.y);
+        ctx.fillStyle = '#0284c7';
+        ctx.fillText('❄', midP.x, midP.y + 0.5);
         ctx.restore();
       }
     });
   });
-
-  // V 1. stupni: vykreslenie priamej spojnice pohotovosti pre všetky okresy v rovnakom regióne
-  if (curLevel === 1 && activeId && targetMeta) {
-    Object.keys(DISTRICT_DICT).forEach(otherId => {
-      if (otherId === activeId) return;
-      if (DISTRICT_DICT[otherId].regionId !== targetMeta.regionId) return;
-      const [idA, idB] = [activeId, otherId].sort();
-      const edgeKey = `${idA}--${idB}`;
-      if (drawnEdges.has(edgeKey)) return;
-      drawnEdges.add(edgeKey);
-
-      const coordA = getMapCoordinates(idA);
-      const coordB = getMapCoordinates(idB);
-      const cp = getCurveControlPoint(coordA, coordB, 18);
-
-      ctx.beginPath();
-      ctx.moveTo(coordA.x, coordA.y);
-      ctx.quadraticCurveTo(cp.x, cp.y, coordB.x, coordB.y);
-      ctx.strokeStyle = 'rgba(16, 185, 129, 0.65)';
-      ctx.lineWidth = 1.8;
-      ctx.setLineDash([4, 4]);
-      ctx.stroke();
-      ctx.setLineDash([]);
-    });
-  }
 
   // 3. Pohyb konvojov pozdĺž reálnej cestnej siete so svetelným chvostom
   for (let i = mapState.activeConvoys.length - 1; i >= 0; i--) {
@@ -834,22 +814,39 @@ function renderCascadeMap() {
     ctx.textBaseline = 'middle';
     ctx.fillText(id, coord.x, coord.y + 0.5);
 
-    // Stavový piktogram (majáčik / štít / krajský štáb / pohotovosť / výstraha MU)
+    // Čisté GIS stavové indikátory namiesto emotikonov
     if (isSelected) {
-      ctx.font = '12px sans-serif';
-      ctx.fillText(isLevel1 ? '🟢' : '🚨', coord.x + radius - 4, coord.y - radius + 4);
+      ctx.beginPath();
+      ctx.arc(coord.x + radius - 2, coord.y - radius + 2, 4.5, 0, Math.PI * 2);
+      ctx.fillStyle = isLevel1 ? '#10b981' : '#dc2626';
+      ctx.fill();
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
     } else if (isBusyNode) {
-      ctx.font = '12px sans-serif';
-      ctx.fillText('⚠️', coord.x + radius - 4, coord.y - radius + 4);
-    } else if (id === 'BB' && isLevel3) {
-      ctx.font = '12px sans-serif';
-      ctx.fillText('🏛️', coord.x + radius - 4, coord.y - radius + 4);
+      ctx.beginPath();
+      ctx.arc(coord.x + radius - 2, coord.y - radius + 2, 4.5, 0, Math.PI * 2);
+      ctx.fillStyle = '#dc2626';
+      ctx.fill();
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
     } else if (isNeighborActive) {
-      ctx.font = '11px sans-serif';
-      ctx.fillText('🛡️', coord.x + radius - 4, coord.y - radius + 4);
+      ctx.beginPath();
+      ctx.arc(coord.x + radius - 2, coord.y - radius + 2, 4, 0, Math.PI * 2);
+      ctx.fillStyle = '#0284c7';
+      ctx.fill();
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
     } else if (isRegionalStandby) {
-      ctx.font = '10px sans-serif';
-      ctx.fillText('⏳', coord.x + radius - 4, coord.y - radius + 4);
+      ctx.beginPath();
+      ctx.arc(coord.x + radius - 2, coord.y - radius + 2, 3.5, 0, Math.PI * 2);
+      ctx.fillStyle = '#10b981';
+      ctx.fill();
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
     }
   });
 

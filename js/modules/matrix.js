@@ -42,39 +42,24 @@ function renderMatrix() {
     tr.className = `${index % 2 === 0 ? 'bg-white' : 'bg-slate-50/60'} hover:bg-sky-50/50 transition group border-b border-slate-200/80`;
     tr.setAttribute('data-agenda', ag.id);
 
-    // Col 1: Agenda code and title with colored strip indicator and distinct badge!
+    // Col 1: Agenda code and title with colored strip indicator and distinct badge
     const tdAgenda = document.createElement('td');
     tdAgenda.className = "p-2.5 font-medium matrix-sticky-col bg-white group-hover:bg-slate-50 border-r border-slate-200 cursor-pointer transition";
-    tdAgenda.style.borderLeft = `4px solid ${ag.color}`;
+    tdAgenda.style.borderLeft = `3px solid ${ag.color}`;
     tdAgenda.onclick = () => showAgendaModal(ag.id);
     tdAgenda.innerHTML = `
       <div class="flex items-center space-x-2.5">
-        <span class="px-2 py-0.5 rounded-lg text-white font-mono-code text-[11px] font-bold tracking-tight shrink-0 shadow-sm" style="background-color: ${ag.color};">AG 0${ag.num}</span>
-        <div>
-          <div class="font-bold text-slate-950 flex items-center space-x-1 text-xs group-hover:text-sky-700 transition">
-            <span>${ag.id}</span>
-            <i class="fa-solid fa-circle-question text-[10px] text-slate-400 group-hover:text-slate-900 transition"></i>
-          </div>
-          <div class="text-[11px] text-slate-500 font-medium truncate max-w-[155px]">${ag.shortName}</div>
+        <span class="px-1.5 py-0.5 rounded text-white font-mono-code text-[11px] font-bold tracking-tight shrink-0" style="background-color: ${ag.color};">AG 0${ag.num}</span>
+        <div class="font-medium text-slate-700 text-xs group-hover:text-sky-700 transition leading-snug truncate max-w-[170px]" title="${ag.name}">
+          ${ag.shortName}
         </div>
       </div>
     `;
     tr.appendChild(tdAgenda);
 
-    // Col 2: Scope badge
-    const tdType = document.createElement('td');
-    tdType.className = "p-2.5 text-center border-r border-slate-200";
-    if (ag.type === 'KRAJ') {
-      tdType.innerHTML = `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 text-[10px] font-bold rounded-full bg-amber-50 text-amber-900 border border-amber-300 shadow-sm"><span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>KRAJ</span>`;
-    } else {
-      tdType.innerHTML = `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 text-[10px] font-semibold rounded-full bg-slate-100 text-slate-700 border border-slate-200"><span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>Región</span>`;
-    }
-    tr.appendChild(tdType);
-
-    // Cols for each of the 13 districts: Modern Color-Coded Precision Pods
+    // Cols for each of the 13 districts: Precision Data Cells
     districtsList.forEach((d, dIdx) => {
       const td = document.createElement('td');
-      // Put a distinct border between regions (after RA index 2, after BS index 6, after LC index 9)
       const isRegionBorder = d.id === 'RA' || d.id === 'BS' || d.id === 'LC';
       td.className = `p-1.5 text-center ${isRegionBorder ? 'border-r-2 border-slate-300' : 'border-r border-slate-200/80'} transition-colors duration-150`;
       td.setAttribute('data-dist', d.id);
@@ -84,18 +69,17 @@ function renderMatrix() {
 
       if (hasAgenda) {
         const isKraj = ag.type === 'KRAJ';
-        const sizeClasses = 'w-7 h-7';
         
         td.innerHTML = `
           <div onclick="showCellDetail('${ag.id}', '${d.id}')" 
-               class="matrix-cell-node mx-auto w-6 h-6 rounded-md cursor-pointer flex items-center justify-center relative transition-all duration-150 shadow-sm hover:scale-110"
+               class="matrix-cell-node mx-auto w-5 h-5 rounded-[3px] cursor-pointer flex items-center justify-center relative shadow-xs"
                style="background-color: ${ag.color};"
                title="${ag.name} - okres ${d.id}">
-            ${isKraj ? '<span class="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-amber-400 ring-2 ring-white shadow-sm" title="Celokrajská pôsobnosť (KRAJ)"></span>' : ''}
+            ${isKraj ? '<span class="w-1.5 h-1.5 rounded-full bg-amber-300" title="Celokrajská pôsobnosť (KRAJ)"></span>' : ''}
           </div>
         `;
       } else {
-        td.innerHTML = `<div class="w-1.5 h-1.5 rounded-full bg-slate-300/70 mx-auto"></div>`;
+        td.innerHTML = `<span class="text-slate-300 text-xs font-mono select-none">—</span>`;
       }
 
       // Crosshair tracking events
@@ -106,10 +90,10 @@ function renderMatrix() {
       tr.appendChild(td);
     });
 
-    // Col total FTE for this agenda
+    // Col total FTE for this agenda (čistý text zhodný s rezom písma názvu agendy)
     const tdTotal = document.createElement('td');
-    tdTotal.className = "p-2.5 text-center font-bold text-slate-900 bg-slate-50";
-    tdTotal.innerHTML = `<span class="px-2.5 py-0.5 rounded-full text-white font-mono-code text-[11px] font-bold shadow-sm" style="background-color: ${ag.color};">${ag.fteTotal} FTE</span>`;
+    tdTotal.className = "p-2.5 text-center font-mono-code text-xs font-medium text-slate-700 bg-slate-50/50";
+    tdTotal.textContent = `${ag.fteTotal} FTE`;
     tr.appendChild(tdTotal);
 
     tbody.appendChild(tr);
@@ -141,9 +125,9 @@ function filterMatrix(regionKey) {
     const btn = document.getElementById('filter-' + def.key);
     if (btn) {
       if (def.key === regionKey) {
-        btn.className = "px-3 py-1.5 rounded-full bg-slate-950 text-white shadow-sm font-semibold transition flex items-center space-x-1.5";
+        btn.className = "px-2.5 py-1.5 rounded bg-slate-900 text-white font-semibold transition flex items-center space-x-1.5 shadow-sm";
       } else {
-        btn.className = "px-3 py-1.5 rounded-full bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 transition flex items-center space-x-1.5";
+        btn.className = "px-2.5 py-1.5 rounded bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 transition flex items-center space-x-1.5";
       }
     }
   });
@@ -478,11 +462,11 @@ function startDistrictOutage(distId) {
   const btnOutageText = document.getElementById('btnToggleOutageText');
 
   if (banner && nameEl) {
-    banner.className = "mb-4 p-3.5 rounded-xl bg-rose-50 border-2 border-rose-400 text-rose-950 text-xs flex flex-col md:flex-row md:items-center justify-between gap-3 shadow-md transition-all duration-200 animate-pulse";
-    if (dotEl) dotEl.className = "w-3 h-3 rounded-full bg-rose-600 animate-ping shrink-0 mt-0.5 md:mt-0";
-    if (labelEl) labelEl.textContent = "🚨 KRÍZOVÝ VÝPADOK:";
-    nameEl.innerHTML = `<span class="font-extrabold text-rose-900">${dMeta.name} (${distId}) je nedostupné!</span>`;
-    if (subEl) subEl.innerHTML = `<strong>Kaskádový plán aktivovaný:</strong> Zvýraznené <span class="text-emerald-700 font-bold">zelené bunky</span> v matici ukazujú, ktoré okresné pracoviská automaticky preberajú garantovanie jednotlivých agend.`;
+    banner.className = "mb-4 p-3 rounded-lg bg-rose-50 border border-rose-300 text-rose-950 text-xs flex flex-col md:flex-row md:items-center justify-between gap-3 shadow-xs transition-all duration-150";
+    if (dotEl) dotEl.className = "w-2.5 h-2.5 rounded-full bg-rose-600 shrink-0 mt-0.5 md:mt-0";
+    if (labelEl) labelEl.textContent = "KRÍZOVÝ VÝPADOK:";
+    nameEl.innerHTML = `<span class="font-bold text-rose-900">${dMeta.name} (${distId}) je nedostupné</span>`;
+    if (subEl) subEl.innerHTML = `<strong>Kaskádový plán aktivovaný:</strong> Zvýraznené zelené bunky v matici označujú pracoviská, ktoré automaticky preberajú garantovanie jednotlivých agend.`;
     if (btnOutageText) btnOutageText.textContent = "Ukončiť výpadok";
     banner.classList.remove('hidden');
   }
@@ -539,7 +523,7 @@ function startDistrictOutage(distId) {
   }
 
   if (typeof showToast === 'function') {
-    showToast(`🚨 Simulácia výpadku okresu ${dMeta.name}: Aktivovaných ${substCount} zastupujúcich garantov`, "warning");
+    showToast(`Simulácia výpadku okresu ${dMeta.name}: Aktivovaných ${substCount} zastupujúcich garantov`, "warning");
   }
 }
 

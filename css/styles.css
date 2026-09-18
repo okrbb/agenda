@@ -1,146 +1,127 @@
 /* =========================================================================
-   2026 TACTICAL GOVTECH LIGHT & SPATIAL INTELLIGENCE STYLES
-   Custom CSS Styles & Micro-interactions for OKR BBK Agenda App
+   SISTÉM REGIONÁLNYCH KAPACÍT A AGEND KR — GOVTECH / ENTERPRISE EDITION
+   Odbor krízového riadenia • Banská Bystrica
+   Autoritatívny, precízny, vysoko prehľadný inštitucionálny štýl
    ========================================================================= */
 
 :root {
-  --glass-bg: rgba(255, 255, 255, 0.88);
-  --glass-border: rgba(226, 232, 240, 0.85);
-  --hud-accent: #0ea5e9;
-  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
-  --surface-canvas: #f8fafc;
-  --brand-cyan: #0891b2;
-  --status-warning: #d97706;
-  --status-critical: #e11d48;
-  --status-optimal: #059669;
+  /* === Inštitucionálne farebné tokeny === */
+  --co-navy-deep:    #091E3A;   /* Hlboká exekutívna námornícka modrá pre hlavičku */
+  --co-navy:         #163A63;   /* Primárna inštitucionálna modrá */
+  --co-navy-mid:     #215286;   /* Stredná modrá pre akcenty a linky */
+  --co-navy-light:   #F1F5F9;   /* Čistý neutrálny podklad pre hover a sekcie */
+  --co-accent:       #D97706;   /* Triezvy jantárový akcent */
+  --co-accent-dim:   #B45309;
+
+  /* === Povrchy a orámovania (GovTech Sharp & Crisp) === */
+  --surface-canvas:  #F8FAFC;   /* neutrálny bridlicový podklad */
+  --surface-card:    #FFFFFF;   /* biele panely */
+  --co-border:       #E2E8F0;   /* precízne štrukturálne orámovanie 1px */
+  --co-border-mid:   #CBD5E1;   /* zvýraznené orámovanie */
+  --co-border-dark:  #94A3B8;
+
+  /* === Funkčné stavové tokeny (vyhradené výhradne pre stav systému) === */
+  --status-optimal:  #059669;   /* zelená: plné krytie / pripravenosť */
+  --status-warning:  #D97706;   /* jantárová: znížená kapacita / výnimka */
+  --status-critical: #DC2626;   /* červená: výpadok / krízový stav */
+
+  /* === Typografia a layout === */
+  --font-sans:       'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono:       'JetBrains Mono', 'Fira Code', monospace;
+  --radius-sm:       6px;
+  --radius-md:       8px;
+  --radius-lg:       12px;
+  --radius-xl:       16px;
+  --radius-2xl:      20px;
+
+  /* === Rozmery layoutu (Odľahčená vzdušná hlavička) === */
+  --header-height:   4.25rem;
+  --subnav-height:   3rem;
+}
+
+/* =========================================================================
+   ZÁKLADNÉ NASTAVENIA
+   ========================================================================= */
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  background-color: #f8f9fb;
+  font-family: var(--font-sans);
+  background-color: var(--surface-canvas);
   color: #0f172a;
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 .font-mono-code {
   font-family: var(--font-mono);
   font-feature-settings: "tnum";
   font-variant-numeric: tabular-nums;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.01em;
 }
 
-/* Custom clean scrollbars */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
+/* Scrollbary — decentné, nevtieravé */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #F1F5F9; }
+::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: var(--radius-sm); }
+::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
 
-::-webkit-scrollbar-track {
-  background: #f1f5f9;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
-}
-
-/* 1. Bento Grid a Karty v čistom Revolut štýle */
+/* =========================================================================
+   1. BENTO & DÁTOVÉ PANELY — Vzdušné, jemné orámovania a mäkké tiene
+   ========================================================================= */
 .bento-panel {
   background: #ffffff;
-  border: 1px solid rgba(15, 23, 42, 0.07);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02), 0 4px 14px -3px rgba(15, 23, 42, 0.03);
-  border-radius: 1.25rem;
-  transition: all 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+  border: 1px solid rgba(226, 232, 240, 0.85);
+  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.03), 0 1px 3px rgba(15, 23, 42, 0.02);
+  border-radius: var(--radius-xl);
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.2s ease;
   position: relative;
-  overflow: hidden;
-}
-
-.bento-panel::before {
-  display: none; /* Odstránený gýčový horný gradientný prúžok */
 }
 
 .bento-panel:hover {
-  border-color: rgba(15, 23, 42, 0.16);
-  box-shadow: 0 12px 30px -8px rgba(15, 23, 42, 0.07);
-  transform: translateY(-2px);
+  border-color: rgba(203, 213, 225, 0.95);
+  box-shadow: 0 12px 32px -4px rgba(15, 23, 42, 0.06), 0 2px 6px rgba(15, 23, 42, 0.03);
 }
 
-.board-cta {
-  display: flex;
-  flex-direction: column;
-  gap: 0.65rem;
-  padding: 1.1rem 1.35rem;
-  border-radius: 1rem;
-  background: #f8fafc;
-  border: 1px solid #eef2f6;
-}
-
-.board-label {
-  display: inline-flex;
-  align-items: center;
-  align-self: flex-start;
-  gap: 0.4rem;
-  padding: 0.25rem 0.65rem;
-  border-radius: 999px;
-  background: #0f172a;
-  border: 1px solid #1e293b;
-  color: #f8fafc;
-  font-size: 0.64rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-
-.board-stat {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.22rem 0.6rem;
-  border-radius: 999px;
-  background: #f1f5f9;
-  border: 1px solid #e2e8f0;
-  color: #0f172a;
-  font-size: 0.66rem;
-  font-weight: 700;
-}
-
-.section-header-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.22rem 0.65rem;
-  border-radius: 999px;
-  background: #f1f5f9;
-  border: 1px solid #e2e8f0;
-  color: #0f172a;
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
-/* Revolut Style KPI Card */
+/* =========================================================================
+   2. KPI METRIC KARTY — Exekutívny dashboard s voľným priestorom
+   ========================================================================= */
 .revolut-kpi-card {
   background: #ffffff;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 1.25rem;
-  padding: 1.15rem 1.25rem;
-  transition: all 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+  border: 1px solid rgba(226, 232, 240, 0.85);
+  border-radius: var(--radius-xl);
+  padding: 1.35rem 1.45rem;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.2s ease;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: 0.75rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+  gap: 1rem;
+  box-shadow: 0 2px 10px -2px rgba(15, 23, 42, 0.03);
+  position: relative;
+}
+
+.revolut-kpi-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 14px;
+  right: 14px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--co-navy);
+  opacity: 0;
+  transition: opacity 0.2s ease;
 }
 
 .revolut-kpi-card:hover {
-  border-color: rgba(15, 23, 42, 0.18);
-  box-shadow: 0 10px 24px -6px rgba(15, 23, 42, 0.07);
+  border-color: rgba(2, 55, 127, 0.25);
+  box-shadow: 0 8px 24px -4px rgba(15, 23, 42, 0.07);
   transform: translateY(-2px);
+}
+
+.revolut-kpi-card:hover::before {
+  opacity: 1;
 }
 
 .revolut-kpi-badge {
@@ -149,199 +130,144 @@ body {
   justify-content: center;
   width: 2.25rem;
   height: 2.25rem;
-  border-radius: 0.75rem;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  color: #0f172a;
-  font-size: 0.95rem;
+  border-radius: var(--radius-md);
+  background: var(--co-navy-light);
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  color: var(--co-navy);
+  font-size: 0.925rem;
   transition: all 0.2s ease;
 }
 
 .revolut-kpi-card:hover .revolut-kpi-badge {
-  background: #0f172a;
+  background: var(--co-navy);
   color: #ffffff;
-  border-color: #0f172a;
-}
-
-/* Revolut Style Agenda Card */
-.revolut-agenda-card {
-  background: #ffffff;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 1.25rem;
-  padding: 1.35rem 1.4rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  transition: all 0.24s cubic-bezier(0.16, 1, 0.3, 1);
-  cursor: pointer;
-  position: relative;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
-}
-
-.revolut-agenda-card:hover {
-  border-color: #0f172a;
-  box-shadow: 0 14px 34px -10px rgba(15, 23, 42, 0.1);
-  transform: translateY(-2px);
-}
-
-/* 2. Taktické tlačidlá výberu okresov */
-.district-map-btn {
-  position: relative;
-  overflow: hidden;
-  border-radius: 0.75rem;
-  background: white;
-  border: 1px solid #e2e8f0;
-  padding: 0.55rem 0.7rem;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  text-align: left;
-}
-
-.district-map-btn::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 3px;
-  background: transparent;
-  transition: background 0.2s ease;
-}
-
-.district-map-btn:hover {
-  transform: translateY(-1px);
-  border-color: #cbd5e1;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
-}
-
-.district-map-btn.active {
-  background: #f0f9ff;
-  border-color: #38bdf8;
-  box-shadow: 0 0 0 1px #38bdf8, 0 4px 14px rgba(14, 165, 233, 0.15);
-}
-
-.district-map-btn.active::before {
-  background: #0284c7;
-}
-
-/* 3. Matica: Heatmap bunky s interaktívnou žiarou & Crosshair */
-.matrix-cell-node {
-  border-radius: 0.5rem;
-  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
-}
-
-.matrix-cell-node:hover {
-  transform: scale(1.24);
-  z-index: 30;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
-}
-
-/* Crosshair Highlight pre maticu */
-tr.crosshair-row-highlight {
-  background-color: rgba(240, 249, 255, 0.85) !important;
-}
-
-tr.crosshair-row-highlight td.sticky {
-  background-color: #e0f2fe !important;
-}
-
-td.crosshair-col-highlight {
-  background-color: rgba(240, 249, 255, 0.75) !important;
-}
-
-th.crosshair-col-highlight {
-  background-color: #e0f2fe !important;
-  color: #0369a1 !important;
-}
-
-/* 4. Canvas Glow Filter */
-#districtMapCanvas {
-  filter: drop-shadow(0 4px 16px rgba(0, 0, 0, 0.04));
-  border-radius: 1rem;
-}
-
-/* 5. Taktický pulzujúci maják */
-@keyframes tacticalBeacon {
-  0% { transform: scale(0.95); opacity: 0.95; }
-  50% { transform: scale(1.2); opacity: 0.45; }
-  100% { transform: scale(0.95); opacity: 0.95; }
-}
-
-.beacon-pulse {
-  animation: tacticalBeacon 2s infinite ease-in-out;
-}
-
-/* 6. Speed-meter lineárny bar pre dojazdové trasy */
-.speed-meter-track {
-  height: 4px;
-  background: #e2e8f0;
-  border-radius: 9999px;
-  overflow: hidden;
-  margin-top: 5px;
-}
-
-.speed-meter-fill {
-  height: 100%;
-  border-radius: 9999px;
-  transition: width 0.4s ease-out;
-}
-
-/* 7. Command Palette klávesové značky (Kbd) */
-.cmd-kbd {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.15rem 0.45rem;
-  font-size: 0.7rem;
-  font-family: var(--font-mono);
-  font-weight: 600;
-  color: #475569;
-  background: #f1f5f9;
-  border: 1px solid #cbd5e1;
-  border-radius: 0.375rem;
-  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.04);
-}
-
-
-/* Floating Scroll to Top button (Revolut Minimalist Dark) */
-.scroll-top-btn {
-  position: fixed;
-  right: 1.5rem;
-  bottom: 1.5rem;
-  z-index: 60;
-  width: 2.75rem;
-  height: 2.75rem;
-  border-radius: 9999px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  background: #0f172a;
-  color: white;
-  box-shadow: 0 8px 24px -4px rgba(15, 23, 42, 0.35);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.scroll-top-btn:hover {
-  background: #020617;
-  box-shadow: 0 12px 28px -4px rgba(15, 23, 42, 0.5);
-  transform: translateY(-2px);
-}
-
-.scroll-top-btn.hidden {
-  opacity: 0;
-  pointer-events: none;
-  transform: translateY(12px);
+  border-color: var(--co-navy);
+  transform: scale(1.05);
 }
 
 /* =========================================================================
-   STICKY TABLE & ROW HIGHLIGHT ENHANCEMENTS
+   3. KATALÓG AGEND — Karty s priestrannou štruktúrou
+   ========================================================================= */
+.revolut-agenda-card {
+  background: #ffffff;
+  border: 1px solid rgba(226, 232, 240, 0.85);
+  border-radius: var(--radius-xl);
+  padding: 1.5rem 1.6rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+  position: relative;
+  box-shadow: 0 3px 12px -2px rgba(15, 23, 42, 0.03);
+}
+
+.revolut-agenda-card:hover {
+  border-color: var(--co-navy-mid);
+  box-shadow: 0 12px 30px -6px rgba(22, 58, 99, 0.12), 0 2px 6px rgba(22, 58, 99, 0.04);
+  transform: translateY(-3px);
+}
+
+/* =========================================================================
+   4. STICKY SUB-NAVIGÁCIA (Namiesto lietajúcich oválnych bublín)
+   ========================================================================= */
+.executive-subnav-bar {
+  position: sticky;
+  top: var(--header-height, 4.25rem);
+  z-index: 35;
+  min-height: var(--subnav-height, 3rem);
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(226, 232, 240, 0.85);
+  box-shadow: 0 4px 16px -4px rgba(15, 23, 42, 0.03);
+  display: flex;
+  align-items: center;
+}
+
+.executive-subnav-inner {
+  max-width: 1520px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+@media (min-width: 640px) {
+  .executive-subnav-inner {
+    padding: 0 2rem;
+    gap: 0.75rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .executive-subnav-inner {
+    padding: 0 3rem;
+    gap: 1rem;
+  }
+}
+
+.executive-subnav-inner::-webkit-scrollbar {
+  display: none;
+}
+
+.subnav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.65rem 0.95rem;
+  font-size: 0.85rem; /* ~13.5px */
+  font-weight: 600;
+  color: #64748b;
+  border-bottom: 2px solid transparent;
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+  white-space: nowrap;
+  transition: all 0.18s ease;
+  text-decoration: none;
+  line-height: 1.25;
+}
+
+.subnav-link .subnav-num {
+  font-family: var(--font-mono);
+  font-size: 0.725rem;
+  font-weight: 700;
+  padding: 0.12rem 0.4rem;
+  border-radius: var(--radius-sm);
+  background: var(--co-navy-light);
+  color: #475569;
+  border: 1px solid var(--co-border);
+  transition: all 0.18s ease;
+}
+
+.subnav-link:hover {
+  color: var(--co-navy-deep);
+  background: rgba(241, 245, 249, 0.8);
+}
+
+.subnav-link.active {
+  color: var(--co-navy-deep);
+  font-weight: 700;
+  border-bottom-color: var(--co-navy);
+  background: rgba(232, 240, 250, 0.45);
+}
+
+.subnav-link.active .subnav-num {
+  background: var(--co-navy);
+  color: #ffffff;
+  border-color: var(--co-navy);
+}
+
+/* =========================================================================
+   5. MATICA FUNKČNEJ ZODPOVEDNOSTI (GovTech Data Grid)
    ========================================================================= */
 .matrix-sticky-col {
   position: sticky !important;
   left: 0 !important;
-  z-index: 15 !important;
-  box-shadow: 3px 0 6px -2px rgba(0, 0, 0, 0.08);
+  box-shadow: 2px 0 4px -1px rgba(15, 23, 42, 0.06);
 }
 
 .matrix-sticky-header {
@@ -350,619 +276,80 @@ th.crosshair-col-highlight {
   z-index: 25 !important;
 }
 
-@keyframes agendaRowPulseAnim {
-  0% {
-    background-color: rgba(14, 165, 233, 0.35);
-    box-shadow: inset 0 0 0 2px rgba(14, 165, 233, 0.8);
-  }
-  50% {
-    background-color: rgba(14, 165, 233, 0.15);
-    box-shadow: inset 0 0 0 1px rgba(14, 165, 233, 0.5);
-  }
-  100% {
-    background-color: transparent;
-    box-shadow: none;
-  }
+thead tr:first-child .matrix-sticky-col  { z-index: 35 !important; }
+thead tr:nth-child(2) .matrix-sticky-col { z-index: 34 !important; }
+tbody .matrix-sticky-col                 { z-index: 20 !important; }
+
+/* Kompaktné dátové bunky — žiadne detské skákanie */
+.matrix-cell-node {
+  border-radius: var(--radius-sm);
+  transition: filter 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
 }
 
-.agenda-row-pulse {
-  animation: agendaRowPulseAnim 2.5s ease-out forwards;
-}
-
-/* =========================================================================
-   FULLSCREEN REŽIM (Mapa)
-   ========================================================================= */
-:fullscreen,
-:-webkit-full-screen {
-  background-color: #f8fafc !important;
-  padding: 1.5rem !important;
-  overflow-y: auto !important;
-  width: 100vw !important;
-  height: 100vh !important;
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: center !important;
-}
-
-:fullscreen canvas,
-:-webkit-full-screen canvas {
-  height: 80vh !important;
-}
-
-
-/* =========================================================================
-   TLAČ A EXPORT DO PDF (@media print)
-   ========================================================================= */
-@media print {
-  @page {
-    size: landscape;
-    margin: 10mm;
-  }
-
-  body {
-    background: #ffffff !important;
-    color: #0f172a !important;
-    font-size: 11pt !important;
-  }
-
-  header,
-  .scroll-top-btn,
-  .tab-btn,
-  button,
-  .no-print,
-  #mapFullscreenBtn,
-  #resetMapSelectionBtn,
-  #dispatchDistrictSelect {
-    display: none !important;
-  }
-
-  /* Zabezpečenie zobrazenia aktívneho obsahu */
-  .tab-content {
-    display: block !important;
-    page-break-after: auto;
-  }
-
-  .bento-panel {
-    box-shadow: none !important;
-    border: 1px solid #cbd5e1 !important;
-    break-inside: avoid;
-    margin-bottom: 1.5rem !important;
-    background: #ffffff !important;
-  }
-
-  table {
-    width: 100% !important;
-    border-collapse: collapse !important;
-    page-break-inside: avoid;
-  }
-
-  th, td {
-    border-color: #cbd5e1 !important;
-  }
-
-  .matrix-sticky-col {
-    position: static !important;
-    box-shadow: none !important;
-  }
-}
-
-/* =========================================================================
-   2026 FLOATING PILL DOCK & EXECUTIVE FEED STYLES
-   ========================================================================= */
-
-html {
-  scroll-behavior: smooth;
-}
-
-.feed-section {
-  scroll-margin-top: 5.5rem;
-  transition: opacity 0.3s ease, transform 0.25s ease;
-  position: relative;
-}
-
-.feed-section::before {
-  display: none;
-}
-
-.section-heading-shell {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.section-spotlight {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.5rem;
-  margin-top: 0.35rem;
-}
-
-.section-kicker {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  padding: 0.2rem 0.6rem;
-  border-radius: 9999px;
-  background: #f1f5f9;
-  border: 1px solid #e2e8f0;
-  color: #0f172a;
-  font-size: 0.64rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
-.section-insight {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  padding: 0.2rem 0.65rem;
-  border-radius: 9999px;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  color: #0f172a;
-  font-size: 0.68rem;
-  font-weight: 700;
-}
-
-/* Ľavý plávajúci dock pre desktop - moderné sklenené ostrovčeky */
-.floating-nav-dock {
-  position: fixed;
-  left: 1rem;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 45;
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  width: auto;
-  max-height: 90vh;
-  pointer-events: none;
-  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease;
-}
-
-/* Tlačidlo na rýchle zbalenie/rozbalenie navigácie na notebookoch */
-.dock-toggle-pill {
-  pointer-events: auto;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 2.2rem;
-  height: 2.2rem;
-  margin-bottom: 0.25rem;
-  border-radius: 9999px;
-  background: rgba(255, 255, 255, 0.88);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(203, 213, 225, 0.9);
-  color: #64748b;
-  font-size: 0.72rem;
-  cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 2px 8px -1px rgba(15, 23, 42, 0.08);
-}
-
-.dock-toggle-pill:hover {
-  background: #ffffff;
-  color: #0284c7;
-  border-color: #38bdf8;
-  transform: scale(1.08);
-  box-shadow: 0 4px 12px rgba(14, 165, 233, 0.2);
-}
-
-/* Zbalený stav navigácie */
-.floating-nav-dock.is-collapsed {
-  transform: translateY(-50%) translateX(-4rem);
-}
-
-.floating-nav-dock.is-collapsed .dock-toggle-pill {
-  transform: translateX(4.25rem);
-  background: #ffffff;
-  color: #0284c7;
-  border-color: #0284c7;
-  box-shadow: 0 4px 14px rgba(14, 165, 233, 0.3);
-}
-
-.floating-nav-dock.is-collapsed .floating-dock-pill {
-  opacity: 0;
-  pointer-events: none;
-  transform: scale(0.85);
-}
-
-/* Každá položka ako samostatná plávajúca svetlá sklenená kapsula */
-.floating-dock-pill {
-  pointer-events: auto;
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 0.7rem;
-  padding: 0.55rem 0.95rem;
-  border-radius: 9999px;
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(16px) saturate(180%);
-  -webkit-backdrop-filter: blur(16px) saturate(180%);
-  border: 1px solid rgba(226, 232, 240, 0.95);
-  box-shadow: 0 4px 18px -2px rgba(15, 23, 42, 0.08), 
-              0 1px 3px 0 rgba(15, 23, 42, 0.04), 
-              inset 0 1px 0 0 rgba(255, 255, 255, 0.95);
-  color: #475569;
-  font-size: 0.78rem;
-  font-weight: 600;
-  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
-  cursor: pointer;
-  text-decoration: none;
-  user-select: none;
-}
-
-.floating-dock-pill:hover {
-  background: #ffffff;
-  color: #0f172a;
-  border-color: #cbd5e1;
-  transform: translateX(3px);
-  box-shadow: 0 8px 20px -4px rgba(15, 23, 42, 0.08);
-}
-
-.floating-dock-pill.active {
-  background: #0f172a;
-  color: #ffffff;
-  border-color: #0f172a;
-  box-shadow: 0 10px 24px -4px rgba(15, 23, 42, 0.25);
-  transform: translateX(3px);
-}
-
-.floating-dock-pill.active .pill-num {
-  background: rgba(255, 255, 255, 0.15);
-  color: #ffffff;
-}
-
-.pill-flyout {
-  display: flex;
-  align-items: center;
-  gap: 0.55rem;
-}
-
-.floating-dock-pill .pill-num {
-  font-family: var(--font-mono);
-  font-size: 0.65rem;
-  font-weight: 700;
-  padding: 0.12rem 0.4rem;
-  border-radius: 9999px;
-  background: #f1f5f9;
-  color: #64748b;
-  border: 1px solid #e2e8f0;
-  transition: all 0.2s ease;
-}
-
-.floating-dock-pill:hover .pill-num {
-  background: #e0f2fe;
-  color: #0284c7;
-  border-color: #bae6fd;
-}
-
-.floating-dock-pill.active .pill-num {
-  background: rgba(255, 255, 255, 0.25);
-  color: #ffffff;
-  border-color: rgba(255, 255, 255, 0.35);
-  font-weight: 800;
-}
-
-.floating-dock-pill .pill-icon {
-  font-size: 0.95rem;
-  width: 1.25rem;
-  text-align: center;
-  color: #0284c7;
-  transition: transform 0.2s ease, color 0.2s ease;
-}
-
-.floating-dock-pill.active .pill-icon {
-  color: #ffffff;
-}
-
-.floating-dock-pill:hover .pill-icon,
-.floating-dock-pill.active .pill-icon {
-  transform: scale(1.12);
-}
-
-.floating-dock-pill .pill-label {
-  white-space: nowrap;
-  letter-spacing: 0.01em;
-}
-
-/* =========================================================================
-   RESPONZÍVNY REŽIM PRE NOTEBOOKY A STREDNÉ DESKTOPY (1024px až 1749px)
-   Kompaktné okrúhle ostrovčeky, žiadne prekrývanie obsahu, flyout tooltip pri hoveri
-   ========================================================================= */
-@media (min-width: 1024px) and (max-width: 1749px) {
-  .floating-nav-dock {
-    left: 0.85rem;
-    gap: 0.45rem;
-  }
-
-  .floating-dock-pill {
-    width: 2.75rem;
-    height: 2.75rem;
-    padding: 0;
-    justify-content: center;
-    border-radius: 9999px;
-  }
-
-  .floating-dock-pill .pill-icon {
-    font-size: 1.05rem;
-    width: auto;
-  }
-
-  /* Flyout tooltip s názvom a číslom sekcie pri prejdení myšou */
-  .floating-dock-pill .pill-flyout {
-    position: absolute;
-    left: calc(100% + 10px);
-    top: 50%;
-    transform: translateY(-50%) translateX(-8px);
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-    background: rgba(15, 23, 42, 0.94);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-    color: #ffffff;
-    padding: 0.4rem 0.85rem;
-    border-radius: 9999px;
-    font-size: 0.76rem;
-    font-weight: 600;
-    white-space: nowrap;
-    box-shadow: 0 10px 25px -4px rgba(15, 23, 42, 0.4);
-    border: 1px solid rgba(255, 255, 255, 0.16);
-    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-    z-index: 55;
-  }
-
-  .floating-dock-pill:hover .pill-flyout {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(-50%) translateX(0);
-  }
-
-  .floating-dock-pill .pill-flyout .pill-label {
-    color: #f8fafc;
-  }
-
-  .floating-dock-pill .pill-flyout .pill-num {
-    background: rgba(255, 255, 255, 0.18);
-    color: #38bdf8;
-    border-color: rgba(56, 189, 248, 0.35);
-  }
-}
-
-/* Veľké širokouhlé monitory (>= 1750px): dostatok miesta na plné textové kapsuly */
-@media (min-width: 1750px) {
-  .floating-nav-dock {
-    left: 1.25rem;
-    gap: 0.65rem;
-  }
-
-  .floating-dock-pill:hover {
-    transform: translateX(6px) scale(1.02);
-  }
-
-  .floating-dock-pill.active {
-    transform: translateX(8px) scale(1.03);
-  }
-}
-
-/* =========================================================================
-   RESPONZÍVNY DOCK PRE MOBILY A TABLETY (< 1024px)
-   Horizontálny spodný pás
-   ========================================================================= */
-@media (max-width: 1023px) {
-  .dock-toggle-pill {
-    display: none !important;
-  }
-  .floating-nav-dock {
-    left: 50%;
-    top: auto;
-    bottom: 1rem;
-    transform: translateX(-50%);
-    flex-direction: row;
-    gap: 0.45rem;
-    background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-    padding: 0;
-    max-width: calc(100vw - 1.5rem);
-    overflow-x: auto;
-    scrollbar-width: none;
-  }
-  .floating-nav-dock::-webkit-scrollbar {
-    display: none;
-  }
-  .floating-dock-pill {
-    padding: 0.6rem;
-    width: 2.75rem;
-    height: 2.75rem;
-    justify-content: center;
-    border-radius: 9999px;
-    transform: none !important;
-  }
-  .floating-dock-pill:hover {
-    transform: none !important;
-  }
-  .floating-dock-pill.active {
-    transform: translateY(-2px) !important;
-  }
-  .floating-dock-pill .pill-flyout {
-    display: none !important;
-  }
-  .floating-dock-pill .pill-icon {
-    font-size: 1rem;
-    width: auto;
-  }
-}
-
-/* =========================================================================
-   HLAVNÝ FEED KONTAJNER - BEZPEČNÉ ODSADENIE OD PLÁVAJÚCEHO DOCKU
-   ========================================================================= */
-.main-feed-container {
-  transition: padding-left 0.28s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-@media (min-width: 1024px) and (max-width: 1749px) {
-  .main-feed-container {
-    padding-left: 5.25rem !important; /* ~84px - čistý odstup, dock končí na 58px */
-    padding-right: 2rem !important;
-  }
-}
-
-@media (min-width: 1750px) {
-  .main-feed-container {
-    padding-left: 2rem !important;
-    padding-right: 2rem !important;
-  }
-}
-
-body:has(#floatingNavDock.is-collapsed) .main-feed-container {
-  padding-left: 2.25rem !important;
-}
-
-/* Sekčné hlavičky a štítky vo feede */
-.section-header-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  padding: 0.2rem 0.65rem;
-  border-radius: 9999px;
-  font-size: 0.68rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  background: linear-gradient(135deg, rgba(14, 165, 233, 0.12), rgba(14, 165, 233, 0.04));
-  color: #0284c7;
-  border: 1px solid rgba(14, 165, 233, 0.25);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
-  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-.section-header-tag:hover {
+.matrix-cell-node:hover {
+  filter: brightness(1.12);
   transform: translateY(-1px);
-  border-color: rgba(14, 165, 233, 0.4);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7), 0 8px 18px -12px rgba(14, 165, 233, 0.35);
+  box-shadow: 0 3px 8px rgba(15, 23, 42, 0.2);
+  z-index: 10;
 }
 
-.feed-divider {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 1.5rem 0;
-  position: relative;
+/* Hairline crosshair tracking — čisté zvýraznenie riadku a stĺpca */
+tr.crosshair-row-highlight {
+  background-color: #F1F5F9 !important;
 }
 
-.feed-divider::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 50%;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(226, 232, 240, 0.8), transparent);
+tr.crosshair-row-highlight td.matrix-sticky-col {
+  background-color: #E2E8F0 !important;
 }
 
-/* =========================================================================
-   SCROLL PROGRESS BAR & DISTRICT FOCUS & COMMAND PALETTE
-   ========================================================================= */
-
-/* Indikátor prečítania materiálu pod hlavičkou */
-.scroll-progress-bar {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  height: 2.5px;
-  background: linear-gradient(90deg, #38bdf8 0%, #0284c7 50%, #10b981 100%);
-  z-index: 50;
-  transition: width 0.06s ease-out;
-  box-shadow: 0 0 10px rgba(56, 189, 248, 0.65);
+td.crosshair-col-highlight {
+  background-color: #F8FAFC !important;
+  outline: 1px dashed var(--co-navy-mid);
+  outline-offset: -1px;
 }
 
-/* Zvýraznenie stĺpca pri fokuse na okres v matici */
+th.crosshair-col-highlight {
+  background-color: #CBD5E1 !important;
+  color: var(--co-navy-deep) !important;
+}
+
+/* Zvýraznenie vybraného okresu v matici */
 th.district-focus-col {
-  background-color: #0284c7 !important;
+  background-color: var(--co-navy) !important;
   color: #ffffff !important;
-  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3) !important;
 }
 
 td.district-focus-col {
-  background-color: rgba(224, 242, 254, 0.75) !important;
-  border-left: 2px solid #0284c7 !important;
-  border-right: 2px solid #0284c7 !important;
+  background-color: rgba(241, 245, 249, 0.9) !important;
+  border-left: 2px solid var(--co-navy) !important;
+  border-right: 2px solid var(--co-navy) !important;
 }
 
-/* Jemné stmavenie a blur pozadia pre Command Palette */
-.cmd-palette-backdrop {
-  background: rgba(15, 23, 42, 0.65);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-}
-
-/* =========================================================================
-   2E. STICKY PRVÝ STĹPEC MATICE
-   ========================================================================= */
-.matrix-sticky-col {
-  position: sticky !important;
-  left: 0 !important;
-  box-shadow: 4px 0 8px -2px rgba(15, 23, 42, 0.08);
-}
-thead tr:first-child .matrix-sticky-col {
-  z-index: 35 !important;
-}
-thead tr:nth-child(2) .matrix-sticky-col {
-  z-index: 34 !important;
-}
-tbody .matrix-sticky-col {
-  z-index: 25 !important;
-}
-
-/* =========================================================================
-   1A. SIMULÁCIA VÝPADKU OKRESU V MATICI
-   ========================================================================= */
+/* Zobrazenie výpadku okresu — seriózny inštitucionálny stav */
 th.district-outage-active {
-  background-color: #e11d48 !important;
+  background-color: #DC2626 !important;
   color: #ffffff !important;
-  box-shadow: 0 0 15px rgba(225, 29, 72, 0.6) !important;
-  animation: outagePulse 2s infinite;
-}
-@keyframes outagePulse {
-  0%, 100% { box-shadow: 0 0 15px rgba(225, 29, 72, 0.7); }
-  50% { box-shadow: 0 0 25px rgba(225, 29, 72, 0.95); }
 }
 
 td.district-outage-col {
   background: repeating-linear-gradient(
     45deg,
-    rgba(254, 226, 226, 0.8),
-    rgba(254, 226, 226, 0.8) 10px,
-    rgba(254, 205, 211, 0.8) 10px,
-    rgba(254, 205, 211, 0.8) 20px
+    rgba(254, 226, 226, 0.7),
+    rgba(254, 226, 226, 0.7) 8px,
+    rgba(254, 205, 211, 0.7) 8px,
+    rgba(254, 205, 211, 0.7) 16px
   ) !important;
-  border-left: 2px solid #e11d48 !important;
-  border-right: 2px solid #e11d48 !important;
-  opacity: 0.75;
+  border-left: 2px solid #DC2626 !important;
+  border-right: 2px solid #DC2626 !important;
+  opacity: 0.85;
 }
 
 td.district-substitute-active {
-  background-color: #ecfdf5 !important;
-  border: 2px solid #10b981 !important;
-  box-shadow: 0 0 14px rgba(16, 185, 129, 0.45) !important;
+  background-color: #ECFDF5 !important;
+  border: 2px solid #059669 !important;
   position: relative !important;
-  padding-top: 4px !important;
   padding-bottom: 20px !important;
-  z-index: 10;
-  animation: substituteGlow 2.5s infinite;
-}
-@keyframes substituteGlow {
-  0%, 100% { box-shadow: 0 0 10px rgba(16, 185, 129, 0.4); }
-  50% { box-shadow: 0 0 20px rgba(16, 185, 129, 0.7); }
 }
 
 .subst-focus-badge {
@@ -970,20 +357,17 @@ td.district-substitute-active {
   bottom: 2px;
   left: 50%;
   transform: translateX(-50%);
-  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  font-size: 9.5px;
-  font-weight: 800;
-  line-height: 1.1;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
   text-transform: uppercase;
-  white-space: nowrap;
-  letter-spacing: 0.04em;
-  background-color: #064e3b;
+  letter-spacing: 0.03em;
+  background-color: #064E3B;
   color: #ffffff;
-  border: 1px solid #34d399;
-  border-radius: 4px;
-  padding: 1.5px 5px;
-  box-shadow: 0 2px 5px rgba(6, 78, 59, 0.4);
-  z-index: 25;
+  border: 1px solid #10B981;
+  border-radius: var(--radius-sm);
+  padding: 1px 4px;
+  white-space: nowrap;
   pointer-events: none;
 }
 
@@ -992,54 +376,160 @@ td.district-substitute-active {
   bottom: 2px;
   left: 50%;
   transform: translateX(-50%);
-  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  font-size: 9.5px;
-  font-weight: 900;
-  line-height: 1.1;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
   text-transform: uppercase;
-  white-space: nowrap;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.03em;
   background-color: #047857;
   color: #ffffff;
-  border: 1px solid #6ee7b7;
-  border-radius: 4px;
-  padding: 1.5px 5px;
-  box-shadow: 0 2px 6px rgba(4, 120, 87, 0.45);
-  z-index: 25;
+  border: 1px solid #34D399;
+  border-radius: var(--radius-sm);
+  padding: 1px 4px;
+  white-space: nowrap;
   pointer-events: none;
-  animation: bounceMini 2s infinite;
-}
-@keyframes bounceMini {
-  0%, 100% { transform: translate(-50%, 0); }
-  50% { transform: translate(-50%, -2px); }
 }
 
 /* =========================================================================
-   2F. BOHATÝ TOOLTIP PRE HLAVIČKY OKRESOV
+   6. SEKČNÉ HLAVIČKY A ROZDEĽOVAČE
    ========================================================================= */
+.feed-section {
+  scroll-margin-top: calc(var(--header-height, 4.25rem) + var(--subnav-height, 3rem) + 1.25rem);
+}
+
+.section-header-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: rgba(2, 55, 127, 0.07);
+  color: var(--co-navy);
+  border: 1px solid rgba(2, 55, 127, 0.15);
+}
+
+.feed-divider {
+  display: none; /* Odstránené pre čistý whitespace-first dizajn */
+}
+
+/* Scroll Progress Bar */
+.scroll-progress-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  background: #D97706;
+  z-index: 50;
+  transition: width 0.05s ease-out;
+}
+
+/* =========================================================================
+   7. SCROLL TO TOP — Nenápadné, inštitucionálne
+   ========================================================================= */
+.scroll-top-btn {
+  position: fixed;
+  right: 1.5rem;
+  bottom: 1.5rem;
+  z-index: 50;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--co-border-dark);
+  background: #ffffff;
+  color: var(--co-navy-deep);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.scroll-top-btn:hover {
+  background: var(--co-navy-deep);
+  color: #ffffff;
+  border-color: var(--co-navy-deep);
+  transform: translateY(-1px);
+}
+
+.scroll-top-btn.hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(8px);
+}
+
+/* =========================================================================
+   8. DISPEČERSKÉ CENTRUM & CANVAS MAPA
+   ========================================================================= */
+#districtMapCanvas {
+  border-radius: var(--radius-md);
+}
+
+.speed-meter-track {
+  height: 4px;
+  background: #E2E8F0;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  margin-top: 5px;
+}
+
+.speed-meter-fill {
+  height: 100%;
+  border-radius: var(--radius-sm);
+  transition: width 0.3s ease-out;
+}
+
+/* Tooltip pre hlavičky okresov */
 .district-header-tooltip {
   position: fixed;
   z-index: 9999;
-  max-width: 300px;
-  background: rgba(15, 23, 42, 0.96);
-  color: #f8fafc;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 0.875rem;
-  padding: 0.85rem;
+  max-width: 320px;
+  background: #091E3A;
+  color: #F8FAFC;
+  border: 1px solid #334155;
+  border-radius: var(--radius-md);
+  padding: 0.75rem 0.85rem;
   font-size: 0.75rem;
-  box-shadow: 0 14px 30px -4px rgba(0, 0, 0, 0.45), 0 8px 12px -6px rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
   pointer-events: none;
   opacity: 0;
   transform: translateY(4px);
   transition: opacity 0.15s ease-out, transform 0.15s ease-out;
 }
+
 .district-header-tooltip.visible {
   opacity: 1;
   transform: translateY(0);
 }
 
+/* =========================================================================
+   9. TLAČ / EXPORT
+   ========================================================================= */
+@media print {
+  @page { size: landscape; margin: 10mm; }
 
+  body {
+    background: #ffffff !important;
+    color: #0f172a !important;
+    font-size: 11pt !important;
+  }
 
+  header, .executive-subnav-bar, .scroll-top-btn, button, .no-print,
+  #mapFullscreenBtn, #resetMapSelectionBtn {
+    display: none !important;
+  }
 
+  .bento-panel {
+    box-shadow: none !important;
+    border: 1px solid #CBD5E1 !important;
+    break-inside: avoid;
+    margin-bottom: 1.5rem !important;
+  }
+
+  table { width: 100% !important; border-collapse: collapse !important; }
+  th, td { border-color: #CBD5E1 !important; }
+  .matrix-sticky-col { position: static !important; box-shadow: none !important; }
+}

@@ -146,18 +146,18 @@ function setWinterMode(enable) {
 
   if (btnSummer && btnWinter) {
     if (mapState.winterMode) {
-      btnWinter.className = "py-1.5 px-2.5 rounded-lg font-bold bg-sky-100 text-sky-900 border border-sky-300 shadow-sm flex items-center justify-center space-x-1.5 transition text-xs";
-      btnSummer.className = "py-1.5 px-2.5 rounded-lg font-medium text-slate-600 hover:text-slate-800 flex items-center justify-center space-x-1.5 transition text-xs";
-      if (lbl) lbl.innerHTML = '<span class="text-sky-700 font-bold flex items-center space-x-1"><i class="fa-regular fa-snowflake"></i><span>Zima (+20% hory)</span></span>';
+      btnWinter.className = "py-1.5 px-2 rounded font-semibold bg-slate-900 text-white shadow-xs flex items-center justify-center transition text-xs";
+      btnSummer.className = "py-1.5 px-2 rounded font-medium text-slate-700 bg-white border border-slate-300 hover:bg-slate-50 flex items-center justify-center transition text-xs";
+      if (lbl) lbl.innerHTML = '<span class="text-sky-700 font-bold">Zimný režim (+40 % hory, +15 % nížiny)</span>';
       if (typeof showToast === 'function') {
-        showToast("❄️ Aktivovaný zimný režim: trasy cez horské priechody (Zbojská, Štiavnica) prepočítané s prirážkou +20%", "info");
+        showToast("Aktivovaný zimný režim: trasy cez horské priechody prepočítané s prirážkou +40 %, nížinný tranzit +15 %", "info");
       }
     } else {
-      btnSummer.className = "py-1.5 px-2.5 rounded-lg font-bold bg-amber-50 text-amber-900 border border-amber-300 shadow-sm flex items-center justify-center space-x-1.5 transition text-xs";
-      btnWinter.className = "py-1.5 px-2.5 rounded-lg font-medium text-slate-600 hover:text-sky-800 flex items-center justify-center space-x-1.5 transition text-xs";
+      btnSummer.className = "py-1.5 px-2 rounded font-semibold bg-slate-900 text-white shadow-xs flex items-center justify-center transition text-xs";
+      btnWinter.className = "py-1.5 px-2 rounded font-medium text-slate-700 bg-white border border-slate-300 hover:bg-slate-50 flex items-center justify-center transition text-xs";
       if (lbl) lbl.textContent = "Štandard (Leto)";
       if (typeof showToast === 'function') {
-        showToast("☀️ Nastavený letný štandardný režim ciest", "info");
+        showToast("Nastavený letný štandardný režim ciest", "info");
       }
     }
   }
@@ -214,8 +214,8 @@ function resetTacticalConditions() {
   const btnWinter = document.getElementById('btnSeasonWinter');
   const lbl = document.getElementById('winterModeStatusLabel');
   if (btnSummer && btnWinter) {
-    btnSummer.className = "py-1.5 px-2.5 rounded-lg font-bold bg-amber-50 text-amber-900 border border-amber-300 shadow-sm flex items-center justify-center space-x-1.5 transition text-xs";
-    btnWinter.className = "py-1.5 px-2.5 rounded-lg font-medium text-slate-600 hover:text-sky-800 flex items-center justify-center space-x-1.5 transition text-xs";
+    btnSummer.className = "py-1.5 px-2 rounded font-semibold bg-slate-900 text-white shadow-xs flex items-center justify-center transition text-xs";
+    btnWinter.className = "py-1.5 px-2 rounded font-medium text-slate-700 bg-white border border-slate-300 hover:bg-slate-50 flex items-center justify-center transition text-xs";
     if (lbl) lbl.textContent = "Štandard (Leto)";
   }
 
@@ -258,7 +258,9 @@ function runDispatchSimulation() {
       bbDisplayTime = '0 min (v sídle)';
     } else if (pairBB) {
       let bbMins = parseTimeToMinutes(pairBB.time);
-      if (mapState.winterMode && pairBB.mountainPass) bbMins = Math.round(bbMins * 1.20);
+      if (mapState.winterMode) {
+        bbMins = pairBB.mountainPass ? Math.round(bbMins * 1.40) : Math.round(bbMins * 1.15);
+      }
       const bbH = Math.floor(bbMins / 60);
       const bbM = Math.round(bbMins % 60);
       bbDisplayTime = `${bbH > 0 ? bbH + ':' + (bbM < 10 ? '0' : '') + bbM + ' h' : bbM + ' min'} (${pairBB.km} km)`;
@@ -301,10 +303,10 @@ function runDispatchSimulation() {
 
       if (isWinter) {
         if (isMountain) {
-          winterDelay = Math.round(baseMins * 0.20); // +20% cez horské priechody
+          winterDelay = Math.round(baseMins * 0.40); // +40% cez horské priechody
           effectiveMins += winterDelay;
         } else {
-          winterDelay = Math.round(baseMins * 0.05); // +5% nížinný zimný tranzit
+          winterDelay = Math.round(baseMins * 0.15); // +15% nížinný zimný tranzit
           effectiveMins += winterDelay;
         }
       }
@@ -375,10 +377,10 @@ function runDispatchSimulation() {
     beaconPulseColor = "bg-emerald-400";
     textColor = "text-emerald-800";
   } else if (curLvl === 3) {
-    hudDecision = `CELOKRAJSKÁ MOBILIZÁCIA VŠETKÝCH 4 REGIÓNOV`;
-    hudReason = `Mimoriadna udalosť krajského významu. Mobilizuje sa celý BB kraj a posily zo všetkých 13 okresov BBK fázované do 3 vĺn (I. vlna vlastný región, II. vlna susedské regióny, III. vlna celý kraj).`;
+    hudDecision = `CELOKRAJSKÁ PODPORA VŠETKÝCH 4 REGIÓNOV`;
+    hudReason = `Mimoriadna udalosť krajského významu. Podpora z celého BB kraja a posily zo všetkých 13 okresov BBK fázované do 3 vĺn (I. vlna vlastný región, II. vlna susedské regióny, III. vlna celý kraj).`;
     hudBadgeClass = "bg-rose-100 text-rose-900 border-rose-300";
-    hudBadgeText = "3. STUPEŇ KASKÁDY (Celokrajská výpomoc)";
+    hudBadgeText = "3. STUPEŇ KASKÁDY (Celokrajská podpora)";
     hudCardBorder = "border-rose-300 bg-gradient-to-br from-white via-rose-50/40 to-pink-50/40 ring-1 ring-rose-400/50";
     beaconColor = "bg-rose-600";
     beaconPulseColor = "bg-rose-400";
@@ -396,19 +398,19 @@ function runDispatchSimulation() {
     // Špecifický kľúčový prípad pre okres Revúca (RA) a Brezno
     if (distId === 'RA' && busySet.has('BR')) {
       if (isWinter) {
-        hudDecision = `NÁHRADNÁ POSILA: AKTIVOVAŤ RIMAVSKÚ SOBOTU (${rsRoute?.time || '1:02 h'})`;
-        hudReason = `⚠️ <strong>Pracovisko Brezno rieši vlastnú mimoriadnu udalosť</strong> (kapacity sú viazané lokálne a nevyrážajú na výpomoc) a horské sedlo <strong>Zbojská (I/72)</strong> má zimné zdržanie (+20%). Systém automaticky presmeroval primárnu výpomoc na južný koridor – <strong>Rimavská Sobota (${rsRoute?.time || '1:02 h'}, ${rsRoute?.km || 58} km, VÝCHOD)</strong>, 2. záloha Poltár (${ptRoute?.time || '1:08 h'}).`;
+        hudDecision = `NÁHRADNÁ POSILA: AKTIVOVAŤ RIMAVSKÚ SOBOTU (${rsRoute?.time || '1:09 h'})`;
+        hudReason = `<strong>Výpadok Brezna:</strong> Pracovisko Brezno rieši vlastnú mimoriadnu udalosť (kapacity sú viazané lokálne) a horské sedlo <strong>Zbojská (I/72)</strong> vykazuje zimné zdržanie (+40 %). Systém automaticky presmeroval primárnu výpomoc na južný koridor – <strong>Rimavská Sobota (${rsRoute?.time || '1:09 h'}, ${rsRoute?.km || 58} km, VÝCHOD)</strong>, 2. záloha Poltár (${ptRoute?.time || '1:15 h'}).`;
       } else {
         hudDecision = `NÁHRADNÁ POSILA: AKTIVOVAŤ RIMAVSKÚ SOBOTU (${rsRoute?.time || '1:00 h'})`;
-        hudReason = `⚠️ <strong>Pracovisko Brezno rieši vlastnú mimoriadnu udalosť</strong> (kapacity sú viazané lokálne a nevyrážajú). Systém aktivuje ako primárnu dostupnú posilu <strong>Rimavskú Sobotu (${rsRoute?.time || '1:00 h'}, ${rsRoute?.km || 58} km, VÝCHOD)</strong>, záloha Poltár (${ptRoute?.time || '1:05 h'}).`;
+        hudReason = `<strong>Výpadok Brezna:</strong> Pracovisko Brezno rieši vlastnú mimoriadnu udalosť (kapacity sú viazané lokálne). Systém aktivuje ako primárnu dostupnú posilu <strong>Rimavskú Sobotu (${rsRoute?.time || '1:00 h'}, ${rsRoute?.km || 58} km, VÝCHOD)</strong>, záloha Poltár (${ptRoute?.time || '1:05 h'}).`;
       }
-      hudCardBorder = "border-amber-300 bg-gradient-to-br from-white via-amber-50/40 to-orange-50/30";
+      hudCardBorder = "border-amber-300 bg-amber-50/30";
       beaconColor = "bg-amber-600";
       beaconPulseColor = "bg-amber-400";
       textColor = "text-amber-800";
     } else if (busyId) {
       // DYNAMICKÝ SCENÁR: Ľubovoľný okres v kraji má vlastnú mimoriadnu udalosť
-      hudCardBorder = "border-amber-300 bg-gradient-to-br from-white via-amber-50/40 to-orange-50/30";
+      hudCardBorder = "border-amber-300 bg-amber-50/30";
       beaconColor = "bg-amber-600";
       beaconPulseColor = "bg-amber-400";
       textColor = "text-amber-800";
@@ -416,41 +418,41 @@ function runDispatchSimulation() {
       if (distId === busyId) {
         // Zvolený zasiahnutý okres je sám vyťažený vlastnou MU
         hudDecision = `EXTERNÁ PODPORA PRE ${targetMeta.name.toUpperCase()} (KAPACITY VIAZANÉ)`;
-        hudReason = `⚠️ Okresné pracovisko <strong>${targetMeta.name}</strong> rieši mimoriadnu udalosť na vlastnom území a jeho sily sú plne vyťažené. Výpomoc musí prísť z vonku. Ako primárna posila sa nasadzuje <strong>${topPick.name} (${topPick.time}, ${topPick.km} km, ${topPick.region})</strong>${secondPick ? `, 2. záloha ${secondPick.name} (${secondPick.time})` : ''}.`;
+        hudReason = `Okresné pracovisko <strong>${targetMeta.name}</strong> rieši mimoriadnu udalosť na vlastnom území a jeho personál je vyťažený. Výpomoc je riadená zvonku. Ako primárna posila sa nasadzuje <strong>${topPick.name} (${topPick.time}, ${topPick.km} km, ${topPick.region})</strong>${secondPick ? `, 2. záloha ${secondPick.name} (${secondPick.time})` : ''}.`;
       } else if (normalFastest && normalFastest.isBusy) {
         // Najrýchlejšie susedné pracovisko má vlastnú MU -> Náhradná posila
         hudDecision = `NÁHRADNÁ POSILA: AKTIVOVAŤ ${topPick.name.toUpperCase()} (${topPick.time})`;
-        hudReason = `⚠️ Najbližšie pracovisko <strong>${normalFastest.name} (${normalFastest.id})</strong> rieši vlastnú mimoriadnu udalosť a jeho kapacity sú viazané lokálne (nevyrážajú na výpomoc). Systém automaticky presmeroval primárnu pomoc na najbližšie voľné pracovisko <strong>${topPick.name} (${topPick.time}, ${topPick.km} km, ${topPick.region})</strong>${secondPick ? `, 2. záloha ${secondPick.name} (${secondPick.time})` : ''}.`;
+        hudReason = `Najbližšie pracovisko <strong>${normalFastest.name} (${normalFastest.id})</strong> rieši vlastnú mimoriadnu udalosť a jeho kapacity sú viazané lokálne. Systém automaticky presmeroval primárnu pomoc na najbližšie voľné pracovisko <strong>${topPick.name} (${topPick.time}, ${topPick.km} km, ${topPick.region})</strong>${secondPick ? `, 2. záloha ${secondPick.name} (${secondPick.time})` : ''}.`;
       } else {
         // Iné pracovisko v kraji má MU (je vyradené z posíl)
         hudDecision = `VÝLUKA PRACOVISKA ${busyMeta.name.toUpperCase()}: AKTIVOVAŤ ${topPick.name.toUpperCase()} (${topPick.time})`;
-        hudReason = `⚠️ Pracovisko <strong>${busyMeta.name} (${busyId})</strong> rieši vlastnú mimoriadnu udalosť a je vyradené z plánu výpomoci (kapacity viazané). Pre okres ${targetMeta.name} nasadzuje systém ako primárnu posilu <strong>${topPick.name} (${topPick.time}, ${topPick.km} km, ${topPick.region})</strong>${secondPick ? `, 2. záloha ${secondPick.name} (${secondPick.time})` : ''}.`;
+        hudReason = `Pracovisko <strong>${busyMeta.name} (${busyId})</strong> rieši vlastnú mimoriadnu udalosť a je vyradené z plánu výpomoci. Pre okres ${targetMeta.name} nasadzuje systém ako primárnu posilu <strong>${topPick.name} (${topPick.time}, ${topPick.km} km, ${topPick.region})</strong>${secondPick ? `, 2. záloha ${secondPick.name} (${secondPick.time})` : ''}.`;
       }
 
       if (isWinter && topPick && topPick.mountainPass) {
-        hudReason += ` ❄️ Trasa posily navyše prechádza cez <strong>${topPick.passName || 'horský priechod'}</strong> so zimným zdržaním (+20%).`;
+        hudReason += ` Trasa posily prechádza cez <strong>${topPick.passName || 'horský priechod'}</strong> so zimným zdržaním (+40 %).`;
       }
     } else if (distId === 'RA') {
       // Štandardné podmienky pre RA bez viazanej MU
       if (isWinter) {
-        hudDecision = `ZIMNÝ REŽIM: AKTIVOVAŤ RIMAVSKÚ SOBOTU (${rsRoute?.time || '1:02 h'})`;
-        hudReason = `❄️ <strong>Zimný režim:</strong> Prechod cez horské sedlo <strong>Zbojská (cesta I/72)</strong> predlžuje dojazd z Brezna na <strong>${brRoute?.time || '1:04 h'}</strong>. Rýchlejšou a bezpečnejšou primárnou posilou z juhu sa stáva <strong>Rimavská Sobota (${rsRoute?.time || '1:02 h'}, ${rsRoute?.km || 58} km, VÝCHOD)</strong>.`;
-        hudCardBorder = "border-sky-300 bg-gradient-to-br from-white via-sky-50/40 to-blue-50/30";
-        beaconColor = "bg-sky-600";
-        beaconPulseColor = "bg-sky-400";
-        textColor = "text-sky-800";
+        hudDecision = `ZIMNÝ REŽIM: AKTIVOVAŤ RIMAVSKÚ SOBOTU (${rsRoute?.time || '1:09 h'})`;
+        hudReason = `<strong>Zimný režim:</strong> Prechod cez horské sedlo <strong>Zbojská (cesta I/72)</strong> predlžuje dojazd z Brezna na <strong>${brRoute?.time || '1:14 h'}</strong> (+40 % zdržanie). Rýchlejšou a bezpečnejšou primárnou posilou z juhu sa stáva <strong>Rimavská Sobota (${rsRoute?.time || '1:09 h'}, ${rsRoute?.km || 58} km, VÝCHOD)</strong>.`;
+        hudCardBorder = "border-slate-300 bg-slate-50";
+        beaconColor = "bg-slate-700";
+        beaconPulseColor = "bg-slate-400";
+        textColor = "text-slate-800";
       } else {
         hudDecision = "AKTIVOVAŤ BREZNO (53 min) ALEBO RIMAVSKÚ SOBOTU (1:00 h)";
-        hudReason = "1. najbližší: Brezno (53 min, 50 km, SEVER) | 2. najbližší: Rimavská Sobota (1:00 h, 58 km, VÝCHOD). Sídlo kraja Banská Bystrica má kritický dojazd až 1:30 h (93 km).";
+        hudReason = "1. najbližší: Brezno (53 min, 50 km, SEVER) | 2. najbližší: Rimavská Sobota (1:00 h, 58 km, VÝCHOD). Sídlo kraja Banská Bystrica má dojazd 1:30 h (93 km).";
       }
     } else if (isWinter && topPick && topPick.mountainPass) {
       // Zimný režim pre horské trasy
       hudDecision = `ZIMNÝ REŽIM: AKTIVOVAŤ ${topPick.name.toUpperCase()} (${topPick.time})`;
-      hudReason = `❄️ Trasa posily prechádza cez exponovaný horský úsek <strong>${topPick.passName || 'horský priechod'}</strong> (+20% zimná prirážka). Odporúča sa zvýšená opatrnosť výjazdovej skupiny.`;
-      hudCardBorder = "border-sky-300 bg-gradient-to-br from-white via-sky-50/40 to-blue-50/30";
-      beaconColor = "bg-sky-600";
-      beaconPulseColor = "bg-sky-400";
-      textColor = "text-sky-800";
+      hudReason = `Trasa posily prechádza cez exponovaný horský úsek <strong>${topPick.passName || 'horský priechod'}</strong> (+40 % zimná prirážka). Odporúča sa zvýšená opatrnosť výjazdovej skupiny.`;
+      hudCardBorder = "border-slate-300 bg-slate-50";
+      beaconColor = "bg-slate-700";
+      beaconPulseColor = "bg-slate-400";
+      textColor = "text-slate-800";
     } else {
       // Bežné taktické pravidlo
       const defaultRule = DISPATCH_TACTICAL_RULES[distId];
@@ -470,30 +472,27 @@ function runDispatchSimulation() {
     const isSpecialBusy = busySet.size > 0;
 
     resultBox.innerHTML = `
-      <!-- 1. Karta taktického rozhodnutia (Tactical HUD Card s majákom) -->
-      <div class="bento-panel p-4 flex flex-col justify-between ${hudCardBorder} shadow-sm">
+      <!-- 1. Karta taktického rozhodnutia (GovTech Alert Card) -->
+      <div class="bento-panel p-4 flex flex-col justify-between ${hudCardBorder} shadow-xs">
         <div>
           <div class="flex items-center space-x-2 ${textColor} font-bold text-xs uppercase tracking-wider mb-2">
-            <span class="relative flex h-3 w-3">
-              <span class="beacon-pulse absolute inline-flex h-full w-full rounded-full ${beaconPulseColor} opacity-75"></span>
-              <span class="relative inline-flex rounded-full h-3 w-3 ${beaconColor}"></span>
-            </span>
+            <span class="w-2 h-2 rounded-full ${beaconColor}"></span>
             <span>Rozhodnutie:</span>
           </div>
-          <div class="text-sm font-extrabold text-slate-900 leading-snug">${hudDecision}</div>
-          <p class="text-xs text-slate-700 mt-2.5 leading-relaxed bg-white/90 p-2.5 rounded-xl border border-slate-200/80 shadow-sm">
+          <div class="text-sm font-bold text-slate-900 leading-snug">${hudDecision}</div>
+          <p class="text-xs text-slate-700 mt-2 leading-relaxed bg-white p-2.5 rounded border border-slate-200 shadow-xs">
             ${hudReason}
           </p>
         </div>
         
-        <div class="mt-3 pt-2.5 border-t border-slate-100 text-[11px] text-slate-600 flex items-center justify-between">
-          <span>Režim nasadenia:</span>
-          <span class="px-2 py-0.5 rounded-md border font-bold uppercase tracking-wider text-[10px] ${hudBadgeClass}">${hudBadgeText}</span>
+        <div class="mt-3 pt-2.5 border-t border-slate-200 text-[11px] text-slate-600 flex items-center justify-between">
+          <span>Stupeň nasadenia:</span>
+          <span class="px-2 py-0.5 rounded border font-bold uppercase tracking-wider text-[10px] ${hudBadgeClass}">${hudBadgeText}</span>
         </div>
       </div>
 
       <!-- 2. Porovnávacia karta dojazdov -->
-      <div class="bento-panel p-4 flex flex-col justify-between shadow-sm">
+      <div class="bento-panel p-4 flex flex-col justify-between shadow-xs">
         <div>
           <div class="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2.5 flex items-center justify-between">
             <span>Porovnanie dojazdov do ${distId}</span>
@@ -501,7 +500,7 @@ function runDispatchSimulation() {
           </div>
           
           <div class="space-y-2 text-xs">
-            <div class="p-2.5 rounded-xl bg-white border border-slate-200 shadow-sm">
+            <div class="p-2.5 rounded bg-white border border-slate-200 shadow-xs">
               <div class="text-slate-500 text-[11px] font-medium flex justify-between">
                 <span>Vlastný región (${targetMeta.region}):</span>
                 <span class="font-bold text-slate-800">${bestRegional ? bestRegional.name : 'Iba vlastné sily'}</span>
@@ -512,14 +511,14 @@ function runDispatchSimulation() {
               </div>
             </div>
 
-            <div class="p-2.5 rounded-xl bg-sky-50/70 border border-sky-200 shadow-sm">
-              <div class="text-sky-800 text-[11px] font-medium flex justify-between">
+            <div class="p-2.5 rounded bg-slate-50 border border-slate-200 shadow-xs">
+              <div class="text-slate-700 text-[11px] font-medium flex justify-between">
                 <span>Najrýchlejšia susedná výpomoc:</span>
-                <span class="font-bold text-sky-950">${bestCrossBorder ? bestCrossBorder.name + ' (' + bestCrossBorder.region + ')' : 'Nie je potrebná'}</span>
+                <span class="font-bold text-slate-900">${bestCrossBorder ? bestCrossBorder.name + ' (' + bestCrossBorder.region + ')' : 'Nie je potrebná'}</span>
               </div>
-              <div class="text-sm font-extrabold text-sky-950 mt-0.5 font-mono-code flex items-center justify-between">
+              <div class="text-sm font-extrabold text-slate-900 mt-0.5 font-mono-code flex items-center justify-between">
                 <span>${bestCrossBorder ? bestCrossBorder.time + ' (' + bestCrossBorder.km + ' km)' : '-'}</span>
-                ${bestCrossBorder && bestCrossBorder.mountainPass && isWinter ? '<span class="text-[10px] font-bold text-sky-700 bg-sky-100 px-1.5 py-0.2 rounded border border-sky-300">❄️ Horský prechod</span>' : ''}
+                ${bestCrossBorder && bestCrossBorder.mountainPass && isWinter ? '<span class="text-[10px] font-bold text-slate-700 bg-white px-1.5 py-0.2 rounded border border-slate-300"><i class="fa-solid fa-mountain mr-1"></i>Horský priechod</span>' : ''}
               </div>
             </div>
           </div>
@@ -533,9 +532,9 @@ function runDispatchSimulation() {
           <div class="pt-1.5 border-t border-slate-100/80 flex items-center justify-between flex-wrap gap-1.5">
             <span class="text-[10px] text-slate-400 font-medium">Stav simulácie:</span>
             <div class="flex items-center space-x-1.5">
-              ${isSpecialWinter ? '<span class="text-[10px] px-2 py-0.5 rounded-full bg-sky-100 text-sky-800 font-bold border border-sky-200"><i class="fa-regular fa-snowflake mr-1"></i>Zima aktívna</span>' : ''}
-              ${isSpecialBusy ? '<span class="text-[10px] px-2 py-0.5 rounded-full bg-rose-100 text-rose-800 font-bold border border-rose-200"><i class="fa-solid fa-triangle-exclamation mr-1"></i>MU simulácia</span>' : ''}
-              <span class="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 font-semibold border border-slate-200">${availableRoutes.length} trás</span>
+              ${isSpecialWinter ? '<span class="text-[10px] px-2 py-0.5 rounded bg-sky-50 text-sky-800 font-bold border border-sky-200"><i class="fa-solid fa-snowflake mr-1"></i>Zima aktívna</span>' : ''}
+              ${isSpecialBusy ? '<span class="text-[10px] px-2 py-0.5 rounded bg-rose-50 text-rose-800 font-bold border border-rose-200"><i class="fa-solid fa-triangle-exclamation mr-1"></i>MU simulácia</span>' : ''}
+              <span class="text-[10px] px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-semibold border border-slate-200">${availableRoutes.length} trás</span>
             </div>
           </div>
         </div>
@@ -554,7 +553,7 @@ function setCascadeLevel(level, showNotification = true) {
   const lvlConfig = {
     1: { color: 'emerald', hex: '#059669', name: 'Lokálne sily', btnBg: 'bg-emerald-600', ring: 'ring-emerald-500/80', border: 'border-emerald-500' },
     2: { color: 'sky', hex: '#0284c7', name: 'Regionálna podpora', btnBg: 'bg-sky-600', ring: 'ring-sky-500/80', border: 'border-sky-500' },
-    3: { color: 'rose', hex: '#e11d48', name: 'Celokrajská mobilizácia', btnBg: 'bg-rose-600', ring: 'ring-rose-500/80', border: 'border-rose-500' }
+    3: { color: 'rose', hex: '#dc2626', name: 'Celokrajská podpora', btnBg: 'bg-rose-600', ring: 'ring-rose-500/80', border: 'border-rose-500' }
   };
 
   // Aktualizácia tlačidiel v simulátore
@@ -562,20 +561,9 @@ function setCascadeLevel(level, showNotification = true) {
     const btn = document.getElementById(`btnCascadeLvl${l}`);
     if (btn) {
       if (l === lvlNum) {
-        btn.className = `px-3 py-1.5 rounded-xl text-xs font-bold shadow-sm transition flex items-center justify-center ${lvlConfig[l].btnBg} text-white ring-2 ${lvlConfig[l].ring}`;
+        btn.className = `px-3 py-1.5 rounded text-xs font-bold shadow-xs transition flex items-center justify-center ${lvlConfig[l].btnBg} text-white`;
       } else {
-        btn.className = "px-3 py-1.5 rounded-xl text-xs font-semibold bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 transition flex items-center justify-center";
-      }
-    }
-
-    // Prehľadové karty kaskády
-    const card = document.getElementById(`cascadeCardLvl${l}`);
-    if (card) {
-      card.style.borderTop = `4px solid ${lvlConfig[l].hex}`;
-      if (l === lvlNum) {
-        card.className = `p-5 rounded-2xl bg-white ${lvlConfig[l].border} ring-2 ${lvlConfig[l].ring} shadow-md cursor-pointer transition relative group flex flex-col justify-between`;
-      } else {
-        card.className = "p-5 rounded-2xl bg-slate-50/60 border border-slate-200 hover:border-slate-300 hover:shadow-sm cursor-pointer transition relative group flex flex-col justify-between opacity-85 hover:opacity-100";
+        btn.className = "px-3 py-1.5 rounded text-xs font-semibold bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 transition flex items-center justify-center";
       }
     }
   });
@@ -584,14 +572,14 @@ function setCascadeLevel(level, showNotification = true) {
   const badge = document.getElementById('mapCascadeLevelBadge');
   if (badge) {
     if (lvlNum === 1) {
-      badge.className = "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-900 border border-emerald-300 shadow-sm";
+      badge.className = "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-900 border border-emerald-300";
       badge.innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-600"></span> 1. STUPEŇ: Lokálne sily';
     } else if (lvlNum === 2) {
-      badge.className = "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-sky-50 text-sky-900 border border-sky-300 shadow-sm";
+      badge.className = "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded text-[10px] font-bold bg-sky-50 text-sky-900 border border-sky-300";
       badge.innerHTML = '<span class="w-2 h-2 rounded-full bg-sky-600"></span> 2. STUPEŇ: Regionálna podpora';
     } else {
-      badge.className = "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-rose-50 text-rose-900 border border-rose-300 shadow-sm";
-      badge.innerHTML = '<span class="w-2 h-2 rounded-full bg-rose-600"></span> 3. STUPEŇ: Celokrajská mobilizácia';
+      badge.className = "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded text-[10px] font-bold bg-rose-50 text-rose-900 border border-rose-300";
+      badge.innerHTML = '<span class="w-2 h-2 rounded-full bg-rose-600"></span> 3. STUPEŇ: Celokrajská podpora';
     }
   }
 

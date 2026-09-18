@@ -10,7 +10,7 @@ const REGIONS = [
     shortName: "SEVER",
     fteTotal: 12,
     villagesTotal: 114,
-    color: "#4F6228",
+    color: "#10b981",
     districts: [
       { id: "BB", name: "Banská Bystrica", fte: 7, villages: 42, ags: ["AG1", "AG2", "AG3", "AG4", "AG5", "AG6", "AG7"] },
       { id: "BR", name: "Brezno", fte: 3, villages: 30, ags: ["AG1", "AG2", "AG3"] },
@@ -23,7 +23,7 @@ const REGIONS = [
     shortName: "ZÁPAD",
     fteTotal: 9,
     villagesTotal: 94,
-    color: "#7c3aed",
+    color: "#6366f1",
     districts: [
       { id: "ZV", name: "Zvolen", fte: 3, villages: 26, ags: ["AG2", "AG3", "AG5"] },
       { id: "ZC", name: "Žarnovica", fte: 2, villages: 18, ags: ["AG2", "AG4"] },
@@ -37,7 +37,7 @@ const REGIONS = [
     shortName: "JUH",
     fteTotal: 8,
     villagesTotal: 144,
-    color: "#984806",
+    color: "#f59e0b",
     districts: [
       { id: "KA", name: "Krupina", fte: 2, villages: 36, ags: ["AG3", "AG4"] },
       { id: "VK", name: "Veľký Krtíš", fte: 3, villages: 71, ags: ["AG2", "AG4", "AG6"] },
@@ -50,7 +50,7 @@ const REGIONS = [
     shortName: "VÝCHOD",
     fteTotal: 8,
     villagesTotal: 164,
-    color: "#215868",
+    color: "#0284c7",
     districts: [
       { id: "DT", name: "Detva", fte: 2, villages: 15, ags: ["AG2", "AG3"] },
       { id: "PT", name: "Poltár", fte: 2, villages: 22, ags: ["AG4", "AG6"] },

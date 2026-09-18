@@ -93,11 +93,11 @@ function getRegionPalette(regionId) {
 function getSupportPalette(distId, activeId) {
   if (!activeId) {
     return {
-      fill: '#38bdf8',
-      glow: '#38bdf8',
-      ring: '#7dd3fc',
-      soft: 'rgba(56, 189, 248, 0.22)',
-      text: '#dbeafe'
+      fill: '#1e3a8a',
+      glow: '#3b82f6',
+      ring: '#2563eb',
+      soft: 'rgba(30, 58, 138, 0.15)',
+      text: '#1e293b'
     };
   }
 
@@ -106,27 +106,33 @@ function getSupportPalette(distId, activeId) {
 
   if (!activeRegionId || !districtRegionId) {
     return {
-      fill: '#38bdf8',
-      glow: '#38bdf8',
-      ring: '#7dd3fc',
-      soft: 'rgba(56, 189, 248, 0.22)',
-      text: '#dbeafe'
+      fill: '#1e3a8a',
+      glow: '#3b82f6',
+      ring: '#2563eb',
+      soft: 'rgba(30, 58, 138, 0.15)',
+      text: '#1e293b'
     };
   }
 
-  // Ak pomoc prichádza z rovnakého regiónu -> štandardná modrá / cyan farba
+  // Ak pomoc prichádza z rovnakého regiónu -> inštitucionálna modrá
   if (districtRegionId === activeRegionId) {
     return {
-      fill: '#38bdf8',
-      glow: '#38bdf8',
-      ring: '#7dd3fc',
-      soft: 'rgba(56, 189, 248, 0.22)',
-      text: '#dbeafe'
+      fill: '#1e3a8a',
+      glow: '#3b82f6',
+      ring: '#2563eb',
+      soft: 'rgba(30, 58, 138, 0.15)',
+      text: '#1e293b'
     };
   }
 
-  // Ak pomoc prichádza z iného regiónu -> charakteristická farba posilového regiónu
-  return getRegionPalette(districtRegionId);
+  // Ak pomoc prichádza z iného regiónu -> jantárovo-bronzová (výnimka z regionality)
+  return {
+    fill: '#b45309',
+    glow: '#d97706',
+    ring: '#d97706',
+    soft: 'rgba(180, 83, 9, 0.15)',
+    text: '#78350f'
+  };
 }
 
 /**

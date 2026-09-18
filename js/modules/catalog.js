@@ -36,7 +36,7 @@ function renderAgendasCatalog() {
   AGENDAS.forEach(ag => {
     const card = document.createElement('div');
     card.className = "revolut-agenda-card group";
-    card.style.borderTop = `3px solid ${ag.color}`;
+    card.style.borderTop = `2px solid ${ag.color}`;
     card.title = `Kliknite pre zobrazenie agendy ${ag.id} v matici funkčnej zodpovednosti`;
     card.onclick = () => highlightAgendaInMatrix(ag.id);
     card.onmouseenter = () => {
@@ -52,14 +52,14 @@ function renderAgendasCatalog() {
 
     const isKraj = ag.type === 'KRAJ';
     const typeBadge = isKraj
-      ? `<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wider uppercase bg-amber-50 text-amber-900 border border-amber-300 shadow-sm"><span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>Celokrajská</span>`
-      : `<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wider uppercase bg-slate-100 text-slate-700 border border-slate-200"><span class="w-1.5 h-1.5 rounded-full" style="background-color: ${ag.color};"></span>Regionálna</span>`;
+      ? `<span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-[11px] font-bold tracking-wide uppercase bg-amber-50 text-amber-900 border border-amber-300/80">Celokrajská</span>`
+      : `<span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-[11px] font-semibold tracking-wide uppercase bg-slate-100 text-slate-700 border border-slate-200">Regionálna</span>`;
 
     card.innerHTML = `
       <div class="space-y-3">
         <div class="flex items-center justify-between gap-2">
           <div class="flex items-center space-x-2">
-            <span class="px-2.5 py-1 rounded-lg text-white font-mono-code text-xs font-bold tracking-tight shadow-sm" style="background-color: ${ag.color};">
+            <span class="px-2.5 py-0.5 rounded-md text-white font-mono-code text-xs font-bold tracking-tight shadow-xs" style="background-color: ${ag.color};">
               AG 0${ag.num}
             </span>
             <span class="text-xs font-bold text-slate-400 font-mono-code">${ag.id}</span>
@@ -67,34 +67,32 @@ function renderAgendasCatalog() {
           ${typeBadge}
         </div>
 
-        <h4 class="font-bold text-slate-950 text-base group-hover:text-slate-700 transition-colors leading-snug tracking-tight">
+        <h4 class="font-bold text-slate-900 text-[15px] group-hover:text-slate-700 transition-colors leading-snug tracking-tight">
           ${ag.name}
         </h4>
 
-        <p class="text-xs text-slate-500 leading-relaxed line-clamp-3">
+        <p class="text-[13px] text-slate-600 leading-relaxed line-clamp-3">
           ${ag.desc}
         </p>
       </div>
 
-      <div class="mt-4 pt-3.5 border-t border-slate-100 space-y-2.5">
+      <div class="mt-5 pt-3.5 border-t border-slate-100 space-y-2.5">
         <div class="flex items-center justify-between text-xs">
           <span class="text-slate-500 font-medium">Personálna kapacita:</span>
-          <span class="font-bold text-slate-950 font-mono-code text-sm">${ag.fteTotal} FTE</span>
+          <span class="font-bold text-slate-900 font-mono-code text-[13px]">${ag.fteTotal} FTE</span>
         </div>
 
         <div class="flex items-start justify-between text-xs gap-2">
           <span class="text-slate-500 font-medium shrink-0">Garantujúce okresy:</span>
-          <span class="font-semibold text-slate-700 text-right font-mono-code text-[11px]">${ag.coveredIn.join(' · ')}</span>
+          <span class="font-semibold text-slate-700 text-right font-mono-code text-xs">${ag.coveredIn.join(' · ')}</span>
         </div>
 
-        <div class="pt-2.5 border-t border-slate-100/80 flex items-center justify-between text-xs font-semibold text-slate-900 group-hover:text-slate-950 transition">
+        <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-slate-600 group-hover:text-slate-950 transition">
           <span class="flex items-center gap-1.5">
-            <i class="fa-solid fa-arrow-down text-[10px] text-slate-400"></i>
-            <span>Zobraziť v matici & detail</span>
+            <i class="fa-solid fa-table-cells text-[11px] text-slate-400"></i>
+            <span>Zobraziť v matici</span>
           </span>
-          <span class="w-6 h-6 rounded-full text-white flex items-center justify-center transition shadow-sm" style="background-color: ${ag.color};">
-            <i class="fa-solid fa-arrow-right text-[10px]"></i>
-          </span>
+          <i class="fa-solid fa-arrow-right text-[11px] text-slate-400 group-hover:text-slate-800 group-hover:translate-x-0.5 transition-all"></i>
         </div>
       </div>
     `;
@@ -184,31 +182,31 @@ function renderComparisonTable(filter = 'all') {
     const regColor = regionDotColors[d.region] || '#64748b';
 
     tr.innerHTML = `
-      <td class="p-3 font-medium border-r border-slate-200">
+      <td class="p-3.5 sm:p-4 font-medium border-r border-slate-200">
         <div class="flex items-center space-x-2">
-          <span class="font-bold text-slate-950">${d.name} (${d.id})</span>
+          <span class="font-bold text-slate-950 text-[14px]">${d.name} (${d.id})</span>
           ${isCriticalBadge}
         </div>
-        <div class="text-[10px] text-slate-500 flex items-center gap-1.5 mt-0.5">
+        <div class="text-xs text-slate-500 flex items-center gap-1.5 mt-1">
           <span class="w-2 h-2 rounded-full inline-block" style="background-color: ${regColor};"></span>
           <span>Región ${d.region}</span>
         </div>
       </td>
-      <td class="p-3 text-center border-r border-slate-200 font-mono-code font-semibold text-slate-800">${d.villages}</td>
-      <td class="p-3 text-center border-r border-slate-200 font-mono-code font-bold ${d.isCritical ? 'text-rose-700 bg-rose-50/50' : 'text-sky-700'}">${d.fte} FTE</td>
-      <td class="p-3 border-r border-slate-200 bg-rose-50/60 text-slate-800">
-        <div class="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-rose-700 bg-rose-100/80 px-2 py-0.5 rounded border border-rose-200 mb-1.5">
+      <td class="p-3.5 sm:p-4 text-center border-r border-slate-200 font-mono-code font-semibold text-slate-800 text-[13px]">${d.villages}</td>
+      <td class="p-3.5 sm:p-4 text-center border-r border-slate-200 font-mono-code font-bold text-[13px] ${d.isCritical ? 'text-rose-700 bg-rose-50/50' : 'text-sky-700'}">${d.fte} FTE</td>
+      <td class="p-3.5 sm:p-4 border-r border-slate-200 bg-rose-50/40 text-slate-800">
+        <div class="inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider text-rose-700 bg-rose-100/80 px-2 py-0.5 rounded border border-rose-200/80 mb-2">
           <i class="fa-solid fa-circle-xmark text-rose-500"></i>
           <span>Starý stav: 7 agend bez zastúpenia</span>
         </div>
-        <p class="text-[11px] leading-relaxed text-slate-700">${d.oldNote}</p>
+        <p class="text-xs leading-relaxed text-slate-700">${d.oldNote}</p>
       </td>
-      <td class="p-3 bg-emerald-50/60 text-slate-800">
-        <div class="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-100/80 px-2 py-0.5 rounded border border-emerald-200 mb-1.5">
+      <td class="p-3.5 sm:p-4 bg-emerald-50/40 text-slate-800">
+        <div class="inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-100/80 px-2 py-0.5 rounded border border-emerald-200/80 mb-2">
           <i class="fa-solid fa-circle-check text-emerald-600"></i>
           <span>Nový stav: Špecializácia & Región</span>
         </div>
-        <p class="text-[11px] leading-relaxed text-slate-700">${d.newNote}</p>
+        <p class="text-xs leading-relaxed text-slate-700">${d.newNote}</p>
       </td>
     `;
 

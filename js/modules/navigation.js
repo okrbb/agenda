@@ -47,26 +47,27 @@ function scrollToComparisonMatrix() {
 }
 
 /**
- * Inicializácia obojsmerného ScrollSpy pre plávajúci Pill Dock
+ * Inicializácia obojsmerného ScrollSpy pre sticky navigačnú lištu
  */
 function initScrollSpy() {
-  const dockPills = document.querySelectorAll('.floating-dock-pill');
-  if (!dockPills.length) return;
+  const navLinks = document.querySelectorAll('.subnav-link, .floating-dock-pill');
+  if (!navLinks.length) return;
 
-  const sectionIds = Array.from(dockPills).map(pill => pill.getAttribute('data-section')).filter(Boolean);
-  const sections = sectionIds.map(id => document.getElementById(id)).filter(Boolean);
+  const sectionIds = Array.from(navLinks).map(link => link.getAttribute('data-section')).filter(Boolean);
+  const uniqueSectionIds = [...new Set(sectionIds)];
+  const sections = uniqueSectionIds.map(id => document.getElementById(id)).filter(Boolean);
 
   if (!sections.length) return;
 
-  function setActivePill(activeId) {
-    dockPills.forEach(pill => {
-      const pillSection = pill.getAttribute('data-section');
-      if (pillSection === activeId) {
-        pill.classList.add('active');
-        pill.setAttribute('aria-current', 'true');
+  function setActiveLink(activeId) {
+    navLinks.forEach(link => {
+      const linkSection = link.getAttribute('data-section');
+      if (linkSection === activeId) {
+        link.classList.add('active');
+        link.setAttribute('aria-current', 'true');
       } else {
-        pill.classList.remove('active');
-        pill.removeAttribute('aria-current');
+        link.classList.remove('active');
+        link.removeAttribute('aria-current');
       }
     });
   }
@@ -74,28 +75,28 @@ function initScrollSpy() {
   // Použitie IntersectionObserver s upraveným horným/dolným offsetom
   const observerOptions = {
     root: null,
-    rootMargin: '-18% 0px -60% 0px',
+    rootMargin: '-15% 0px -60% 0px',
     threshold: 0
   };
 
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
-        setActivePill(entry.target.id);
+        setActiveLink(entry.target.id);
       }
     });
   }, observerOptions);
 
   sections.forEach(sec => observer.observe(sec));
 
-  // Kliknutie na pill v docku
-  dockPills.forEach(pill => {
-    pill.addEventListener('click', (e) => {
+  // Kliknutie na link v navigácii
+  navLinks.forEach(link => {
+    link.addEventListener('click', (e) => {
       e.preventDefault();
-      const secId = pill.getAttribute('data-section');
+      const secId = link.getAttribute('data-section');
       if (secId) {
         scrollToSection(secId);
-        setActivePill(secId);
+        setActiveLink(secId);
       }
     });
   });
